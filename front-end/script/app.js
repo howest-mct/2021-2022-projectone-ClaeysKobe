@@ -1,11 +1,11 @@
 'use strict';
-let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll
+let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll, htmlLidStatus
 
 const lanIP = `${window.location.hostname}:5000`;
 const socket = io(`http://${lanIP}`);
 
 const showHistory = function(jsonObject) {
-  console.log(jsonObject);
+  // console.log(jsonObject);
   let stringHTML = '';
   for (const sensorInfo of jsonObject.sensors){
     stringHTML += `<tr>
@@ -15,6 +15,17 @@ const showHistory = function(jsonObject) {
   }
   document.querySelector('.js-table').innerHTML = stringHTML;
 };
+
+const showLidStatus = function(payload) {
+  if (payload.status == 0) {
+    htmlLidStatus.innerHTML = `Gesloten`
+    htmlLidStatus.classList.remove('u-clr-main');
+  }
+  else {
+    htmlLidStatus.innerHTML = `Geopend`
+    htmlLidStatus.classList.add('u-clr-main');
+  }
+}
 
 const loadHistoryToday = function () {
   const url = `http://192.168.168.169:5000/api/v1/sensors/today/`;
@@ -71,9 +82,12 @@ const listenToUI = function () {
 };
 
 const listenToSocket = function () {
-  socket.on("connected", function () {
+  socket.on('connected', function () {
     console.log("verbonden met socket webserver");
   });
+  socket.on('B2F_change_magnet', function (payload) {
+    showLidStatus(payload)
+  })
 };
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -81,7 +95,8 @@ document.addEventListener("DOMContentLoaded", function () {
   htmlBoxOpen = document.querySelector('.js-boxopen');
   htmlBoxClose = document.querySelector('.js-boxclose');
   htmlHistoryToday = document.querySelector('.js-historytoday');
-  htmlHistoryAll = document.querySelector('.js-historyall')
+  htmlHistoryAll = document.querySelector('.js-historyall');
+  htmlLidStatus = document.querySelector('.js-lid')
   listenToUI();
   listenToSocket();
   loadHistoryToday();

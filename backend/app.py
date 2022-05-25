@@ -14,18 +14,23 @@ from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
 
 
-ledPin = 16
-btnPin = Button(6)
+magnetPin = 17
+# btnPin = Button(6)
+
+# Default variables
+magnet_status = 0
+prev_magnet_status = 0
 
 # Code voor Hardware
 
 
-# def setup_gpio():
-#     GPIO.setwarnings(False)
-#     GPIO.setmode(GPIO.BCM)
+def setup_gpio():
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
 
-#     GPIO.setup(ledPin, GPIO.OUT)
-#     GPIO.output(ledPin, GPIO.LOW)
+    GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(ledPin, GPIO.OUT)
+    # GPIO.output(ledPin, GPIO.LOW)
 
 #     btnPin.on_press(lees_knop)
 
@@ -85,27 +90,26 @@ def sensors():
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
-    # # Send to the client!
-    # vraag de status op van de lampen uit de DB
-    # status = DataRepository.read_status_lampen()
-    # emit('B2F_status_lampen', {'lampen': status}, broadcast=True)
+    # Send to the client!
+    emit('B2F_change_magnet', {'status': magnet_status}, broadcast=True)
 
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
-def all_out():
+def read_sensors():
     while True:
-        print('*** We zetten alles uit **')
-        DataRepository.update_status_alle_lampen(0)
-        GPIO.output(ledPin, 0)
-        status = DataRepository.read_status_lampen()
-        socketio.emit('B2F_status_lampen', {'lampen': status})
-        time.sleep(15)
+        global magnet_status
+        global prev_magnet_status
+        magnet_status = GPIO.input(magnetPin)
+        if magnet_status != prev_magnet_status:
+            socketio.emit('B2F_change_magnet', {
+                          'status': magnet_status}, broadcast=True)
+        prev_magnet_status = magnet_status
 
 
 def start_thread():
     print("**** Starting THREAD ****")
-    thread = threading.Thread(target=all_out, args=(), daemon=True)
+    thread = threading.Thread(target=read_sensors, args=(), daemon=True)
     thread.start()
 
 
@@ -150,8 +154,8 @@ def start_chrome_thread():
 
 if __name__ == '__main__':
     try:
-        # setup_gpio()
-        # start_thread()
+        setup_gpio()
+        start_thread()
         start_chrome_thread()
         print("**** Starting APP ****")
         socketio.run(app, debug=False, host='0.0.0.0')

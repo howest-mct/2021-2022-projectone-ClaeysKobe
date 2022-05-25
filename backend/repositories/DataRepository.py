@@ -12,7 +12,7 @@ class DataRepository:
 
     @staticmethod
     def read_sensor_gesch():
-        sql = "SELECT * from historiek"
+        sql = "SELECT * from historiek order by actiedatum DESC"
         return Database.get_rows(sql)
 
     @staticmethod

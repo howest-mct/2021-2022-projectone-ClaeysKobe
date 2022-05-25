@@ -108,11 +108,22 @@ def initial_connection():
 def open_box():
     print('Box opened via PC')
     # Add change to database
-    answer = DataRepository.open_box(0, "Lock geopend")
+    answer = DataRepository.insert_box_value(0, "Lock geopend")
     print(answer)
     # Send to the client!
-    emit('B2F_change_magnet', {'status': answer}, broadcast=True)
+    socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
+    socketio.emit('B2F_refresh_history', broadcast=True)
 
+
+@socketio.on('F2B_closeBox')
+def open_box():
+    print('Box closed via PC')
+    # Add change to database
+    answer = DataRepository.insert_box_value(1, "Lock gesloten")
+    print(answer)
+    # Send to the client!
+    socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
+    socketio.emit('B2F_refresh_history', broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.

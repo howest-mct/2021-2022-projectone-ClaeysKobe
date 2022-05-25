@@ -1,20 +1,35 @@
 'use strict';
-let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll, htmlLidStatus
+let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll, htmlLidStatus, historyToday, historyAll
 
 const lanIP = `${window.location.hostname}:5000`;
 const socket = io(`http://${lanIP}`);
 
-const showHistory = function(jsonObject) {
+const showHistoryToday = function(jsonObject) {
   // console.log(jsonObject);
   let stringHTML = '';
   for (const sensorInfo of jsonObject.sensors){
+    const datum = sensorInfo.actiedatum.split(' ')
     stringHTML += `<tr>
-                            <td>${sensorInfo.actiedatum}</td>
-                            <td>${sensorInfo.waarde}</td>
+                            <td>${datum[4]}</td>
+                            <td>${sensorInfo.commentaar}</td>
                         </tr>`
   }
   document.querySelector('.js-table').innerHTML = stringHTML;
 };
+
+const showHistoryAll = function(jsonObject) {
+  // console.log(jsonObject);
+  let stringHTML = '';
+  for (const sensorInfo of jsonObject.sensors){
+    const datum = sensorInfo.actiedatum.split(' ')
+    const showDatum = datum[1] + ' ' + datum[2] + ' ' + datum[3]
+    stringHTML += `<tr>
+                            <td>${showDatum}</td>
+                            <td>${sensorInfo.commentaar}</td>
+                        </tr>`
+  }
+  document.querySelector('.js-table').innerHTML = stringHTML;
+}
 
 const showLidStatus = function(payload) {
   if (payload.status == 0) {
@@ -29,12 +44,17 @@ const showLidStatus = function(payload) {
 
 const loadHistoryToday = function () {
   const url = `http://192.168.168.169:5000/api/v1/sensors/today/`;
-  handleData(url, showHistory);
+  handleData(url, showHistoryToday);
 };
 
 const loadHistoryAll = function () {
   const url = `http://192.168.168.169:5000/api/v1/sensors/`;
-  handleData(url, showHistory);
+  handleData(url, showHistoryAll);
+}
+
+const loadLidStatus = function () {
+  const url = `http://192.168.168.169:5000/api/v1/sensors/lid/`
+  handleData(url,showLidStatus)
 }
 
 const listenToUI = function () {
@@ -48,6 +68,7 @@ const listenToUI = function () {
       htmlBoxClose.classList.add('c-btn--unselected');
       htmlBoxClose.classList.remove('c-btn--selected');
       htmlBoxClose.classList.remove('u-no-clicking');
+      socket.emit('F2B_openBox')
     });
     htmlBoxClose.addEventListener('click', function () {
       console.log('Setting box Locked');
@@ -58,6 +79,7 @@ const listenToUI = function () {
       htmlBoxOpen.classList.add('c-btn--unselected');
       htmlBoxOpen.classList.remove('c-btn--selected');
       htmlBoxOpen.classList.remove('u-no-clicking');
+      socket.emit('F2B_closeBox')
     })
 
     // toggle history showings
@@ -68,6 +90,10 @@ const listenToUI = function () {
       // other element
       htmlHistoryAll.classList.add('c-btn--unselected');
       htmlHistoryAll.classList.remove('c-btn--selected');
+      // setting globals
+      historyToday = true;
+      historyAll = false;
+      // load history
       loadHistoryToday();
     })
     htmlHistoryAll.addEventListener('click', function () {
@@ -77,6 +103,10 @@ const listenToUI = function () {
       // other element
       htmlHistoryToday.classList.add('c-btn--unselected');
       htmlHistoryToday.classList.remove('c-btn--selected');
+      // setting globals
+      historyToday = false;
+      historyAll = true;
+      // load history
       loadHistoryAll();
     })
 };
@@ -87,6 +117,13 @@ const listenToSocket = function () {
   });
   socket.on('B2F_change_magnet', function (payload) {
     showLidStatus(payload)
+  })
+  socket.on('B2F_refresh_history', function (payload) {
+    if (historyAll == true) {
+      loadHistoryAll();
+    } else {
+      loadHistoryToday();
+    }
   })
 };
 
@@ -100,41 +137,5 @@ document.addEventListener("DOMContentLoaded", function () {
   listenToUI();
   listenToSocket();
   loadHistoryToday();
+  loadLidStatus()
 });
-
-const handleData = function (url, callbackFunctionName, callbackErrorFunctionName = null, method = 'GET', body = null) {
-  fetch(url, {
-  method: method,
-  body: body,
-  headers: {
-    'content-type': 'application/json'
-  },
-  })
-  .then(function(response) {
-    if (!response.ok) {
-      console.warn(`>> Probleem bij de fetch(). Statuscode: ${response.status}`);
-      if (callbackErrorFunctionName) {
-        console.warn(`>> Callback errorfunctie ${callbackErrorFunctionName.name}(response) wordt opgeroepen`);
-        callbackErrorFunctionName(response); 
-      } else {
-        console.warn('>> Er is geen callback errorfunctie meegegeven als parameter');
-      }
-    } else {
-      console.info('>> Er is een response teruggekomen van de server');
-      return response.json();
-    }
-  })
-  .then(function(jsonObject) {
-    if (jsonObject) {
-      console.info('>> JSONobject is aangemaakt');
-      console.info(`>> Callbackfunctie ${callbackFunctionName.name}(response) wordt opgeroepen`);
-      callbackFunctionName(jsonObject);
-    }
-  })
-  .catch(function(error) {
-    console.warn(`>>fout bij verwerken json: ${error}`);
-      if (callbackErrorFunctionName) {
-      callbackErrorFunctionName(undefined);
-    }
-  })
-};

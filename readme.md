@@ -1,25 +1,21 @@
-# Project One - Name of the project
+# Project One - YouGotMailBox
 
-**De inhoud van dit document schrijf je volledig in het Engels**
-
-Omschrijf het project. Doe dit in het markdown formaat.
-- [Syntax md](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-
-Hoe kan een externe persoon (die niets weet over de "ProjectOne" opdracht) het project snel runnen op de eigen pc?
-Op github vind je verschillende voorbeelden hoe je een readme.md bestand kan structureren.
-- [Voorbeeld 1](https://github.com/othneildrew/Best-README-Template)
-- [Voorbeeld 2](https://github.com/tsungtwu/flask-example/blob/master/README.md)
-- [Voorbeeld 3](https://github.com/twbs/bootstrap/blob/main/README.md)
-- [Voorbeeld 4](https://www.makeareadme.com/)
-
-## Inhoud
-Zoals je kan zien is er geen "vaste" structuur voor zo'n document. Je bepaalt zelf hoe je het bestand via markdown structureert. Zorg ervoor dat het document minimaal op volgende vragen een antwoord biedt.
-
-- Wat is de structuur van het project?
-- Wat moet er gebeuren met de database? Hoe krijgt de persoon dit up and running?
-- Moeten er settings worden veranderd in de backend code voor de database? 
-- Runt de back- en front-end code direct? Of moeten er nog commando's worden ingegeven?
-- Zijn er poorten die extra aandacht vereisen in de back- en/of front-end code?
+## What is this?
+This is code for smart mailbox, that shows you (on your website) when you get a new letter, when someone opens the lid of your mailbox, or when someone unlocks the back door via RFID/pc
+The code consists of a website with css and javascript, a SQL database, backend and control of the devices. You can ofcourse change everything to suit your needs (new website for example).
   
+## MySQL database
+### Setup
+- Start MySQLWorkbench on your laptop and open a new connection
+-- Choose Standard TCP/IP over SSH for Connection Method
+-- SSH Hostname: 192.168.168.169
+-- SSH Username: student
+-- SSH Password: W8w00rd
+-- MySQL Hostname: 127.0.0.1
+-- MySQL Server Port: 3306
+-- Username: student
+-- Password: W8w00rd
+No settings need to be changed in the config.py (except when change your ip)
+
 ## Instructables
 Plaats zeker een link naar de Instructables zodat het project kan nagebouwd worden!

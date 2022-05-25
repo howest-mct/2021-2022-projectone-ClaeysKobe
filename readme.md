@@ -7,14 +7,14 @@ The code consists of a website with css and javascript, a SQL database, backend 
 ## MySQL database
 ### Setup
 - Start MySQLWorkbench on your laptop and open a new connection
--- Choose Standard TCP/IP over SSH for Connection Method
--- SSH Hostname: 192.168.168.169
--- SSH Username: student
--- SSH Password: W8w00rd
--- MySQL Hostname: 127.0.0.1
--- MySQL Server Port: 3306
--- Username: student
--- Password: W8w00rd
+- Choose Standard TCP/IP over SSH for Connection Method
+- SSH Hostname: 192.168.168.169
+- SSH Username: student
+- SSH Password: W8w00rd
+- MySQL Hostname: 127.0.0.1
+- MySQL Server Port: 3306
+- Username: student
+- Password: W8w00rd
 No settings need to be changed in the config.py (except when change your ip)
 
 ## Instructables

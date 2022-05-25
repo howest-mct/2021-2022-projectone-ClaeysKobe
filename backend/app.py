@@ -87,6 +87,16 @@ def sensors():
             return jsonify(data="ERROR"), 404
 
 
+@app.route(endpoint + '/sensors/lid/', methods=['GET'])
+def sensors_lid():
+    if request.method == 'GET':
+        data = DataRepository.read_latest_lid()
+        if data is not None:
+            return jsonify(sensors=data), 200
+        else:
+            return jsonify(data="ERROR"), 404
+
+
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
@@ -94,16 +104,37 @@ def initial_connection():
     emit('B2F_change_magnet', {'status': magnet_status}, broadcast=True)
 
 
+@socketio.on('F2B_openBox')
+def open_box():
+    print('Box opened via PC')
+    # Add change to database
+    answer = DataRepository.open_box(0, "Lock geopend")
+    print(answer)
+    # Send to the client!
+    emit('B2F_change_magnet', {'status': answer}, broadcast=True)
+
+
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
+
+
 def read_sensors():
     while True:
         global magnet_status
         global prev_magnet_status
         magnet_status = GPIO.input(magnetPin)
         if magnet_status != prev_magnet_status:
+            beschrijving = ''
+            if magnet_status == 0:
+                beschrijving = "Brievenbusklep gesloten"
+            else:
+                beschrijving = "brievenbusklep geopend"
+            answer = DataRepository.insert_magnet_value(
+                magnet_status, beschrijving)
+            print(f"New magnet value: {answer}")
             socketio.emit('B2F_change_magnet', {
                           'status': magnet_status}, broadcast=True)
+            socketio.emit('B2F_refresh_history', broadcast=True)
         prev_magnet_status = magnet_status
 
 

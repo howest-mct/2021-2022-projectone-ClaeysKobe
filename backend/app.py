@@ -86,7 +86,7 @@ def hallo():
     return "Server is running."
 
 
-@app.route(endpoint + '/sensors/today/', methods=['GET'])
+@app.route(endpoint + '/events/today/', methods=['GET'])
 def sens_today():
     if request.method == 'GET':
         data = DataRepository.read_sensor_gesch_today()
@@ -96,7 +96,7 @@ def sens_today():
             return jsonify(data="ERROR"), 404
 
 
-@app.route(endpoint + '/sensors/', methods=['GET'])
+@app.route(endpoint + '/events/', methods=['GET'])
 def sensors():
     if request.method == 'GET':
         data = DataRepository.read_sensor_gesch()
@@ -106,10 +106,20 @@ def sensors():
             return jsonify(data="ERROR"), 404
 
 
-@app.route(endpoint + '/sensors/lid/', methods=['GET'])
+@app.route(endpoint + '/events/lid/', methods=['GET'])
 def sensors_lid():
     if request.method == 'GET':
         data = DataRepository.read_latest_lid()
+        if data is not None:
+            return jsonify(sensors=data), 200
+        else:
+            return jsonify(data="ERROR"), 404
+
+
+@app.route(endpoint + '/events/letters/', methods=['GET'])
+def sensors_letters():
+    if request.method == 'GET':
+        data = len(DataRepository.read_brieven_today())
         if data is not None:
             return jsonify(sensors=data), 200
         else:

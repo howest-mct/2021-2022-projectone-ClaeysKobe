@@ -1,5 +1,5 @@
 'use strict';
-let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll, htmlLidStatus, historyToday, historyAll
+let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll,  htmlLettersToday, htmlLidStatus, historyToday, historyAll
 
 const lanIP = `${window.location.hostname}:5000`;
 const socket = io(`http://${lanIP}`);
@@ -13,7 +13,7 @@ const showHistoryToday = function(jsonObject) {
                             <td>${datum[4]}</td>
                             <td>${sensorInfo.opmerking}</td>
                         </tr>`
-  }
+  };
   document.querySelector('.js-table').innerHTML = stringHTML;
 };
 
@@ -27,34 +27,50 @@ const showHistoryAll = function(jsonObject) {
                             <td>${showDatum}</td>
                             <td>${sensorInfo.opmerking}</td>
                         </tr>`
-  }
+  };
   document.querySelector('.js-table').innerHTML = stringHTML;
-}
+};
 
 const showLidStatus = function(payload) {
   if (payload.status == 0) {
-    htmlLidStatus.innerHTML = `Gesloten`
+    htmlLidStatus.innerHTML = `Gesloten`;
     htmlLidStatus.classList.remove('u-clr-main');
   }
   else {
-    htmlLidStatus.innerHTML = `Geopend`
+    htmlLidStatus.innerHTML = `Geopend`;
     htmlLidStatus.classList.add('u-clr-main');
-  }
-}
+  };
+};
+
+const showLetters = function(payload) {
+  console.log(payload.sensors)
+  if (payload.sensors > 1) {
+    htmlLettersToday.innerHTML = payload.sensors;
+  } else if (payload.sensors == 1) {
+    htmlLettersToday.innerHTML = '1 brief';
+  } else {
+    htmlLettersToday.innerHTML = '--';
+  };
+};
 
 const loadHistoryToday = function () {
-  const url = `http://192.168.168.169:5000/api/v1/sensors/today/`;
+  const url = `http://192.168.168.169:5000/api/v1/events/today/`;
   handleData(url, showHistoryToday);
 };
 
 const loadHistoryAll = function () {
-  const url = `http://192.168.168.169:5000/api/v1/sensors/`;
+  const url = `http://192.168.168.169:5000/api/v1/events/`;
   handleData(url, showHistoryAll);
 }
 
 const loadLidStatus = function () {
-  const url = `http://192.168.168.169:5000/api/v1/sensors/lid/`
-  handleData(url,showLidStatus)
+  const url = `http://192.168.168.169:5000/api/v1/events/lid/`;
+  handleData(url,showLidStatus);
+}
+
+const loadLettersToday = function () {
+  const url = `http://192.168.168.169:5000/api/v1/events/letters/`;
+  handleData(url,showLetters);
 }
 
 const listenToUI = function () {
@@ -133,9 +149,11 @@ document.addEventListener("DOMContentLoaded", function () {
   htmlBoxClose = document.querySelector('.js-boxclose');
   htmlHistoryToday = document.querySelector('.js-historytoday');
   htmlHistoryAll = document.querySelector('.js-historyall');
-  htmlLidStatus = document.querySelector('.js-lid')
+  htmlLidStatus = document.querySelector('.js-lid');
+  htmlLettersToday = document.querySelector('.js-brievenaantal');
   listenToUI();
   listenToSocket();
   loadHistoryToday();
-  loadLidStatus()
+  loadLidStatus();
+  loadLettersToday();
 });

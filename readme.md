@@ -8,14 +8,9 @@ The code consists of a website with css and javascript, a SQL database, backend 
 ### Setup
 - Start MySQLWorkbench on your laptop and open a new connection
 - Choose Standard TCP/IP over SSH for Connection Method
-- SSH Hostname: 192.168.168.169
-- SSH Username: student
-- SSH Password: W8w00rd
-- MySQL Hostname: 127.0.0.1
-- MySQL Server Port: 3306
-- Username: student
-- Password: W8w00rd
-No settings need to be changed in the config.py (except when change your ip)
+- Fill in all the other details
+- when you are done, execute the projectonedb.sql file in your MySQLWorkbench
+- update the config.py to match your settings
 
 ## Instructables
 Plaats zeker een link naar de Instructables zodat het project kan nagebouwd worden!

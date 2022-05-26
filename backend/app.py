@@ -41,7 +41,8 @@ def setup_gpio():
     lcd_module = LCD_Module(16, 20)
     # aantal brieven vandaag setten
     global brieven_vandaag
-    # brieven_vandaag = len(DataRepository.read_brieven_today())
+    brieven_vandaag = len(DataRepository.read_brieven_today())
+    show_brieven_vandaag()
 
     btnPin.on_press(lees_knop)
 
@@ -52,7 +53,14 @@ def lees_knop(pin):
         ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
         lcd_module.write_message(ip)
         time.sleep(5)
-        lcd_module.write_message(ip)
+        show_brieven_vandaag()
+
+
+def show_brieven_vandaag():
+    if brieven_vandaag > 0:
+        lcd_module.write_message(f"Brieven vandaag:{brieven_vandaag}")
+    else:
+        lcd_module.write_message(f"Nog geen brieven ontvangen")
 
 
 # Code voor Flask

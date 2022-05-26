@@ -56,6 +56,7 @@ class DataRepository:
         params = [beschrijving, status]
         return Database.execute_sql(sql, params)
 
+    @staticmethod
     def insert_box_scanner(parid, beschrijving):
         sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES( (Select gebruikersID from gebruiker where rfid_code like %s) , 7, now(), %s, null)"
         params = [parid, beschrijving]

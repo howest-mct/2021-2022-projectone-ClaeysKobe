@@ -1,7 +1,9 @@
 import time
 from RPi import GPIO
 from helpers.klasseknop import Button
+from classes.lcd_class import LCD_Module
 import threading
+import netifaces as ni
 
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
@@ -16,11 +18,13 @@ from selenium import webdriver
 
 
 magnetPin = 17
+btnPin = Button(21)
 
 # Default variables
 magnet_status = 0
 prev_magnet_status = 0
 lock_opened = False
+brieven_vandaag = f""
 # Code voor Hardware
 
 
@@ -32,17 +36,23 @@ def setup_gpio():
     # rfid-reader
     global reader
     reader = SimpleMFRC522()
-    # GPIO.setup(ledPin, GPIO.OUT)
-    # GPIO.output(ledPin, GPIO.LOW)
+    # lcd
+    global lcd_module
+    lcd_module = LCD_Module(16, 20)
+    # aantal brieven vandaag setten
+    global brieven_vandaag
+    brieven_vandaag = len(DataRepository.read_brieven_today())
+
+    btnPin.on_press(lees_knop)
 
 
-# def lees_knop(pin):
-#     if btnPin.pressed:
-#         print("**** button pressed ****")
-#         if GPIO.input(ledPin) == 1:
-#             switch_light({'lamp_id': '3', 'new_status': 0})
-#         else:
-#             switch_light({'lamp_id': '3', 'new_status': 1})
+def lees_knop(pin):
+    if btnPin.pressed:
+        print("**** button pressed: showing IP ****")
+        ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+        lcd_module.write_message(ip)
+        time.sleep(5)
+        lcd_module.write_message(ip)
 
 
 # Code voor Flask
@@ -165,15 +175,20 @@ def read_rfid():
             socketio.emit('B2F_refresh_history', broadcast=True)
 
 
-def start_thread():
+def start_thread_magnet():
     print("**** Starting THREADS ****")
     thread = threading.Thread(target=read_sensor_magnet, args=(), daemon=True)
     thread.start()
 
 
-def start_thread2():
+def start_thread_rfid():
     thread2 = threading.Thread(target=read_rfid, args=(), daemon=True)
     thread2.start()
+
+
+def start_threads():
+    start_thread_magnet()
+    start_thread_rfid()
 
 
 def start_chrome_kiosk():
@@ -218,8 +233,7 @@ def start_chrome_thread():
 if __name__ == '__main__':
     try:
         setup_gpio()
-        start_thread()
-        start_thread2()
+        start_threads()
         start_chrome_thread()
         print("**** Starting APP ****")
         socketio.run(app, debug=False, host='0.0.0.0')

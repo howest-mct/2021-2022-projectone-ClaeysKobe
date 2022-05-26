@@ -21,13 +21,19 @@ class DataRepository:
         return Database.get_rows(sql)
 
     @staticmethod
+    def read_brieven_today(status, beschrijving):
+        sql = "select * from historiek where cast(actiedatum as Date) = cast(now() as Date) AND"
+        params = [status, beschrijving]
+        return Database.execute_sql(sql, params)
+
+    @staticmethod
     def read_latest_lid():
         sql = "select * from historiek where cast(actiedatum as Date) = cast(now() as Date) order by actiedatum DESC LIMIT 1"
         return Database.get_one_row(sql)
 
     @staticmethod
     def insert_magnet_value(status, beschrijving):
-        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 12, 7)"
+        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 12, 5)"
         params = [status, beschrijving]
         return Database.execute_sql(sql, params)
 
@@ -39,6 +45,6 @@ class DataRepository:
 
     @staticmethod
     def insert_rfid_value(status, beschrijving):
-        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 11, 1)"
+        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 7, 6)"
         params = [status, beschrijving]
         return Database.execute_sql(sql, params)

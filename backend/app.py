@@ -7,6 +7,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 from flask import Flask, jsonify, request
 from repositories.DataRepository import DataRepository
+from mfrc522 import SimpleMFRC522
 
 from selenium import webdriver
 
@@ -15,12 +16,11 @@ from selenium import webdriver
 
 
 magnetPin = 17
-# btnPin = Button(6)
 
 # Default variables
 magnet_status = 0
 prev_magnet_status = 0
-
+lock_opened = False
 # Code voor Hardware
 
 
@@ -29,10 +29,11 @@ def setup_gpio():
     GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # rfid-reader
+    global reader
+    reader = SimpleMFRC522()
     # GPIO.setup(ledPin, GPIO.OUT)
     # GPIO.output(ledPin, GPIO.LOW)
-
-#     btnPin.on_press(lees_knop)
 
 
 # def lees_knop(pin):
@@ -129,7 +130,7 @@ def open_box():
 # werk enkel met de packages gevent en gevent-websocket.
 
 
-def read_sensors():
+def read_sensor_magnet():
     while True:
         global magnet_status
         global prev_magnet_status
@@ -149,10 +150,30 @@ def read_sensors():
         prev_magnet_status = magnet_status
 
 
+def read_rfid():
+    global lock_opened
+    while True:
+        id, text = reader.read()
+        if id != " ":
+            print("ID: %s\nText: %s" % (id, text))
+            lock_opened = not lock_opened
+            if lock_opened == True:
+                beschrijving = f"{text} Unlocked your mailbox"
+            else:
+                beschrijving = f"{text} Locked your mailbox"
+            answer = DataRepository.insert_rfid_value(id, beschrijving)
+            socketio.emit('B2F_refresh_history', broadcast=True)
+
+
 def start_thread():
-    print("**** Starting THREAD ****")
-    thread = threading.Thread(target=read_sensors, args=(), daemon=True)
+    print("**** Starting THREADS ****")
+    thread = threading.Thread(target=read_sensor_magnet, args=(), daemon=True)
     thread.start()
+
+
+def start_thread2():
+    thread2 = threading.Thread(target=read_rfid, args=(), daemon=True)
+    thread2.start()
 
 
 def start_chrome_kiosk():
@@ -198,6 +219,7 @@ if __name__ == '__main__':
     try:
         setup_gpio()
         start_thread()
+        start_thread2()
         start_chrome_thread()
         print("**** Starting APP ****")
         socketio.run(app, debug=False, host='0.0.0.0')

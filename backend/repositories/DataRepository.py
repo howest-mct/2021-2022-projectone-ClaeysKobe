@@ -36,3 +36,9 @@ class DataRepository:
         sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 11, 6)"
         params = [status, beschrijving]
         return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def insert_rfid_value(status, beschrijving):
+        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 11, 1)"
+        params = [status, beschrijving]
+        return Database.execute_sql(sql, params)

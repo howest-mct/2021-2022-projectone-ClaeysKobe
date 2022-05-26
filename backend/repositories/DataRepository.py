@@ -10,35 +10,54 @@ class DataRepository:
             gegevens = request.form.to_dict()
         return gegevens
 
-    @staticmethod
-    def read_sensor_gesch():
-        sql = "SELECT * from historiek order by actiedatum DESC"
-        return Database.get_rows(sql)
-
-    @staticmethod
-    def read_sensor_gesch_today():
-        sql = "select * from historiek where cast(actiedatum as Date) = cast(now() as Date) order by actiedatum DESC"
-        return Database.get_rows(sql)
-
-    @staticmethod
-    def read_latest_lid():
-        sql = "select * from historiek where cast(actiedatum as Date) = cast(now() as Date) order by actiedatum DESC LIMIT 1"
-        return Database.get_one_row(sql)
-
+    # --- LOGGING SENSORS / ACTUATORS ---
     @staticmethod
     def insert_magnet_value(status, beschrijving):
-        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 12, 7)"
-        params = [status, beschrijving]
-        return Database.execute_sql(sql, params)
-
-    @staticmethod
-    def insert_box_value(status, beschrijving):
-        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 11, 6)"
+        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 14, 5)"
         params = [status, beschrijving]
         return Database.execute_sql(sql, params)
 
     @staticmethod
     def insert_rfid_value(status, beschrijving):
-        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 11, 1)"
+        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) VALUES(now(), %s, %s, 7, 6)"
         params = [status, beschrijving]
+        return Database.execute_sql(sql, params)
+
+    # --- Mailbox Events ---
+    @staticmethod
+    def read_sensor_gesch():
+        sql = "SELECT * from brievenbusevent order by date DESC"
+        return Database.get_rows(sql)
+
+    @staticmethod
+    def read_sensor_gesch_today():
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC"
+        return Database.get_rows(sql)
+
+    @staticmethod
+    def read_brieven_today():
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and actieID = 3"
+        return Database.get_rows(sql)
+
+    @staticmethod
+    def read_latest_lid():
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC LIMIT 1"
+        return Database.get_one_row(sql)
+
+    @staticmethod
+    def insert_lid(status, beschrijving):
+        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES(null, 5, now(), %s, %s)"
+        params = [beschrijving, status]
+        return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def insert_box_site(status, beschrijving):
+        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES(null, 7, now(), %s, %s)"
+        params = [beschrijving, status]
+        return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def insert_box_scanner(parid, beschrijving):
+        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES( (Select gebruikersID from gebruiker where rfid_code like %s) , 7, now(), %s, null)"
+        params = [parid, beschrijving]
         return Database.execute_sql(sql, params)

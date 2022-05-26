@@ -1,19 +1,23 @@
 'use strict';
-let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll, htmlLidStatus, historyToday, historyAll
+// #region ***  DOM references                           ***********
+let htmlBoxOpen, htmlBoxClose, htmlHistoryToday, htmlHistoryAll,  htmlLettersToday, htmlLidStatus, historyToday, historyAll
 
 const lanIP = `${window.location.hostname}:5000`;
 const socket = io(`http://${lanIP}`);
+// #endregion
+
+// #region ***  Callback-Visualisation - show___         ***********
 
 const showHistoryToday = function(jsonObject) {
-  // console.log(jsonObject);
+  // console.log(jsonObject.sensors);
   let stringHTML = '';
   for (const sensorInfo of jsonObject.sensors){
-    const datum = sensorInfo.actiedatum.split(' ')
+    const datum = sensorInfo.date.split(' ')
     stringHTML += `<tr>
                             <td>${datum[4]}</td>
-                            <td>${sensorInfo.commentaar}</td>
+                            <td>${sensorInfo.opmerking}</td>
                         </tr>`
-  }
+  };
   document.querySelector('.js-table').innerHTML = stringHTML;
 };
 
@@ -21,42 +25,65 @@ const showHistoryAll = function(jsonObject) {
   // console.log(jsonObject);
   let stringHTML = '';
   for (const sensorInfo of jsonObject.sensors){
-    const datum = sensorInfo.actiedatum.split(' ')
+    const datum = sensorInfo.date.split(' ')
     const showDatum = datum[1] + ' ' + datum[2] + ' ' + datum[3]
     stringHTML += `<tr>
                             <td>${showDatum}</td>
-                            <td>${sensorInfo.commentaar}</td>
+                            <td>${sensorInfo.opmerking}</td>
                         </tr>`
-  }
+  };
   document.querySelector('.js-table').innerHTML = stringHTML;
-}
+};
 
 const showLidStatus = function(payload) {
   if (payload.status == 0) {
-    htmlLidStatus.innerHTML = `Gesloten`
+    htmlLidStatus.innerHTML = `Gesloten`;
     htmlLidStatus.classList.remove('u-clr-main');
   }
   else {
-    htmlLidStatus.innerHTML = `Geopend`
+    htmlLidStatus.innerHTML = `Geopend`;
     htmlLidStatus.classList.add('u-clr-main');
-  }
-}
+  };
+};
 
+const showLetters = function(payload) {
+  console.log(payload.sensors)
+  if (payload.sensors > 1) {
+    htmlLettersToday.innerHTML = payload.sensors;
+  } else if (payload.sensors == 1) {
+    htmlLettersToday.innerHTML = '1 brief';
+  } else {
+    htmlLettersToday.innerHTML = '--';
+  };
+};
+// #endregion
+
+// #region ***  Callback-No Visualisation - callback___  ***********
+// #endregion
+
+// #region ***  Data Access - get___                     ***********
 const loadHistoryToday = function () {
-  const url = `http://192.168.168.169:5000/api/v1/sensors/today/`;
+  const url = `http://192.168.168.169:5000/api/v1/events/today/`;
   handleData(url, showHistoryToday);
 };
 
 const loadHistoryAll = function () {
-  const url = `http://192.168.168.169:5000/api/v1/sensors/`;
+  const url = `http://192.168.168.169:5000/api/v1/events/`;
   handleData(url, showHistoryAll);
-}
+};
 
 const loadLidStatus = function () {
-  const url = `http://192.168.168.169:5000/api/v1/sensors/lid/`
-  handleData(url,showLidStatus)
-}
+  const url = `http://192.168.168.169:5000/api/v1/events/lid/`;
+  handleData(url,showLidStatus);
+};
 
+const loadLettersToday = function () {
+  const url = `http://192.168.168.169:5000/api/v1/events/letters/`;
+  handleData(url,showLetters);
+};
+// #endregion
+
+// #region ***  Event Listeners - listenTo___            ***********
 const listenToUI = function () {
   // togle box lock
     htmlBoxOpen.addEventListener('click', function () {
@@ -126,16 +153,23 @@ const listenToSocket = function () {
     }
   })
 };
+// #endregion
 
-document.addEventListener("DOMContentLoaded", function () {
+// #region ***  Init / DOMContentLoaded                  ***********
+const init = function(){
   console.info("DOM geladen");
   htmlBoxOpen = document.querySelector('.js-boxopen');
   htmlBoxClose = document.querySelector('.js-boxclose');
   htmlHistoryToday = document.querySelector('.js-historytoday');
   htmlHistoryAll = document.querySelector('.js-historyall');
-  htmlLidStatus = document.querySelector('.js-lid')
+  htmlLidStatus = document.querySelector('.js-lid');
+  htmlLettersToday = document.querySelector('.js-brievenaantal');
   listenToUI();
   listenToSocket();
   loadHistoryToday();
-  loadLidStatus()
-});
+  loadLidStatus();
+  loadLettersToday();
+}
+
+document.addEventListener('DOMContentLoaded',init);
+// #endregion

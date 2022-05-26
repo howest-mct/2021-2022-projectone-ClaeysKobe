@@ -41,7 +41,7 @@ def setup_gpio():
     lcd_module = LCD_Module(16, 20)
     # aantal brieven vandaag setten
     global brieven_vandaag
-    brieven_vandaag = len(DataRepository.read_brieven_today())
+    # brieven_vandaag = len(DataRepository.read_brieven_today())
 
     btnPin.on_press(lees_knop)
 
@@ -119,7 +119,8 @@ def initial_connection():
 def open_box():
     print('Box opened via PC')
     # Add change to database
-    answer = DataRepository.insert_box_value(0, "Lock geopend")
+    answer = DataRepository.insert_rfid_value(0, "Lock geopend")
+    answer = DataRepository.insert_box_site(1, "Lock geopend")
     print(answer)
     # Send to the client!
     socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
@@ -130,7 +131,8 @@ def open_box():
 def open_box():
     print('Box closed via PC')
     # Add change to database
-    answer = DataRepository.insert_box_value(1, "Lock gesloten")
+    answer = DataRepository.insert_rfid_value(1, "Lock gesloten")
+    answer = DataRepository.insert_box_site(1, "Lock gesloten")
     print(answer)
     # Send to the client!
     socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
@@ -153,6 +155,7 @@ def read_sensor_magnet():
                 beschrijving = "brievenbusklep geopend"
             answer = DataRepository.insert_magnet_value(
                 magnet_status, beschrijving)
+            answer = DataRepository.insert_lid(magnet_status, beschrijving)
             print(f"New magnet value: {answer}")
             socketio.emit('B2F_change_magnet', {
                           'status': magnet_status}, broadcast=True)
@@ -172,6 +175,7 @@ def read_rfid():
             else:
                 beschrijving = f"{text} Locked your mailbox"
             answer = DataRepository.insert_rfid_value(id, beschrijving)
+            answer = DataRepository.insert_box_scanner(id, beschrijving)
             socketio.emit('B2F_refresh_history', broadcast=True)
 
 

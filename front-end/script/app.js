@@ -5,13 +5,13 @@ const lanIP = `${window.location.hostname}:5000`;
 const socket = io(`http://${lanIP}`);
 
 const showHistoryToday = function(jsonObject) {
-  // console.log(jsonObject);
+  // console.log(jsonObject.sensors);
   let stringHTML = '';
   for (const sensorInfo of jsonObject.sensors){
-    const datum = sensorInfo.actiedatum.split(' ')
+    const datum = sensorInfo.date.split(' ')
     stringHTML += `<tr>
                             <td>${datum[4]}</td>
-                            <td>${sensorInfo.commentaar}</td>
+                            <td>${sensorInfo.opmerking}</td>
                         </tr>`
   }
   document.querySelector('.js-table').innerHTML = stringHTML;
@@ -21,11 +21,11 @@ const showHistoryAll = function(jsonObject) {
   // console.log(jsonObject);
   let stringHTML = '';
   for (const sensorInfo of jsonObject.sensors){
-    const datum = sensorInfo.actiedatum.split(' ')
+    const datum = sensorInfo.date.split(' ')
     const showDatum = datum[1] + ' ' + datum[2] + ' ' + datum[3]
     stringHTML += `<tr>
                             <td>${showDatum}</td>
-                            <td>${sensorInfo.commentaar}</td>
+                            <td>${sensorInfo.opmerking}</td>
                         </tr>`
   }
   document.querySelector('.js-table').innerHTML = stringHTML;

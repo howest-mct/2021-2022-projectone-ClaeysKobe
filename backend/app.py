@@ -20,7 +20,7 @@ magnetPin = 17
 # Default variables
 magnet_status = 0
 prev_magnet_status = 0
-
+lock_opened = False
 # Code voor Hardware
 
 
@@ -151,9 +151,18 @@ def read_sensor_magnet():
 
 
 def read_rfid():
+    global lock_opened
     while True:
         id, text = reader.read()
-        print("ID: %s\nText: %s" % (id, text))
+        if id != " ":
+            print("ID: %s\nText: %s" % (id, text))
+            lock_opened = not lock_opened
+            if lock_opened == True:
+                beschrijving = f"{text} Unlocked your mailbox"
+            else:
+                beschrijving = f"{text} Locked your mailbox"
+            answer = DataRepository.insert_rfid_value(id, beschrijving)
+            socketio.emit('B2F_refresh_history', broadcast=True)
 
 
 def start_thread():

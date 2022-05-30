@@ -53,7 +53,7 @@ const showLetters = function(payload) {
   } else if (payload.sensors == 1) {
     htmlLettersToday.innerHTML = '1 brief';
   } else {
-    htmlLettersToday.innerHTML = '--';
+    htmlLettersToday.innerHTML = '-- brieven';
   };
 };
 // #endregion

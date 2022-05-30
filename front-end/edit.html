@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>YouGotMailBox</title>
-    <meta name="description" content="YouGotMailbox">
+    <meta name="description" content="YouGotMailbox | Edit">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="msapplication-TileColor" content="#e85e00">
     <meta name="theme-color" content="#e85e00">
@@ -30,7 +30,7 @@
     <script src="script/app.js"></script>
 </head>
 
-<body class="js-index">
+<body class="js-user">
     <header class="o-row--header u-z-index-hgh">
         <div class="c-header">
             <div class="c-header__logo">
@@ -46,58 +46,33 @@
                 </nav>
             </div>
             <div class="c-header__nav">
-                <a class="u-mb-clear" href="user.html">
+                <a class="u-mb-clear" href="index.html">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 31.05">
                         <path id="person_FILL0_wght400_GRAD0_opsz48"
                             d="M24,23.95a7.193,7.193,0,0,1-7.5-7.5A7.193,7.193,0,0,1,24,8.95a7.193,7.193,0,0,1,7.5,7.5,7.193,7.193,0,0,1-7.5,7.5ZM8,40V35.3a5.5,5.5,0,0,1,.95-3.25A6.1,6.1,0,0,1,11.4,30a37.583,37.583,0,0,1,6.425-2.25A25.973,25.973,0,0,1,24,27a24.88,24.88,0,0,1,6.15.775A42.593,42.593,0,0,1,36.55,30a6.028,6.028,0,0,1,2.5,2.05A5.5,5.5,0,0,1,40,35.3V40Zm3-3H37V35.3a2.739,2.739,0,0,0-.475-1.525A3.011,3.011,0,0,0,35.35,32.7a26.551,26.551,0,0,0-5.85-2.125A25.869,25.869,0,0,0,24,30a26.573,26.573,0,0,0-5.55.575A25.4,25.4,0,0,0,12.6,32.7,3.008,3.008,0,0,0,11,35.3ZM24,20.95a4.361,4.361,0,0,0,4.5-4.5,4.361,4.361,0,0,0-4.5-4.5,4.361,4.361,0,0,0-4.5,4.5,4.361,4.361,0,0,0,4.5,4.5Zm0-4.5ZM24,37Z"
-                            transform="translate(-8 -8.95)" fill="#000" />
+                            transform="translate(-8 -8.95)" fill="#24d406" />
                     </svg>
                 </a>
             </div>
         </div>
     </header>
-    <div class="c-intro">
-        <figure class="o-row--md u-mb-clear u-pt-clear">
-            <img class="c-intro__image" src="img/IMG_7498.png" alt="Intro visual">
-        </figure>
-        <section class="c-intro__text">
-            <h2 class="c-intro__text--header u-clr-light">U kreeg vandaag:</h2>
-            <h3 class="c-intro__text--subheader u-clr-light js-brievenaantal">-- brieven</h3>
-            <div class="o-layout u-gap--md o-layout--justify-center">
-                <h2 class="u-mb-clear"><span class="c-btn c-btn--selected js-boxopen u-no-clicking">Open box</span></h2>
-                <h2 class="u-mb-clear"><span class="c-btn c-btn--unselected js-boxclose">Close box</span>
-                </h2>
-            </div>
-        </section>
-    </div>
-    <section class="o-row">
+    <section class="o-row o-row--xxl">
         <div class="o-container">
-            <h2 class="u-clr-dark">Uw brievenbusklep staat: <span class="js-lid">--</span></h2>
-        </div>
-    </section>
-    <section class="o-row o-row--md">
-        <div class="o-container">
-            <article class="o-section o-section--xl">
-                <h2 class="c-titel">Geschiedenis</h2>
-                <div class="o-layout u-gap--md">
-                    <h2><span class="c-btn--sml c-btn--selected js-historytoday">Vandaag</span></h2>
-                    <h2><span class="c-btn--sml c-btn--unselected js-historyall">Allemaal</span></h2>
+            <div class="">
+                <h1 class="js-name">Kobe Claeys</h1>
+                <form class="u-mb-md js-form">
+                    <label for="rfid">RFID:</label><br>
+                    <input type="text" name="rfid" id="rfid" value="" readonly><br>
+                    <label for="name">Name:</label><br>
+                    <input type="text" name="name" id="name" value=""><br>
+                    <label for="pwrd">Password:</label><br>
+                    <input type="password" name="pwrd" id="pwrd"><br>
+                </form>
+                <div class="o-layout o-layout--justify-end u-max-width-xs u-gap--md">
+                    <h2><span class="c-btn--sml c-btn--unselected js-adduser">Cancel</span></h2>
+                    <h2><span class="c-btn--sml c-btn--selected js-adduser">Save</span></h2>
                 </div>
-                <table class="c-table u-mt-clear">
-                    <thead class="c-table__head">
-                        <tr>
-                            <th>Tijdstip</th>
-                            <th>Gebeurtenis</th>
-                        </tr>
-                    </thead>
-                    <tbody class="c-table__body js-table">
-                        <tr>
-                            <td>--</td>
-                            <td>--</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </article>
+            </div>
         </div>
     </section>
 </body>

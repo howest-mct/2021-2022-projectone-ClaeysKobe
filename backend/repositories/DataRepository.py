@@ -61,3 +61,8 @@ class DataRepository:
         sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES( (Select gebruikersID from gebruiker where rfid_code like %s) , 7, now(), %s, null)"
         params = [parid, beschrijving]
         return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def read_users():
+        sql = "SELECT * FROM projectonedb.gebruiker"
+        return Database.get_rows(sql)

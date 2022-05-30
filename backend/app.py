@@ -60,7 +60,7 @@ def show_brieven_vandaag():
     if brieven_vandaag > 0:
         lcd_module.write_message(f"Brieven vandaag:{brieven_vandaag}")
     else:
-        lcd_module.write_message(f"Nog geen brieven ontvangen")
+        lcd_module.write_message(f"Nog geen brievenontvangen")
 
 
 # Code voor Flask
@@ -122,6 +122,16 @@ def sensors_letters():
         data = len(DataRepository.read_brieven_today())
         if data is not None:
             return jsonify(sensors=data), 200
+        else:
+            return jsonify(data="ERROR"), 404
+
+
+@app.route(endpoint + '/users/', methods=['GET'])
+def gebruikers():
+    if request.method == 'GET':
+        data = DataRepository.read_users()
+        if data is not None:
+            return jsonify(gebruikers=data), 200
         else:
             return jsonify(data="ERROR"), 404
 

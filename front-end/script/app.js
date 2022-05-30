@@ -93,9 +93,26 @@ const showUsers = function (payload) {
   }
   document.querySelector('.js-tableUsers').innerHTML = stringHTML;
 };
+
+const showUserInfo = function (payload) {
+  console.log(payload);
+  document.querySelector('.js-name').innerHTML = payload.gebruikers.naam;
+  setValueAndId('js-parRfid', payload.gebruikers.rfid_code);
+  setValueAndId('js-parName', payload.gebruikers.naam);
+  setValueAndId('js-parPwrd', payload.gebruikers.wachtwoord);
+  listenToUpdateUser();
+};
 // #endregion
 
 // #region ***  Callback-No Visualisation - callback___  ***********
+const setValueAndId = function (jsKlasse, value) {
+  document.querySelector(`.${jsKlasse}`).setAttribute('value', value);
+  document.querySelector(`.${jsKlasse}`).setAttribute('id', value);
+};
+
+const backToList = function (jsonObj) {
+  window.location.href = 'user.html';
+};
 // #endregion
 
 // #region ***  Data Access - get___                     ***********
@@ -122,6 +139,11 @@ const loadLettersToday = function () {
 const getUsers = function () {
   const url = `http://192.168.168.169:5000/api/v1/users/`;
   handleData(url, showUsers);
+};
+
+const getUserInfo = function (UserID) {
+  const url = `http://192.168.168.169:5000/api/v1/user/${UserID}/`;
+  handleData(url, showUserInfo);
 };
 // #endregion
 
@@ -196,6 +218,22 @@ const listenToSocket = function () {
   });
 };
 
+const listenToUpdateUser = function () {
+  document.querySelector('.js-adduser').addEventListener('click', function () {
+    const rfid = document.querySelector('.js-parRfid').value;
+    const name = document.querySelector('.js-parName').value;
+    const pwrd = document.querySelector('.js-parPwrd').value;
+    const body = JSON.stringify({
+      rfid: rfid,
+      naam: name,
+      wachtwoord: pwrd,
+    });
+    let urlParams = new URLSearchParams(window.location.search);
+    let userID = urlParams.get('userID');
+    const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
+    handleData(url, backToList, null, 'PUT', body);
+  });
+};
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********

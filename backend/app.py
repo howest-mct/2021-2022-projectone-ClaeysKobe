@@ -119,7 +119,7 @@ def sensors_lid():
 @app.route(endpoint + '/events/letters/', methods=['GET'])
 def sensors_letters():
     if request.method == 'GET':
-        data = len(DataRepository.read_brieven_today())
+        data = DataRepository.read_brieven_today()
         if data is not None:
             return jsonify(sensors=data), 200
         else:
@@ -134,6 +134,29 @@ def gebruikers():
             return jsonify(gebruikers=data), 200
         else:
             return jsonify(data="ERROR"), 404
+
+
+@app.route(endpoint + '/user/<UserID>/', methods=['GET', 'PUT'])
+def gebruiker(UserID):
+    if request.method == 'GET':
+        data = DataRepository.read_user(UserID)
+        if data is not None:
+            return jsonify(gebruikers=data), 200
+        else:
+            return jsonify(data="ERROR"), 404
+    elif request.method == 'PUT':
+        te_verzenden = DataRepository.json_or_formdata(request)
+        print(te_verzenden)
+        print(UserID)
+        rfid = te_verzenden['rfid']
+        naam = te_verzenden['naam']
+        wachtwoord = te_verzenden['wachtwoord']
+        answer = DataRepository.update_user(rfid, naam, wachtwoord, UserID)
+        print(f"Answer: {answer}")
+        if answer is not None:
+            return jsonify(data=answer), 201
+        else:
+            return jsonify(data="ERROR"), 400
 
 
 @socketio.on('connect')

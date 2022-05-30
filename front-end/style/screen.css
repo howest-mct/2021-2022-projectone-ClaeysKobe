@@ -660,7 +660,7 @@ a:focus {
 
 .c-btn--unselected {
     color: #77DD66 !important;
-    background-color: #fff;
+    background-color: #fff !important;
     border-color: #77DD66;
     border-style: solid;
     padding: 2px 12px;

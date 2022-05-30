@@ -36,7 +36,7 @@ class DataRepository:
 
     @staticmethod
     def read_brieven_today():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and actieID = 3"
+        sql = "select count(*) from brievenbusevent where cast(date as Date) = cast(now() as Date) and actieID = 3"
         return Database.get_rows(sql)
 
     @staticmethod
@@ -66,3 +66,15 @@ class DataRepository:
     def read_users():
         sql = "SELECT * FROM projectonedb.gebruiker"
         return Database.get_rows(sql)
+
+    @staticmethod
+    def read_user(userID):
+        sql = "SELECT * FROM projectonedb.gebruiker where gebruikersID = %s"
+        params = [userID]
+        return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def update_user(rfid, naam, pswrd, gebruikersid):
+        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = %s WHERE gebruikersID = %s"
+        params = [rfid, naam, pswrd, gebruikersid]
+        return Database.execute_sql(sql, params)

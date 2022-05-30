@@ -102,6 +102,12 @@ const showUserInfo = function (payload) {
   setValueAndId('js-parPwrd', payload.gebruikers.wachtwoord);
   listenToUpdateUser();
 };
+
+const showRFIDInfo = function (payload) {
+  document.querySelector('.js-parRfid').removeAttribute('hidden');
+  setValueAndId('js-parRfid', payload.rfid);
+  document.querySelector('.js-adduser').removeAttribute('hidden');
+};
 // #endregion
 
 // #region ***  Callback-No Visualisation - callback___  ***********
@@ -216,6 +222,9 @@ const listenToSocket = function () {
       loadHistoryToday();
     }
   });
+  socket.on('B2F_rfidwritten', function (payload) {
+    showRFIDInfo(payload);
+  });
 };
 
 const listenToUpdateUser = function () {
@@ -235,6 +244,14 @@ const listenToUpdateUser = function () {
   });
 };
 
+const listenToContinue = function () {
+  document.querySelector('.js-continue').addEventListener('click', function () {
+    const name = document.querySelector('.js-parName');
+    const payload = { name: naam };
+    socket.emit('F2B_name4rfid', payload);
+  });
+};
+
 const listenToSubmit = function () {
   const rfid = document.querySelector('.js-parRfid').value;
   const name = document.querySelector('.js-parName').value;
@@ -244,11 +261,9 @@ const listenToSubmit = function () {
     naam: name,
     wachtwoord: pwrd,
   });
-  let urlParams = new URLSearchParams(window.location.search);
-  let userID = urlParams.get('userID');
-  const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
-  handleData(url, backToList, null, 'PUT', body);
-}
+  const url = `http://192.168.168.169:5000/api/v1/users/`;
+  handleData(url, backToList, null, 'POST', body);
+};
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -283,7 +298,7 @@ const init = function () {
   } else if (htmlUser) {
     getUsers();
   } else if (htmlEdit) {
-    listenToSubmit();
+    listenToContinue();
   }
 
   // event listeners and loads

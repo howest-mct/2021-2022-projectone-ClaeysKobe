@@ -646,6 +646,13 @@ a:focus {
     text-decoration: none;
 }
 
+.c-btn--xsml {
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 26px;
+    text-decoration: none;
+}
+
 .c-btn--light {
     border: 3px solid #fff;
     background-color: #fff !important;
@@ -737,6 +744,16 @@ a:focus {
 /*------------------------------------*\
   #UTILITIES
 \*------------------------------------*/
+
+/*
+    Utilities: display
+    ---
+    Display class to make a specific item dissapear
+*/
+
+.u-hide-item {
+    display: none !important;
+}
 
 /*
     Utilities: coloring

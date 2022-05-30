@@ -196,6 +196,15 @@ def open_box():
     socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
 
+
+@socketio.on('F2B_name4rfid')
+def write_to_rfid(payload):
+    text = payload.name
+    reader.write(text)
+    id, text = reader.read()
+    socketio.emit('B2F_rfidwritten', {'rfid': id})
+
+
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 

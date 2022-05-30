@@ -61,13 +61,15 @@
             <div class="">
                 <h1>Welcome!</h1>
                 <form class="c-form u-mb-md js-form">
-                    <input type="text" name="name" id="name" value="" placeholder="Your Name" value="" required><br>
+                    <input type="text" name="name" id="name" value="" placeholder="Your Name" value="" class="js-parName" required><br>
                     <br>
-                    <input type="password" name="password" id="name" placeholder="Password" value="" required><br>
+                    <input type="password" name="password" id="name" placeholder="Password" value="" class="js-parPwrd" required><br>
                     <br>
-                    <input type="text" name="rfid" id="rfid" placeholder="RFID-Tag (scanning...)" value="" required><br>
+                    <h2><span class="c-btn--sml c-btn--selected js-continue">Continue!</span></h2>
+                    <br>
+                    <input class="js-parRfid" type="text" name="rfid" id="rfid" placeholder="RFID-Tag: Click to scan..." value="" hidden required><br>
+                    <h2><span class="c-btn--sml c-btn--selected js-adduser" hidden>Let's go!</span></h2>
                 </form>
-                <h2><span class="c-btn--sml c-btn--selected js-adduser">Let's go!</span></h2>
             </div>
         </div>
     </section>

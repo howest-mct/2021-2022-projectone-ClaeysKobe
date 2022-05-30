@@ -78,3 +78,9 @@ class DataRepository:
         sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = %s WHERE gebruikersID = %s"
         params = [rfid, naam, pswrd, gebruikersid]
         return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def insert_user(rfid, naam, pswrd, gebruikersid):
+        sql = "INSERT INTO gebruiker(naam, wachtwoord, rfid_code) VALUES(%s, %s, %s)"
+        params = [rfid, naam, pswrd]
+        return Database.execute_sql(sql, params)

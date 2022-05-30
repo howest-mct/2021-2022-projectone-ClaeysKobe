@@ -126,7 +126,7 @@ def sensors_letters():
             return jsonify(data="ERROR"), 404
 
 
-@app.route(endpoint + '/users/', methods=['GET'])
+@app.route(endpoint + '/users/', methods=['GET', 'POST'])
 def gebruikers():
     if request.method == 'GET':
         data = DataRepository.read_users()
@@ -134,6 +134,16 @@ def gebruikers():
             return jsonify(gebruikers=data), 200
         else:
             return jsonify(data="ERROR"), 404
+    elif request.method == 'POST':
+        te_verzenden = DataRepository.json_or_formdata(request)
+        rfid = te_verzenden['rfid']
+        naam = te_verzenden['naam']
+        wachtwoord = te_verzenden['wachtwoord']
+        answer = DataRepository.insert_user(rfid, naam, wachtwoord)
+        if answer is not None:
+            return jsonify(data=answer), 201
+        else:
+            return jsonify(data="ERROR"), 400
 
 
 @app.route(endpoint + '/user/<UserID>/', methods=['GET', 'PUT'])
@@ -146,13 +156,10 @@ def gebruiker(UserID):
             return jsonify(data="ERROR"), 404
     elif request.method == 'PUT':
         te_verzenden = DataRepository.json_or_formdata(request)
-        print(te_verzenden)
-        print(UserID)
         rfid = te_verzenden['rfid']
         naam = te_verzenden['naam']
         wachtwoord = te_verzenden['wachtwoord']
         answer = DataRepository.update_user(rfid, naam, wachtwoord, UserID)
-        print(f"Answer: {answer}")
         if answer is not None:
             return jsonify(data=answer), 201
         else:

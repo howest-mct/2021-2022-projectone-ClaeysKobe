@@ -234,6 +234,21 @@ const listenToUpdateUser = function () {
     handleData(url, backToList, null, 'PUT', body);
   });
 };
+
+const listenToSubmit = function () {
+  const rfid = document.querySelector('.js-parRfid').value;
+  const name = document.querySelector('.js-parName').value;
+  const pwrd = document.querySelector('.js-parPwrd').value;
+  const body = JSON.stringify({
+    rfid: rfid,
+    naam: name,
+    wachtwoord: pwrd,
+  });
+  let urlParams = new URLSearchParams(window.location.search);
+  let userID = urlParams.get('userID');
+  const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
+  handleData(url, backToList, null, 'PUT', body);
+}
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -267,6 +282,8 @@ const init = function () {
     }
   } else if (htmlUser) {
     getUsers();
+  } else if (htmlEdit) {
+    listenToSubmit();
   }
 
   // event listeners and loads

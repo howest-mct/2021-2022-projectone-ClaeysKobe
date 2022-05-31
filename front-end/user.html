@@ -20,8 +20,8 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/screen.css">
+    <link rel="stylesheet" href="style/normalize.css">
+    <link rel="stylesheet" href="style/screen.css">
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
         integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
@@ -30,7 +30,7 @@
     <script src="script/app.js"></script>
 </head>
 
-<body class="js-user">
+<body class="js-userPage">
     <header class="o-row--header u-z-index-hgh">
         <div class="c-header">
             <div class="c-header__logo">
@@ -72,7 +72,7 @@
                         <tr>
                             <td>--</td>
                             <td>--</td>
-                            <td class="js-edit" data-persoon="--">
+                            <td class="js-edit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path id="edit_FILL1_wght400_GRAD0_opsz48"
                                     d="M27.34,10.812,23.288,6.76l2.66-2.66L30,8.153ZM6,28.1V24.047L21.958,8.089l4.053,4.053L10.053,28.1Z"
@@ -82,8 +82,8 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="o-layout o-layout--justify-end u-max-width-xs">
-                    <h2><span class="c-btn--sml c-btn--selected js-adduser">Add User</span></h2>
+                <div class="o-layout u-max-width-xs">
+                    <h2><a href="add.html" class="c-link c-btn--sml c-btn--selected">Add User</a></h2>
                 </div>
             </div>
         </div>

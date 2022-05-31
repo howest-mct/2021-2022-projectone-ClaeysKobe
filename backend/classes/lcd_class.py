@@ -50,7 +50,7 @@ class LCD_Module:
 
     def __init_LCD(self):
         self.send_instruction(0b00111000)  # function set of 0x38
-        self.send_instruction(0b00001111)  # display on of 0xf
+        self.send_instruction(0b00001100)  # display on of 0xf
         self.send_instruction(0b00000001)
 
     # --- PUBLIC FUNCTIONS ---
@@ -88,7 +88,7 @@ class LCD_Module:
 
     def init_LCD(self):
         self.send_instruction(0b00111000)  # function set of 0x38
-        self.send_instruction(0b00001111)  # display on of 0xf
+        self.send_instruction(0b00001100)  # display on of 0xf
         self.send_instruction(0b00000001)  # clear display/cursor home of 0x01
 
     def write_scrolling(self, message):

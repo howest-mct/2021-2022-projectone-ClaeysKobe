@@ -25,6 +25,7 @@ magnet_status = 0
 prev_magnet_status = 0
 lock_opened = False
 brieven_vandaag = f""
+ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 # Code voor Hardware
 
 
@@ -44,13 +45,10 @@ def setup_gpio():
     brieven_vandaag = len(DataRepository.read_brieven_today())
     show_brieven_vandaag()
 
-    btnPin.on_press(lees_knop)
-
 
 def lees_knop(pin):
     if btnPin.pressed:
         print("**** button pressed: showing IP ****")
-        ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
         lcd_module.write_message(ip)
         time.sleep(5)
         show_brieven_vandaag()
@@ -60,7 +58,7 @@ def show_brieven_vandaag():
     if brieven_vandaag > 0:
         lcd_module.write_message(f"Brieven vandaag:{brieven_vandaag}")
     else:
-        lcd_module.write_message(f"Nog geen brieven ontvangen")
+        lcd_module.write_message(f"Nog geen brievenontvangen")
 
 
 # Code voor Flask
@@ -119,18 +117,60 @@ def sensors_lid():
 @app.route(endpoint + '/events/letters/', methods=['GET'])
 def sensors_letters():
     if request.method == 'GET':
-        data = len(DataRepository.read_brieven_today())
+        data = DataRepository.read_brieven_today()
         if data is not None:
             return jsonify(sensors=data), 200
         else:
             return jsonify(data="ERROR"), 404
 
 
+@app.route(endpoint + '/users/', methods=['GET', 'POST'])
+def gebruikers():
+    if request.method == 'GET':
+        data = DataRepository.read_users()
+        if data is not None:
+            return jsonify(gebruikers=data), 200
+        else:
+            return jsonify(data="ERROR"), 404
+    elif request.method == 'POST':
+        te_verzenden = DataRepository.json_or_formdata(request)
+        rfid = te_verzenden['rfid']
+        naam = te_verzenden['naam']
+        wachtwoord = te_verzenden['wachtwoord']
+        answer = DataRepository.insert_user(rfid, naam, wachtwoord)
+        if answer is not None:
+            return jsonify(data=answer), 201
+        else:
+            return jsonify(data="ERROR"), 400
+
+
+@app.route(endpoint + '/user/<UserID>/', methods=['GET', 'PUT'])
+def gebruiker(UserID):
+    if request.method == 'GET':
+        data = DataRepository.read_user(UserID)
+        if data is not None:
+            return jsonify(gebruikers=data), 200
+        else:
+            return jsonify(data="ERROR"), 404
+    elif request.method == 'PUT':
+        te_verzenden = DataRepository.json_or_formdata(request)
+        rfid = te_verzenden['rfid']
+        naam = te_verzenden['naam']
+        wachtwoord = te_verzenden['wachtwoord']
+        answer = DataRepository.update_user(rfid, naam, wachtwoord, UserID)
+        if answer is not None:
+            return jsonify(data=answer), 201
+        else:
+            return jsonify(data="ERROR"), 400
+
+
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
     # Send to the client!
-    emit('B2F_change_magnet', {'status': magnet_status}, broadcast=True)
+    socketio.emit('B2F_change_magnet', {
+        'status': magnet_status}, broadcast=True)
+    time.sleep(0.1)
 
 
 @socketio.on('F2B_openBox')
@@ -143,6 +183,7 @@ def open_box():
     # Send to the client!
     socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
+    time.sleep(0.1)
 
 
 @socketio.on('F2B_closeBox')
@@ -155,6 +196,17 @@ def open_box():
     # Send to the client!
     socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
+    time.sleep(0.1)
+
+
+@socketio.on('F2B_name4rfid')
+def write_to_rfid(payload):
+    print(f"rfid: {payload}")
+    text = payload['name']
+    reader.write(text)
+    socketio.emit('B2F_rfidwritten', {'rfid': rfid_id})
+    time.sleep(0.1)
+
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
@@ -179,14 +231,17 @@ def read_sensor_magnet():
                           'status': magnet_status}, broadcast=True)
             socketio.emit('B2F_refresh_history', broadcast=True)
         prev_magnet_status = magnet_status
+        time.sleep(0.5)
 
 
 def read_rfid():
     global lock_opened
+    global rfid_id
     while True:
         id, text = reader.read()
         if id != " ":
             print("ID: %s\nText: %s" % (id, text))
+            rfid_id = id
             lock_opened = not lock_opened
             if lock_opened == True:
                 beschrijving = f"{text} Unlocked your mailbox"
@@ -195,10 +250,15 @@ def read_rfid():
             answer = DataRepository.insert_rfid_value(id, beschrijving)
             answer = DataRepository.insert_box_scanner(id, beschrijving)
             socketio.emit('B2F_refresh_history', broadcast=True)
+            time.sleep(0.5)
+
+
+def wait_for_button():
+    btnPin.on_press(lees_knop)
+    time.sleep(0.1)
 
 
 def start_thread_magnet():
-    print("**** Starting THREADS ****")
     thread = threading.Thread(target=read_sensor_magnet, args=(), daemon=True)
     thread.start()
 
@@ -208,9 +268,16 @@ def start_thread_rfid():
     thread2.start()
 
 
+def start_thread_button():
+    thread3 = threading.Thread(target=wait_for_button, args=(), daemon=True)
+    thread3.start()
+
+
 def start_threads():
+    print("**** Starting THREADS ****")
     start_thread_magnet()
     start_thread_rfid()
+    start_thread_button()
 
 
 def start_chrome_kiosk():
@@ -240,7 +307,7 @@ def start_chrome_kiosk():
     driver = webdriver.Chrome(options=options)
     driver.get("http://localhost")
     while True:
-        pass
+        time.sleep(0.1)
 
 
 def start_chrome_thread():

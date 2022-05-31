@@ -20,8 +20,8 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/screen.css">
+    <link rel="stylesheet" href="style/normalize.css">
+    <link rel="stylesheet" href="style/screen.css">
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
         integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
@@ -30,7 +30,7 @@
     <script src="script/app.js"></script>
 </head>
 
-<body class="js-user">
+<body class="js-addPage">
     <header class="o-row--header u-z-index-hgh">
         <div class="c-header">
             <div class="c-header__logo">
@@ -40,7 +40,7 @@
                 <nav class="c-nav">
                     <a class="c-link" href="index.html">
                         <ul class="o-list c-nav__list u-mb-clear u-clr-main">
-                            <li>YouGotMailBox</li>
+                            <a class="c-link" href="index.html">YouGotMailBox</a>
                         </ul>
                     </a>
                 </nav>
@@ -59,15 +59,17 @@
     <section class="o-row o-row--xxl">
         <div class="o-container">
             <div class="">
-                <h1 class="js-name">Kobe Claeys</h1>
+                <h1>Welcome!</h1>
                 <form class="c-form u-mb-md js-form">
-                    <input type="text" name="name" id="name" value="" placeholder="Your Name" value="" required><br>
+                    <input type="text" name="name" id="name" value="" placeholder="Your Name" value="" class="js-parName" required><br>
                     <br>
-                    <input type="password" name="password" id="name" placeholder="Password" value="" required><br>
+                    <input type="password" name="password" id="password" placeholder="Password" value="" class="js-parPwrd" required><br>
                     <br>
-                    <input type="text" name="rfid" id="rfid" placeholder="RFID-Tag (scanning...)" value="" required><br>
+                    <h2><span class="c-btn--sml c-btn--selected js-continue">Continue!</span></h2>
+                    <br>
+                    <input class="js-parRfid" type="text" name="rfid" id="rfid" placeholder="RFID-Tag: Scanning..." value="" hidden required><br>
+                    <h2><span class="c-btn--sml c-btn--selected js-adduser" hidden>Let's go!</span></h2>
                 </form>
-                <h2><span class="c-btn--sml c-btn--selected js-adduser">Let's go!</span></h2>
             </div>
         </div>
     </section>

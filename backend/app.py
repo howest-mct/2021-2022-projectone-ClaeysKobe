@@ -2,6 +2,7 @@ import time
 from RPi import GPIO
 from helpers.klasseknop import Button
 from classes.lcd_class import LCD_Module
+from classes.spi_class import SpiClass
 import threading
 import netifaces as ni
 
@@ -40,6 +41,9 @@ def setup_gpio():
     # lcd
     global lcd_module
     lcd_module = LCD_Module(16, 20)
+    # spi
+    global spiObj
+    spiObj = SpiClass(0, 1)
     # aantal brieven vandaag setten
     global brieven_vandaag
     brieven_vandaag = len(DataRepository.read_brieven_today())
@@ -200,13 +204,14 @@ def open_box():
 
 
 @socketio.on('F2B_name4rfid')
-def write_to_rfid(payload):
-    print(f"rfid: {payload}")
-    text = payload['name']
-    reader.write(text)
-    socketio.emit('B2F_rfidwritten', {'rfid': rfid_id})
-    time.sleep(0.1)
-
+def write_to_rfid():
+    try:
+        rfid_verzendid = rfid_id
+        time.sleep(0.1)
+        if rfid_verzendid is not None:
+            socketio.emit('B2F_rfidwritten', {'rfid': rfid_verzendid})
+    finally:
+        time.sleep(0.1)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
@@ -258,6 +263,19 @@ def wait_for_button():
     time.sleep(0.1)
 
 
+def read_ldr():
+    while True:
+        ldr1 = spiObj.read_channel(0b1)
+        ldr2 = spiObj.read_channel(2)
+        ldr3 = spiObj.read_channel(4)
+        ldr4 = spiObj.read_channel(8)
+        ldr5 = spiObj.read_channel(16)
+        ldr6 = spiObj.read_channel(32)
+        if ldr1 > 75 or ldr2 > 75 or ldr3 > 75 or ldr4 > 75 or ldr5 > 75:
+            print("Brief ontvangen")
+        time.sleep(0.5)
+
+
 def start_thread_magnet():
     thread = threading.Thread(target=read_sensor_magnet, args=(), daemon=True)
     thread.start()
@@ -273,11 +291,17 @@ def start_thread_button():
     thread3.start()
 
 
+def start_thread_read_ldr():
+    thread4 = threading.Thread(target=read_ldr, args=(), daemon=True)
+    thread4.start()
+
+
 def start_threads():
     print("**** Starting THREADS ****")
     start_thread_magnet()
     start_thread_rfid()
     start_thread_button()
+    # start_thread_read_ldr()
 
 
 def start_chrome_kiosk():

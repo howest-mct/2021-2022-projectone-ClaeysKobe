@@ -573,7 +573,7 @@ a:focus {
 }
 
 .c-intro__image {
-    width: 1920px;
+    width: 100%;
     height: 576px;
     object-fit: cover;
     object-position: left;

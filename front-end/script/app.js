@@ -104,9 +104,10 @@ const showUserInfo = function (payload) {
 };
 
 const showRFIDInfo = function (payload) {
-  document.querySelector('.js-parRfid').removeAttribute('hidden');
-  setValueAndId('js-parRfid', payload.rfid);
-  document.querySelector('.js-adduser').removeAttribute('hidden');
+  console.log('YEEY');
+  // document.querySelector('.js-parRfid').removeAttribute('hidden');
+  // setValueAndId('js-parRfid', payload.rfid);
+  // document.querySelector('.js-adduser').removeAttribute('hidden');
 };
 // #endregion
 
@@ -154,7 +155,7 @@ const getUserInfo = function (UserID) {
 // #endregion
 
 // #region ***  Event Listeners - listenTo___            ***********
-const listenToUI = function () {
+const listenToUIIndex = function () {
   // togle box lock
   htmlBoxOpen.addEventListener('click', function () {
     console.log('Setting box Unlocked');
@@ -246,8 +247,9 @@ const listenToUpdateUser = function () {
 
 const listenToContinue = function () {
   document.querySelector('.js-continue').addEventListener('click', function () {
-    const name = document.querySelector('.js-parName');
-    const payload = { name: naam };
+    console.log('click');
+    const name = document.querySelector('.js-parName').value;
+    const payload = { name: name };
     socket.emit('F2B_name4rfid', payload);
   });
 };
@@ -287,6 +289,8 @@ const init = function () {
     loadHistoryToday();
     loadLidStatus();
     loadLettersToday();
+    listenToSocketIndex();
+    listenToUI();
   } else if (htmlEdit) {
     let urlParams = new URLSearchParams(window.location.search);
     let userID = urlParams.get('userID');
@@ -297,13 +301,12 @@ const init = function () {
     }
   } else if (htmlUser) {
     getUsers();
-  } else if (htmlEdit) {
-    listenToContinue();
+  } else if (htmlAdd) {
+    // listenToSocket();
+    // listenToContinue();
   }
 
   // event listeners and loads
-  listenToUI();
-  listenToSocket();
 };
 
 document.addEventListener('DOMContentLoaded', init);

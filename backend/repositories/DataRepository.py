@@ -23,7 +23,19 @@ class DataRepository:
         params = [status, beschrijving]
         return Database.execute_sql(sql, params)
 
+    @staticmethod
+    def insert_ldr_values(waarde1, waarde2, waarde3, waarde4, waarde5):
+        sql = "INSERT INTO historiek(actiedatum, waarde, commentaar, DeviceID, ActieID) values \
+            (now(), %s, 'Veranderde ldr waarde', 1, 3),\
+            (now(), %s, 'Veranderde ldr waarde', 2, 3),\
+            (now(), %s, 'Veranderde ldr waarde', 3, 3),\
+            (now(), %s, 'Veranderde ldr waarde', 4, 3),\
+            (now(), %s, 'Veranderde ldr waarde', 5, 3)"
+        params = [waarde1, waarde2, waarde3, waarde4, waarde5]
+        return Database.execute_sql(sql, params)
+
     # --- Mailbox Events ---
+
     @staticmethod
     def read_sensor_gesch():
         sql = "SELECT * from brievenbusevent order by date DESC"

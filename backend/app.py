@@ -309,6 +309,8 @@ def read_ldr():
         ldr6 = spiObj.read_channel(32)
         if ldr1 > 75 or ldr2 > 75 or ldr3 > 75 or ldr4 > 75 or ldr5 > 75:
             print("Brief ontvangen")
+            answer = DataRepository.insert_ldr_values(
+                ldr1, ldr2, ldr3, ldr4, ldr5)
         time.sleep(0.5)
 
 

@@ -104,10 +104,10 @@ const showUserInfo = function (payload) {
 };
 
 const showRFIDInfo = function (payload) {
-  console.log('YEEY');
-  // document.querySelector('.js-parRfid').removeAttribute('hidden');
-  // setValueAndId('js-parRfid', payload.rfid);
-  // document.querySelector('.js-adduser').removeAttribute('hidden');
+  // console.log('YEEY');
+  document.querySelector('.js-parRfid').removeAttribute('hidden');
+  setValueAndId('js-parRfid', payload.rfid);
+  document.querySelector('.js-adduser').removeAttribute('hidden');
 };
 // #endregion
 
@@ -213,6 +213,9 @@ const listenToSocket = function () {
   socket.on('connected', function () {
     console.log('verbonden met socket webserver');
   });
+};
+
+const listenToSocketIndex = function () {
   socket.on('B2F_change_magnet', function (payload) {
     showLidStatus(payload);
   });
@@ -223,6 +226,9 @@ const listenToSocket = function () {
       loadHistoryToday();
     }
   });
+};
+
+const listenToSocketAdd = function () {
   socket.on('B2F_rfidwritten', function (payload) {
     showRFIDInfo(payload);
   });
@@ -247,10 +253,7 @@ const listenToUpdateUser = function () {
 
 const listenToContinue = function () {
   document.querySelector('.js-continue').addEventListener('click', function () {
-    console.log('click');
-    const name = document.querySelector('.js-parName').value;
-    const payload = { name: name };
-    socket.emit('F2B_name4rfid', payload);
+    socket.emit('F2B_name4rfid');
   });
 };
 
@@ -290,7 +293,6 @@ const init = function () {
     loadLidStatus();
     loadLettersToday();
     listenToSocketIndex();
-    listenToUI();
   } else if (htmlEdit) {
     let urlParams = new URLSearchParams(window.location.search);
     let userID = urlParams.get('userID');
@@ -302,11 +304,12 @@ const init = function () {
   } else if (htmlUser) {
     getUsers();
   } else if (htmlAdd) {
-    // listenToSocket();
-    // listenToContinue();
+    listenToContinue();
+    listenToSocketAdd();
   }
 
   // event listeners and loads
+  listenToSocket();
 };
 
 document.addEventListener('DOMContentLoaded', init);

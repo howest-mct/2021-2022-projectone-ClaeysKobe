@@ -151,7 +151,7 @@ def gebruikers():
             return jsonify(data="ERROR"), 400
 
 
-@app.route(endpoint + '/user/<UserID>/', methods=['GET', 'PUT'])
+@app.route(endpoint + '/user/<UserID>/', methods=['GET', 'PUT', 'DELETE'])
 def gebruiker(UserID):
     if request.method == 'GET':
         data = DataRepository.read_user(UserID)
@@ -169,6 +169,12 @@ def gebruiker(UserID):
             return jsonify(data=answer), 201
         else:
             return jsonify(data="ERROR"), 400
+    elif request.method == 'DELETE':
+        data = DataRepository.remove_user(UserID)
+        if data is not None:
+            return jsonify(gebruikers=data), 200
+        else:
+            return jsonify(data="ERROR"), 404
 
 
 @socketio.on('connect')
@@ -268,7 +274,7 @@ def read_rfid():
     global register_rfid
     while True:
         id, text = reader.read()
-        if id != " ":
+        if id != "":
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
             if register_rfid == False:
@@ -284,6 +290,8 @@ def read_rfid():
             else:
                 socketio.emit('B2F_rfidwritten', {'rfid': rfid_id})
                 register_rfid = False
+            time.sleep(1)
+            id = ""
 
 
 def wait_for_button():

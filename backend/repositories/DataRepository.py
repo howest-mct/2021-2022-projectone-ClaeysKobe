@@ -84,3 +84,9 @@ class DataRepository:
         sql = "insert into gebruiker (naam, wachtwoord, rfid_code) Select %s, %s, %s Where not exists(select * from gebruiker where rfid_code=%s)"
         params = [naam, pswrd, rfid, rfid]
         return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def remove_user(id):
+        sql = "DELETE FROM gebruiker WHERE gebruikersID = %s;"
+        params = [id]
+        return Database.execute_sql(sql, params)

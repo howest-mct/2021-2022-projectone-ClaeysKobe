@@ -101,6 +101,7 @@ const showUserInfo = function (payload) {
   setValueAndId('js-parName', payload.gebruikers.naam);
   setValueAndId('js-parPwrd', payload.gebruikers.wachtwoord);
   listenToUpdateUser();
+  listenToDeleteUser();
 };
 
 const showRFIDInfo = function (payload) {
@@ -236,20 +237,33 @@ const listenToSocketAdd = function () {
 };
 
 const listenToUpdateUser = function () {
-  document.querySelector('.js-adduser').addEventListener('click', function () {
-    const rfid = document.querySelector('.js-parRfid').value;
-    const name = document.querySelector('.js-parName').value;
-    const pwrd = document.querySelector('.js-parPwrd').value;
-    const body = JSON.stringify({
-      rfid: rfid,
-      naam: name,
-      wachtwoord: pwrd,
+  document
+    .querySelector('.js-updateuser')
+    .addEventListener('click', function () {
+      const rfid = document.querySelector('.js-parRfid').value;
+      const name = document.querySelector('.js-parName').value;
+      const pwrd = document.querySelector('.js-parPwrd').value;
+      const body = JSON.stringify({
+        rfid: rfid,
+        naam: name,
+        wachtwoord: pwrd,
+      });
+      let urlParams = new URLSearchParams(window.location.search);
+      let userID = urlParams.get('userID');
+      const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
+      handleData(url, backToList, null, 'PUT', body);
     });
-    let urlParams = new URLSearchParams(window.location.search);
-    let userID = urlParams.get('userID');
-    const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
-    handleData(url, backToList, null, 'PUT', body);
-  });
+};
+
+const listenToDeleteUser = function () {
+  document
+    .querySelector('.js-removeuser')
+    .addEventListener('click', function () {
+      let urlParams = new URLSearchParams(window.location.search);
+      let userID = urlParams.get('userID');
+      const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
+      handleData(url, backToList, null, 'DELETE');
+    });
 };
 
 const listenToContinue = function () {

@@ -18,6 +18,7 @@ from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
 
 
+buzzerPin = 23
 magnetPin = 17
 btnPin = Button(21)
 
@@ -25,6 +26,7 @@ btnPin = Button(21)
 magnet_status = 0
 prev_magnet_status = 0
 lock_opened = False
+register_rfid = False
 brieven_vandaag = f""
 ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 # Code voor Hardware
@@ -34,6 +36,7 @@ def setup_gpio():
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
 
+    GPIO.setup(buzzerPin, GPIO.OUT)
     GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     # rfid-reader
     global reader
@@ -205,16 +208,37 @@ def open_box():
 
 @socketio.on('F2B_name4rfid')
 def write_to_rfid():
+    global register_rfid
     try:
-        rfid_verzendid = rfid_id
         time.sleep(0.1)
-        if rfid_verzendid is not None:
-            socketio.emit('B2F_rfidwritten', {'rfid': rfid_verzendid})
+        register_rfid = True
     finally:
+        play()
         time.sleep(0.1)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
+
+
+def buzz(noteFreq, duration):
+    halveWaveTime = 1 / (noteFreq * 2)
+    waves = int(duration * noteFreq)
+    for i in range(waves):
+        GPIO.output(buzzerPin, True)
+        time.sleep(halveWaveTime)
+        GPIO.output(buzzerPin, False)
+        time.sleep(halveWaveTime)
+
+
+def play():
+    t = 0
+    notes = [262]
+    duration = [2]
+    for n in notes:
+        buzz(n, duration[t])
+        time.sleep(duration[t] * 0.1)
+        t += 1
+#buzz(262, 0.5)
 
 
 def read_sensor_magnet():
@@ -241,21 +265,25 @@ def read_sensor_magnet():
 
 def read_rfid():
     global lock_opened
-    global rfid_id
+    global register_rfid
     while True:
         id, text = reader.read()
         if id != " ":
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
-            lock_opened = not lock_opened
-            if lock_opened == True:
-                beschrijving = f"{text} Unlocked your mailbox"
+            if register_rfid == False:
+                lock_opened = not lock_opened
+                if lock_opened == True:
+                    beschrijving = f"{text} Unlocked your mailbox"
+                else:
+                    beschrijving = f"{text} Locked your mailbox"
+                answer = DataRepository.insert_rfid_value(id, beschrijving)
+                answer = DataRepository.insert_box_scanner(id, beschrijving)
+                socketio.emit('B2F_refresh_history', broadcast=True)
+                time.sleep(0.5)
             else:
-                beschrijving = f"{text} Locked your mailbox"
-            answer = DataRepository.insert_rfid_value(id, beschrijving)
-            answer = DataRepository.insert_box_scanner(id, beschrijving)
-            socketio.emit('B2F_refresh_history', broadcast=True)
-            time.sleep(0.5)
+                socketio.emit('B2F_rfidwritten', {'rfid': rfid_id})
+                register_rfid = False
 
 
 def wait_for_button():

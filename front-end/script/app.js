@@ -108,6 +108,7 @@ const showRFIDInfo = function (payload) {
   document.querySelector('.js-parRfid').removeAttribute('hidden');
   setValueAndId('js-parRfid', payload.rfid);
   document.querySelector('.js-adduser').removeAttribute('hidden');
+  listenToSubmit();
 };
 // #endregion
 
@@ -258,16 +259,20 @@ const listenToContinue = function () {
 };
 
 const listenToSubmit = function () {
-  const rfid = document.querySelector('.js-parRfid').value;
-  const name = document.querySelector('.js-parName').value;
-  const pwrd = document.querySelector('.js-parPwrd').value;
-  const body = JSON.stringify({
-    rfid: rfid,
-    naam: name,
-    wachtwoord: pwrd,
+  document.querySelector('.js-adduser').addEventListener('click', function () {
+    const rfid = document.querySelector('.js-parRfid').value;
+    const name = document.querySelector('.js-parName').value;
+    const pwrd = document.querySelector('.js-parPwrd').value;
+    const body = JSON.stringify({
+      rfid: rfid,
+      naam: name,
+      wachtwoord: pwrd,
+    });
+    const url = `http://192.168.168.169:5000/api/v1/users/`;
+    handleData(url, backToList, null, 'POST', body);
+    console.log('verzonden');
+    console.log(body);
   });
-  const url = `http://192.168.168.169:5000/api/v1/users/`;
-  handleData(url, backToList, null, 'POST', body);
 };
 // #endregion
 
@@ -292,6 +297,7 @@ const init = function () {
     loadHistoryToday();
     loadLidStatus();
     loadLettersToday();
+    listenToUIIndex();
     listenToSocketIndex();
   } else if (htmlEdit) {
     let urlParams = new URLSearchParams(window.location.search);

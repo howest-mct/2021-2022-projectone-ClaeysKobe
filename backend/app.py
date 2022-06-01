@@ -49,7 +49,9 @@ def setup_gpio():
     spiObj = SpiClass(0, 1)
     # aantal brieven vandaag setten
     global brieven_vandaag
-    brieven_vandaag = len(DataRepository.read_brieven_today())
+    brieven_vandaag = DataRepository.read_brieven_today()
+    brieven_vandaag = brieven_vandaag[0]
+    brieven_vandaag = brieven_vandaag['Aantal']
     show_brieven_vandaag()
 
 
@@ -300,17 +302,23 @@ def wait_for_button():
 
 
 def read_ldr():
+    global led_strip_ldr
     while True:
         ldr1 = spiObj.read_channel(0b1)
         ldr2 = spiObj.read_channel(2)
         ldr3 = spiObj.read_channel(4)
         ldr4 = spiObj.read_channel(8)
         ldr5 = spiObj.read_channel(16)
-        ldr6 = spiObj.read_channel(32)
         if ldr1 > 75 or ldr2 > 75 or ldr3 > 75 or ldr4 > 75 or ldr5 > 75:
             print("Brief ontvangen")
             answer = DataRepository.insert_ldr_values(
                 ldr1, ldr2, ldr3, ldr4, ldr5)
+            answer = DataRepository.add_letter()
+        ldr6 = spiObj.read_channel(32)
+        if ldr6 > 850:
+            led_strip_ldr = True
+        else:
+            led_strip_ldr = False
         time.sleep(0.5)
 
 

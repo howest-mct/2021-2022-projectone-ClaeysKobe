@@ -48,7 +48,7 @@ class DataRepository:
 
     @staticmethod
     def read_brieven_today():
-        sql = "select count(*) from brievenbusevent where cast(date as Date) = cast(now() as Date) and actieID = 3"
+        sql = "select count(*) as `Aantal` from brievenbusevent where cast(date as Date) = cast(now() as Date) and actieID = 3"
         return Database.get_rows(sql)
 
     @staticmethod
@@ -102,3 +102,8 @@ class DataRepository:
         sql = "DELETE FROM gebruiker WHERE gebruikersID = %s;"
         params = [id]
         return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def add_letter():
+        sql = "insert into projectonedb.brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 3, now(), 'Post ontvangen', null);"
+        return Database.execute_sql(sql)

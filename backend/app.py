@@ -20,6 +20,7 @@ from selenium import webdriver
 
 buzzerPin = 23
 magnetPin = 17
+transistorPin = 27
 btnPin = Button(21)
 
 # Default variables
@@ -27,6 +28,10 @@ magnet_status = 0
 prev_magnet_status = 0
 lock_opened = False
 register_rfid = False
+led_strip_ldr = False
+led_strip_lock = False
+led_waarde = False
+prev_led_waarde = False
 brieven_vandaag = f""
 ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 # Code voor Hardware
@@ -37,6 +42,7 @@ def setup_gpio():
     GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(buzzerPin, GPIO.OUT)
+    GPIO.setup(transistorPin, GPIO.OUT)
     GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     # rfid-reader
     global reader
@@ -196,6 +202,7 @@ def open_box():
     answer = DataRepository.insert_box_site(1, "Lock geopend")
     print(answer)
     # Send to the client!
+    led_strip_lock == True
     socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
     time.sleep(0.1)
@@ -209,6 +216,7 @@ def open_box():
     answer = DataRepository.insert_box_site(1, "Lock gesloten")
     print(answer)
     # Send to the client!
+    led_strip_lock == False
     socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
     time.sleep(0.1)
@@ -258,8 +266,10 @@ def read_sensor_magnet():
             beschrijving = ''
             if magnet_status == 0:
                 beschrijving = "Brievenbusklep gesloten"
+                led_strip_lock == True
             else:
                 beschrijving = "brievenbusklep geopend"
+                led_strip_lock == False
             answer = DataRepository.insert_magnet_value(
                 magnet_status, beschrijving)
             answer = DataRepository.insert_lid(magnet_status, beschrijving)
@@ -280,14 +290,23 @@ def read_rfid():
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
             if register_rfid == False:
-                lock_opened = not lock_opened
-                if lock_opened == True:
-                    beschrijving = f"{text} Unlocked your mailbox"
+                gebruiker = DataRepository.check_gebruiker(rfid_id)
+                if gebruiker is not None:
+                    gebruiker = gebruiker['naam']
+                    lock_opened = not lock_opened
+                    if lock_opened == True:
+                        beschrijving = f"{gebruiker} Unlocked your mailbox"
+                        print(beschrijving)
+
+                    else:
+                        beschrijving = f"{gebruiker} Locked your mailbox"
+                        print(beschrijving)
+                    answer = DataRepository.insert_rfid_value(id, beschrijving)
+                    answer = DataRepository.insert_box_scanner(
+                        id, beschrijving)
+                    socketio.emit('B2F_refresh_history', broadcast=True)
                 else:
-                    beschrijving = f"{text} Locked your mailbox"
-                answer = DataRepository.insert_rfid_value(id, beschrijving)
-                answer = DataRepository.insert_box_scanner(id, beschrijving)
-                socketio.emit('B2F_refresh_history', broadcast=True)
+                    print("Ongeregistreede gebruiker probeerde in te loggen")
                 time.sleep(0.5)
             else:
                 socketio.emit('B2F_rfidwritten', {'rfid': rfid_id})
@@ -314,12 +333,28 @@ def read_ldr():
             answer = DataRepository.insert_ldr_values(
                 ldr1, ldr2, ldr3, ldr4, ldr5)
             answer = DataRepository.add_letter()
+            show_brieven_vandaag()
         ldr6 = spiObj.read_channel(32)
         if ldr6 > 850:
             led_strip_ldr = True
         else:
             led_strip_ldr = False
         time.sleep(0.5)
+
+
+def change_led():
+    global prev_led_waarde
+    if led_strip_ldr == True and led_strip_lock == True:
+        led_waarde = True
+        GPIO.output(transistorPin, GPIO.HIGH)
+        DataRepository.insert_led(1)
+    else:
+        led_waarde = False
+        GPIO.output(transistorPin, GPIO.LOW)
+        if prev_led_waarde != led_waarde:
+            DataRepository.insert_led(0)
+    prev_led_waarde = led_waarde
+    time.sleep(1)
 
 
 def start_thread_magnet():
@@ -342,12 +377,18 @@ def start_thread_read_ldr():
     thread4.start()
 
 
+def start_thread_led():
+    thread5 = threading.Thread(target=change_led, args=(), daemon=True)
+    thread5.start()
+
+
 def start_threads():
     print("**** Starting THREADS ****")
     start_thread_magnet()
     start_thread_rfid()
     start_thread_button()
     # start_thread_read_ldr()
+    start_thread_led()
 
 
 def start_chrome_kiosk():

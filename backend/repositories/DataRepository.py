@@ -34,6 +34,12 @@ class DataRepository:
         params = [waarde1, waarde2, waarde3, waarde4, waarde5]
         return Database.execute_sql(sql, params)
 
+    @staticmethod
+    def insert_led(value):
+        sql = "insert into historiek (actiedatum, waarde, commentaar, deviceID, actieID) values (now(), %s, 'Ledstrip getoggeld', 11, 8);"
+        params = [value]
+        return Database.execute_sql(sql, params)
+
     # --- Mailbox Events ---
 
     @staticmethod
@@ -107,3 +113,9 @@ class DataRepository:
     def add_letter():
         sql = "insert into projectonedb.brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 3, now(), 'Post ontvangen', null);"
         return Database.execute_sql(sql)
+
+    @staticmethod
+    def check_gebruiker(rfid_code):
+        sql = "SELECT naam FROM gebruiker WHERE rfid_code like %s"
+        params = [rfid_code]
+        return Database.get_one_row(sql, params)

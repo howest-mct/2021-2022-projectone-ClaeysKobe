@@ -343,7 +343,10 @@ def read_ldr():
 
 
 def change_led():
+<<<<<<< HEAD
     global prev_led_waarde
+=======
+>>>>>>> a2846f590c8d3c4faa842702fd598cba853206e2
     if led_strip_ldr == True and led_strip_lock == True:
         led_waarde = True
         GPIO.output(transistorPin, GPIO.HIGH)

@@ -288,6 +288,15 @@ const listenToSubmit = function () {
     console.log(body);
   });
 };
+
+const listenToToggleNav = function () {
+  const btns = document.querySelectorAll('.js-toggle-nav');
+  for (const btn of btns) {
+    btn.addEventListener('click', function () {
+      document.querySelector('body').classList.toggle('has-mobile-nav');
+    });
+  }
+};
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -330,6 +339,7 @@ const init = function () {
 
   // event listeners and loads
   listenToSocket();
+  listenToToggleNav();
 };
 
 document.addEventListener('DOMContentLoaded', init);

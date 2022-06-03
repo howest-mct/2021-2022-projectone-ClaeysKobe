@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>YouGotMailBox</title>
+    <meta name="description" content="YouGotMailbox">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="msapplication-TileColor" content="#e85e00">
+    <meta name="theme-color" content="#e85e00">
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style/normalize.css">
+    <link rel="stylesheet" href="style/screen.css">
+
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+        integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+        crossorigin="anonymous"></script>
+    <script src="script/datahandler.js"></script>
+    <script src="script/app.js"></script>
+</head>
+
+<body class="js-userPage">
+    <header class="o-row--header u-z-index-hgh">
+        <div class="c-header">
+            <div class="c-header__logo">
+                <h1 class="u-mb-clear c-logo">
+                    <svg class="c-logo__symbol" id="Logo_-_Small" data-name="Logo - Small"
+                        xmlns="http://www.w3.org/2000/svg" width="21" height="48" viewBox="0 0 21 48">
+                        <rect id="Rectangle_20" data-name="Rectangle 20" width="5" height="32" fill="#010700" />
+                        <rect id="Rectangle_21" data-name="Rectangle 21" width="21" height="5" fill="#010700" />
+                        <rect id="Rectangle_22" data-name="Rectangle 22" width="5" height="21"
+                            transform="translate(21 43) rotate(90)" fill="#010700" />
+                        <rect id="Rectangle_23" data-name="Rectangle 23" width="5" height="29"
+                            transform="translate(21 48) rotate(180)" fill="#010700" />
+                        <rect id="Rectangle_24" data-name="Rectangle 24" width="5" height="8" transform="translate(16)"
+                            fill="#010700" />
+                    </svg>
+                </h1>
+            </div>
+            <div class="c-header__nav c-header__nav--main">
+                <nav class="c-nav">
+                    <ul class="o-list c-nav__list u-mb-clear">
+                        <li class="c-nav__item"><a href="index.html" class="c-link">Home</a></li>
+                        <li class="c-nav__item"><a href="users.html" class="c-link c-link--active">Users</a></li>
+                        <li class="c-nav__item"><a href="settings.html" class="c-link">Settings</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="c-header__nav">
+                <a class="u-mb-clear" href="user.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="31.05" viewBox="0 0 32 31.05">
+                        <path id="person_FILL0_wght400_GRAD0_opsz48"
+                            d="M24,23.95a7.193,7.193,0,0,1-7.5-7.5A7.193,7.193,0,0,1,24,8.95a7.193,7.193,0,0,1,7.5,7.5,7.193,7.193,0,0,1-7.5,7.5ZM8,40V35.3a5.5,5.5,0,0,1,.95-3.25A6.1,6.1,0,0,1,11.4,30a37.583,37.583,0,0,1,6.425-2.25A25.973,25.973,0,0,1,24,27a24.88,24.88,0,0,1,6.15.775A42.593,42.593,0,0,1,36.55,30a6.028,6.028,0,0,1,2.5,2.05A5.5,5.5,0,0,1,40,35.3V40Zm3-3H37V35.3a2.739,2.739,0,0,0-.475-1.525A3.011,3.011,0,0,0,35.35,32.7a26.551,26.551,0,0,0-5.85-2.125A25.869,25.869,0,0,0,24,30a26.573,26.573,0,0,0-5.55.575A25.4,25.4,0,0,0,12.6,32.7,3.008,3.008,0,0,0,11,35.3ZM24,20.95a4.361,4.361,0,0,0,4.5-4.5,4.361,4.361,0,0,0-4.5-4.5,4.361,4.361,0,0,0-4.5,4.5,4.361,4.361,0,0,0,4.5,4.5Zm0-4.5ZM24,37Z"
+                            transform="translate(-8 -8.95)" fill="#0d121a" />
+                    </svg>
+                </a>
+            </div>
+            <div class="c-header__mobile-nav-trigger">
+                <button class="o-button-reset c-nav-trigger js-toggle-nav">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24">
+                        <path id="menu_FILL0_wght400_GRAD0_opsz48" d="M6,36V33H42v3ZM6,25.5v-3H42v3ZM6,15V12H42v3Z"
+                            transform="translate(-6 -12)" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+    <section>
+        <img class="c-intro__image" src="img/IMG_7899.JPEG" alt="header picture">
+        <h2 class="c-intro__text">U heeft momenteel geen post</h2>
+    </section>
+    <section class="o-row o-row--lg">
+        <div class="o-container">
+            <div class="o-layout o-layout--justify-space-between o-layout--align-center">
+                <div class="o-layout__item u-1-of-6 u-1-of-6-bp3">
+                    <h2 class="c-users__title u-mb-sm">Users</h2>
+                </div>
+                <div class="o-layout__item u-1-of-6">
+                    <svg id="Component_18_1" data-name="Component 18 – 1" xmlns="http://www.w3.org/2000/svg" width="144"
+                        height="32" viewBox="0 0 144 32">
+                        <g id="btn">
+                            <rect id="Rectangle_1" data-name="Rectangle 1" width="144" height="32" rx="6"
+                                fill="#010700" />
+                            <text id="Toevoegen" transform="translate(16 4)" fill="#fff" font-size="18"
+                                font-family="DMSans-Medium, DM Sans" font-weight="500">
+                                <tspan x="2.541" y="18">Toevoegen</tspan>
+                            </text>
+                        </g>
+                        <path id="add_FILL1_wght400_GRAD0_opsz48"
+                            d="M18.929,30V21.071H10V18.929h8.929V10h2.143v8.929H30v2.143H21.071V30Z"
+                            transform="translate(106 -4)" fill="#fff" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+    <hr>
+    <div class="o-container">
+        <table class="c-styled-table js-tableUsers">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>RFID</th>
+                    <th>Register Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="u-pd-rght-l">Kobe</td>
+                    <td class="u-pd-rght-s">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32.55" height="23.5" viewBox="0 0 32.55 23.5">
+                            <path id="check_FILL0_wght400_GRAD0_opsz48"
+                                d="M18.9,35.7,7.7,24.5l2.15-2.15L18.9,31.4,38.1,12.2l2.15,2.15Z"
+                                transform="translate(-7.7 -12.2)" fill="#24d406" />
+                        </svg>
+                    </td>
+                    <td class="u-pd-rght-m">24-05-2022</td>
+                    <td class="u-pd-rght-xs js-removeuser">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="36" viewBox="0 0 32 36">
+                            <path id="delete_FILL0_wght400_GRAD0_opsz48_1_"
+                                data-name="delete_FILL0_wght400_GRAD0_opsz48 (1)"
+                                d="M13.05,42a3.076,3.076,0,0,1-3-3V10.5H8v-3h9.4V6H30.6V7.5H40v3H37.95V39a3.076,3.076,0,0,1-3,3Zm21.9-31.5H13.05V39h21.9ZM18.35,34.7h3V14.75h-3Zm8.3,0h3V14.75h-3ZM13.05,10.5V39h0Z"
+                                transform="translate(-8 -6)" />
+                        </svg>
+                    </td>
+                    <td class="u-pd-rght-xs js-edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36.65" height="36.626"
+                            viewBox="0 0 36.65 36.626">
+                            <path id="edit_FILL0_wght400_GRAD0_opsz48_2_"
+                                data-name="edit_FILL0_wght400_GRAD0_opsz48 (2)"
+                                d="M9,39h2.2L35.45,14.75l-1.1-1.1-1.1-1.1L9,36.8ZM6,42V35.6L35.4,6.2a2.8,2.8,0,0,1,2.125-.825,2.971,2.971,0,0,1,2.125.875L41.8,8.4a2.853,2.853,0,0,1,.85,2.1,2.853,2.853,0,0,1-.85,2.1L12.4,42ZM39.5,10.45,37.45,8.4Zm-4.05,4.3-1.1-1.1-1.1-1.1Z"
+                                transform="translate(-6 -5.374)" />
+                        </svg>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="u-pd-rght-l">Lily</td>
+                    <td class="u-pd-rght-s">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32.55" height="23.5" viewBox="0 0 32.55 23.5">
+                            <path id="check_FILL0_wght400_GRAD0_opsz48"
+                                d="M18.9,35.7,7.7,24.5l2.15-2.15L18.9,31.4,38.1,12.2l2.15,2.15Z"
+                                transform="translate(-7.7 -12.2)" fill="#24d406" />
+                        </svg>
+                    </td>
+                    <td class="u-pd-rght-m">24-05-2022</td>
+                    <td class="u-pd-rght-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="36" viewBox="0 0 32 36">
+                            <path id="delete_FILL0_wght400_GRAD0_opsz48_1_"
+                                data-name="delete_FILL0_wght400_GRAD0_opsz48 (1)"
+                                d="M13.05,42a3.076,3.076,0,0,1-3-3V10.5H8v-3h9.4V6H30.6V7.5H40v3H37.95V39a3.076,3.076,0,0,1-3,3Zm21.9-31.5H13.05V39h21.9ZM18.35,34.7h3V14.75h-3Zm8.3,0h3V14.75h-3ZM13.05,10.5V39h0Z"
+                                transform="translate(-8 -6)" />
+                        </svg>
+                    </td>
+                    <td class="u-pd-rght-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36.65" height="36.626"
+                            viewBox="0 0 36.65 36.626">
+                            <path id="edit_FILL0_wght400_GRAD0_opsz48_2_"
+                                data-name="edit_FILL0_wght400_GRAD0_opsz48 (2)"
+                                d="M9,39h2.2L35.45,14.75l-1.1-1.1-1.1-1.1L9,36.8ZM6,42V35.6L35.4,6.2a2.8,2.8,0,0,1,2.125-.825,2.971,2.971,0,0,1,2.125.875L41.8,8.4a2.853,2.853,0,0,1,.85,2.1,2.853,2.853,0,0,1-.85,2.1L12.4,42ZM39.5,10.45,37.45,8.4Zm-4.05,4.3-1.1-1.1-1.1-1.1Z"
+                                transform="translate(-6 -5.374)" />
+                        </svg>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

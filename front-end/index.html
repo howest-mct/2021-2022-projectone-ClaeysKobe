@@ -12,7 +12,6 @@
 
     <link rel="icon" href="favicon.svg">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,72 +33,144 @@
     <header class="o-row--header u-z-index-hgh">
         <div class="c-header">
             <div class="c-header__logo">
-                <h1 class="u-mb-clear">
+                <h1 class="u-mb-clear c-logo">
+                    <svg class="c-logo__symbol" id="Logo_-_Small" data-name="Logo - Small"
+                        xmlns="http://www.w3.org/2000/svg" width="21" height="48" viewBox="0 0 21 48">
+                        <rect id="Rectangle_20" data-name="Rectangle 20" width="5" height="32" fill="#010700" />
+                        <rect id="Rectangle_21" data-name="Rectangle 21" width="21" height="5" fill="#010700" />
+                        <rect id="Rectangle_22" data-name="Rectangle 22" width="5" height="21"
+                            transform="translate(21 43) rotate(90)" fill="#010700" />
+                        <rect id="Rectangle_23" data-name="Rectangle 23" width="5" height="29"
+                            transform="translate(21 48) rotate(180)" fill="#010700" />
+                        <rect id="Rectangle_24" data-name="Rectangle 24" width="5" height="8" transform="translate(16)"
+                            fill="#010700" />
+                    </svg>
+                </h1>
             </div>
-            <div class="c-header__nav">
+            <div class="c-header__nav c-header__nav--main">
                 <nav class="c-nav">
-                    <a class="c-link" href="index.html">
-                        <ul class="o-list c-nav__list u-mb-clear u-clr-main">
-                            <li>YouGotMailBox</li>
-                        </ul>
-                    </a>
+                    <ul class="o-list c-nav__list u-mb-clear">
+                        <li class="c-nav__item"><a href="index.html" class="c-link c-link--active">Home</a></li>
+                        <li class="c-nav__item"><a href="users.html" class="c-link">Users</a></li>
+                        <li class="c-nav__item"><a href="settings.html" class="c-link">Settings</a></li>
+                    </ul>
                 </nav>
             </div>
             <div class="c-header__nav">
                 <a class="u-mb-clear" href="user.html">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 31.05">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="31.05" viewBox="0 0 32 31.05">
                         <path id="person_FILL0_wght400_GRAD0_opsz48"
                             d="M24,23.95a7.193,7.193,0,0,1-7.5-7.5A7.193,7.193,0,0,1,24,8.95a7.193,7.193,0,0,1,7.5,7.5,7.193,7.193,0,0,1-7.5,7.5ZM8,40V35.3a5.5,5.5,0,0,1,.95-3.25A6.1,6.1,0,0,1,11.4,30a37.583,37.583,0,0,1,6.425-2.25A25.973,25.973,0,0,1,24,27a24.88,24.88,0,0,1,6.15.775A42.593,42.593,0,0,1,36.55,30a6.028,6.028,0,0,1,2.5,2.05A5.5,5.5,0,0,1,40,35.3V40Zm3-3H37V35.3a2.739,2.739,0,0,0-.475-1.525A3.011,3.011,0,0,0,35.35,32.7a26.551,26.551,0,0,0-5.85-2.125A25.869,25.869,0,0,0,24,30a26.573,26.573,0,0,0-5.55.575A25.4,25.4,0,0,0,12.6,32.7,3.008,3.008,0,0,0,11,35.3ZM24,20.95a4.361,4.361,0,0,0,4.5-4.5,4.361,4.361,0,0,0-4.5-4.5,4.361,4.361,0,0,0-4.5,4.5,4.361,4.361,0,0,0,4.5,4.5Zm0-4.5ZM24,37Z"
-                            transform="translate(-8 -8.95)" fill="#000" />
+                            transform="translate(-8 -8.95)" fill="#0d121a" />
                     </svg>
                 </a>
             </div>
+            <div class="c-header__mobile-nav-trigger">
+                <button class="o-button-reset c-nav-trigger js-toggle-nav">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24">
+                        <path id="menu_FILL0_wght400_GRAD0_opsz48" d="M6,36V33H42v3ZM6,25.5v-3H42v3ZM6,15V12H42v3Z"
+                            transform="translate(-6 -12)" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </header>
-    <div class="c-intro">
-        <figure class="o-row--md u-mb-clear u-pt-clear">
-            <img class="c-intro__image" src="img/IMG_7498.png" alt="Intro visual">
-        </figure>
-        <section class="c-intro__text">
-            <h2 class="c-intro__text--header u-clr-light">U kreeg vandaag:</h2>
-            <h3 class="c-intro__text--subheader u-clr-light js-brievenaantal">-- brieven</h3>
-            <div class="o-layout u-gap--md o-layout--justify-center">
-                <h2 class="u-mb-clear"><span class="c-btn c-btn--selected js-boxopen u-no-clicking">Open box</span></h2>
-                <h2 class="u-mb-clear"><span class="c-btn c-btn--unselected js-boxclose">Close box</span>
-                </h2>
-            </div>
-        </section>
-    </div>
-    <section class="o-row">
-        <div class="o-container">
-            <h2 class="u-clr-dark">Uw brievenbusklep staat: <span class="js-lid">--</span></h2>
-        </div>
+    <section>
+        <img class="c-intro__image" src="img/IMG_7899.JPEG" alt="header picture">
+        <h2 class="c-intro__text">U heeft momenteel geen post</h2>
     </section>
-    <section class="o-row o-row--md">
+    <section class="o-row o-row--lg">
         <div class="o-container">
-            <article class="o-section o-section--xl">
-                <h2 class="c-titel">Geschiedenis</h2>
-                <div class="o-layout u-gap--md">
-                    <h2><span class="c-btn--sml c-btn--selected js-historytoday">Vandaag</span></h2>
-                    <h2><span class="c-btn--sml c-btn--unselected js-historyall">Allemaal</span></h2>
+            <div class="o-layout-bp3 u-gap--lg">
+                <div class="o-layout__item u-4-of-6-bp3">
+                    <article class="o-section o-section--lg">
+                        <h2 class="c-info">Info</h3>
+                            <div class="o-layout-bp3">
+                                <div class="o-layout__item u-1-of-2-bp3">
+                                    <h3 class="c-info__sub u-mb-clear">Your Mailbox lid is:</h3>
+                                    <h3 class="c-info__sub u-mb-clear js-lid">--</h3>
+                                    <p class="c-info__small u-mb-xxl">Last change: <span>--</span></p>
+                                    <h3 class="c-info__sub u-mb-clear">Your Lock is:</h3>
+                                    <h3 class="c-info__sub u-mb-xs">--</h3>
+                                    <div class="o-layout u-gap--md u-mb-xxl">
+                                        <button
+                                            class="o-layout__item c-btn c-btn--selected u-2-of-5 u-1-of-6-bp3 js-boxclose">Lock</button>
+                                        <button
+                                            class="o-layout__item c-btn c-btn--unselected u-2-of-5 u-1-of-6-bp3 js-boxopen">Unlock</button>
+                                    </div>
+                                </div>
+                                <div class="o-layout__item u-1-of-2-bp3">
+                                    <h3 class="c-info__sub u-mb-clear">Total deposits today:</h3>
+                                    <h3 class="c-info__sub u-mb-clear">--</h3>
+                                    <p class="c-info__small">Last change</p>
+                                </div>
+                            </div>
+                    </article>
                 </div>
-                <table class="c-table u-mt-clear">
-                    <thead class="c-table__head">
-                        <tr>
-                            <th>Tijdstip</th>
-                            <th>Gebeurtenis</th>
-                        </tr>
-                    </thead>
-                    <tbody class="c-table__body js-table">
-                        <tr>
-                            <td>--</td>
-                            <td>--</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </article>
+                <div class="o-layout__item u-1-of-6-bp3">
+                    <article class="o-section o-section--lg">
+                        <h2 class="c-info u-mb-xs u-mb-xl-bp3">History</h2>
+                        <div class="o-layout u-gap--md u-mb-md">
+                            <button
+                                class="o-layout__item c-btn--sml c-btn--selected u-2-of-5 u-1-of-6-bp3">Today</button>
+                            <button
+                                class="o-layout__item c-btn--sml c-btn--unselected u-2-of-5 u-1-of-6-bp3">All</button>
+                        </div>
+                        <table class="c-table js-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>--</td>
+                                    <td>--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </article>
+                </div>
+            </div>
         </div>
     </section>
+    <aside class="c-mobile-nav">
+        <div class="c-mobile-nav__bg"></div>
+        <div class="c-mobile-nav__body">
+            <div class="c-mobile-nav__header">
+                <p class="c-logo">
+                    <svg class="c-logo__symbol" id="Logo_-_Small" data-name="Logo - Small"
+                        xmlns="http://www.w3.org/2000/svg" width="21" height="48" viewBox="0 0 21 48">
+                        <rect id="Rectangle_20" data-name="Rectangle 20" width="5" height="32" fill="#010700" />
+                        <rect id="Rectangle_21" data-name="Rectangle 21" width="21" height="5" fill="#010700" />
+                        <rect id="Rectangle_22" data-name="Rectangle 22" width="5" height="21"
+                            transform="translate(21 43) rotate(90)" fill="#010700" />
+                        <rect id="Rectangle_23" data-name="Rectangle 23" width="5" height="29"
+                            transform="translate(21 48) rotate(180)" fill="#010700" />
+                        <rect id="Rectangle_24" data-name="Rectangle 24" width="5" height="8" transform="translate(16)"
+                            fill="#010700" />
+                    </svg>
+                </p>
+                <button class="o-button-reset c-nav-trigger js-toggle-nav">
+                    <svg class="c-nav-trigger__svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="c-mobile-nav__nav c-mobile-nav__nav--main">
+                <nav class="c-nav">
+                    <ul class="o-list c-nav__list">
+                        <li class="c-nav__item"><a href="index.html" class="c-link c-link--active">Home</a></li>
+                        <li class="c-nav__item"><a href="users.html" class="c-link">Users</a></li>
+                        <li class="c-nav__item"><a href="settings.html" class="c-link">Setting</a></li>
+                        <li class="c-nav__item"><a href="user.html" class="c-link">Profile</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </aside>
 </body>
 
 </html>

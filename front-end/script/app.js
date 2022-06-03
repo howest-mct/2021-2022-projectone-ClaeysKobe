@@ -138,11 +138,19 @@ const showUsers = function (payload) {
 };
 
 const showUserInfo = function (payload) {
-  console.log(payload);
+  // console.log(payload);
+  let registreerdatum = '';
+  if (payload.gebruikers.registreerdatum != null) {
+    const datum = payload.gebruikers.registreerdatum.split(' ');
+    registreerdatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
+  } else {
+    registreerdatum = 'Unknown';
+  }
   document.querySelector('.js-name').innerHTML = payload.gebruikers.naam;
   setValueAndId('js-parRfid', payload.gebruikers.rfid_code);
   setValueAndId('js-parName', payload.gebruikers.naam);
   setValueAndId('js-parPwrd', payload.gebruikers.wachtwoord);
+  setValueAndId('js-parRegDate', registreerdatum);
   listenToUpdateUser();
 };
 
@@ -162,7 +170,7 @@ const setValueAndId = function (jsKlasse, value) {
 };
 
 const backToList = function (jsonObj) {
-  window.location.href = 'user.html';
+  window.location.href = 'users.html';
 };
 
 const boxOpen = function () {

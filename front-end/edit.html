@@ -82,29 +82,33 @@
     </section>
     <section class="o-row o-row--lg">
         <div class="o-container">
-            <h2 class="u-mb-md">Kobe Claeys</h2>
+            <h2 class="u-mb-md js-name">Kobe Claeys</h2>
             <form class="o-layout">
                 <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
                     <label for="name">Name</label>
                     <br>
-                    <input class="c-input" type="text" name="name" id="name">
+                    <input class="c-input js-parName" type="text" name="name" id="name">
                 </div>
                 <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-sm" for="password">Password</label>
+                    <label class="u-pb-lg" for="password">Password</label>
                     <br>
-                    <input class="c-input" type="password" name="password" id="password">
+                    <input class="c-input js-parPwrd" type="password" name="password" id="password">
                 </div>
                 <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-sm" for="rfid">RFID</label>
+                    <label class="u-pb-lg" for="rfid">RFID</label>
                     <br>
-                    <input class="c-input" type="text" name="rfid" id="rfid">
+                    <input class="c-input js-parRfid" type="text" name="rfid" id="rfid" readonly>
                 </div>
                 <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-sm" for="regdate">Register Date</label>
+                    <label class="u-pb-lg" for="regdate">Register Date</label>
                     <br>
-                    <input class="c-input" type="text" name="regdate" id="regdate">
+                    <input class="c-input js-parRegDate" type="text" name="regdate" id="regdate" readonly>
                 </div>
             </form>
+            <button class="o-layout__item c-btn c-btn--selected js-updateuser">Save</button>
+            <br>
+            <br>
+            <a href="users.html"><button class="o-layout__item c-btn c-btn--unselected">cancel</button></a>
         </div>
     </section>
 

@@ -131,7 +131,7 @@ class DataRepository:
 
     @staticmethod
     def check_gebruiker(naam, wachtwoord):
-        sql = "SELECT * FROM gebruiker WHERE naam = %s and wachtwoord = AES_ENCRYPT('%s', 'secretsMustBeKept')"
+        sql = "SELECT * FROM gebruiker WHERE naam = %s and wachtwoord = AES_ENCRYPT(%s, 'secretsMustBeKept')"
         params = [naam, wachtwoord]
         return Database.get_one_row(sql, params)
 

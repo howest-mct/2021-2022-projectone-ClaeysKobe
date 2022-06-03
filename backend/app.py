@@ -29,6 +29,7 @@ magnet_status = 0
 prev_magnet_status = 0
 lock_opened = False
 register_rfid = False
+login_rfid = False
 led_strip_ldr = False
 led_strip_lock = False
 led_waarde = False
@@ -132,8 +133,8 @@ def login():
         return jsonify(message="missing parameter!"), 400
 
     answer = DataRepository.check_gebruiker(username, password)
-    if answer == 1:
-
+    if answer is not None:
+        print("succesvol ingelogd")
         expires = datetime.timedelta(seconds=10)
         access_token = create_access_token(
             identity=username, expires_delta=expires)
@@ -318,6 +319,12 @@ def write_to_rfid():
         play()
         time.sleep(0.1)
 
+
+@socketio.on('F2B_waitingForLogin')
+def login_via_rfid():
+    global login_rfid
+    login_rfid = True
+
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 
@@ -370,6 +377,7 @@ def read_sensor_magnet():
 def read_rfid():
     global lock_opened
     global register_rfid
+    global login_rfid
     while True:
         id, text = reader.read()
         if id != "":
@@ -380,19 +388,24 @@ def read_rfid():
                 if gebruiker is not None:
                     gebruiker = gebruiker['naam']
                     lock_opened = not lock_opened
-                    if lock_opened == True:
-                        beschrijving = f"{gebruiker} Unlocked your mailbox"
-                        print(beschrijving)
-
+                    if login_rfid == True:
+                        socketio.emit('B2F_loginPermitted')
+                        login_rfid == False
                     else:
-                        beschrijving = f"{gebruiker} Locked your mailbox"
-                        print(beschrijving)
-                    answer = DataRepository.insert_rfid_value(id, beschrijving)
-                    answer = DataRepository.insert_box_scanner(
-                        id, beschrijving, lock_opened)
-                    socketio.emit('B2F_changed_lock', {
-                                  "lock_status": lock_opened}, broadcast=True)
-                    socketio.emit('B2F_refresh_history', broadcast=True)
+                        if lock_opened == True:
+                            beschrijving = f"{gebruiker} Unlocked your mailbox"
+                            print(beschrijving)
+
+                        else:
+                            beschrijving = f"{gebruiker} Locked your mailbox"
+                            print(beschrijving)
+                        answer = DataRepository.insert_rfid_value(
+                            id, beschrijving)
+                        answer = DataRepository.insert_box_scanner(
+                            id, beschrijving, lock_opened)
+                        socketio.emit('B2F_changed_lock', {
+                            "lock_status": lock_opened}, broadcast=True)
+                        socketio.emit('B2F_refresh_history', broadcast=True)
                 else:
                     print("Ongeregistreede gebruiker probeerde in te loggen")
                 time.sleep(0.5)

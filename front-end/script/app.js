@@ -342,7 +342,9 @@ const listenToSocketAdd = function () {
 };
 
 const listenToSocketLogin = function () {
-  socket.on('B2F_rfidlogin', function () {});
+  socket.on('B2F_loginPermitted', function () {
+    console.log('Ingelogd!');
+  });
 };
 
 const listenToUpdateUser = function () {
@@ -468,6 +470,7 @@ const init = function () {
     listenToContinue();
     listenToSocketAdd();
   } else if (htmlLogin) {
+    socket.emit('F2B_waitingForLogin');
     listenToLogin();
     listenToSocketLogin();
   }

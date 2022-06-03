@@ -2,6 +2,7 @@
 // #region ***  DOM references                           ***********
 let htmlBoxOpen,
   htmlBoxClose,
+  htmlBoxStatus,
   htmlHistoryToday,
   htmlHistoryAll,
   htmlLettersToday,
@@ -23,9 +24,12 @@ const showHistoryToday = function (jsonObject) {
   // console.log(jsonObject.sensors);
   let stringHTML = '';
   for (const sensorInfo of jsonObject.sensors) {
-    const datum = sensorInfo.date.split(' ');
+    let datum = sensorInfo.date.split(' ');
+    let tijdStip = datum[4];
+    tijdStip = tijdStip.split(':');
+    tijdStip = tijdStip[0] + ':' + tijdStip[1];
     stringHTML += `<tr>
-                            <td>${datum[4]}</td>
+                            <td>${tijdStip}</td>
                             <td>${sensorInfo.opmerking}</td>
                         </tr>`;
   }
@@ -47,6 +51,12 @@ const showHistoryAll = function (jsonObject) {
 };
 
 const showLidStatus = function (payload) {
+  // console.log(payload.sensors);
+  let tijdStip = payload.sensors.date;
+  tijdStip = tijdStip.split(' ');
+  tijdStip = tijdStip[4];
+  tijdStip = tijdStip.split(':');
+  tijdStip = tijdStip[0] + ':' + tijdStip[1];
   if (payload.status == 0) {
     htmlLidStatus.innerHTML = `Gesloten`;
     htmlLidStatus.classList.remove('u-clr-main');
@@ -54,16 +64,23 @@ const showLidStatus = function (payload) {
     htmlLidStatus.innerHTML = `Geopend`;
     htmlLidStatus.classList.add('u-clr-main');
   }
+  document.querySelector('.js-lastLid').innerHTML = tijdStip;
 };
 
 const showLetters = function (payload) {
-  console.log(payload.sensors);
-  if (payload.sensors > 1) {
-    htmlLettersToday.innerHTML = payload.sensors;
-  } else if (payload.sensors == 1) {
-    htmlLettersToday.innerHTML = '1 brief';
+  // console.log(payload.letters[0].Aantal);
+  htmlLettersToday.innerHTML = payload.letters[0].Aantal;
+};
+
+const showLatestLetter = function (payload) {
+  document.querySelector('.js-lastDeposit').innerHTML = payload.data;
+};
+
+const showLatestLock = function (payload) {
+  if (payload.data.waarde == 1) {
+    boxOpen();
   } else {
-    htmlLettersToday.innerHTML = '-- brieven';
+    boxClose();
   }
 };
 
@@ -122,6 +139,34 @@ const setValueAndId = function (jsKlasse, value) {
 const backToList = function (jsonObj) {
   window.location.href = 'user.html';
 };
+
+const boxOpen = function () {
+  htmlBoxOpen.classList.remove('c-btn--unselected');
+  htmlBoxOpen.classList.add('c-btn--selected');
+  htmlBoxOpen.classList.add('u-no-clicking');
+  htmlBoxOpen.innerHTML = 'Unlocked';
+  // other element
+  htmlBoxClose.classList.add('c-btn--unselected');
+  htmlBoxClose.classList.remove('c-btn--selected');
+  htmlBoxClose.classList.remove('u-no-clicking');
+  htmlBoxStatus.innerHTML = 'Open';
+  htmlBoxStatus.classList.add('u-clr-main');
+  htmlBoxOpen.innerHTML = 'Close';
+};
+
+const boxClose = function () {
+  htmlBoxClose.classList.remove('c-btn--unselected');
+  htmlBoxClose.classList.add('c-btn--selected');
+  htmlBoxClose.classList.add('u-no-clicking');
+  htmlBoxClose.innerHTML = 'Locked';
+  // other element
+  htmlBoxOpen.classList.add('c-btn--unselected');
+  htmlBoxOpen.classList.remove('c-btn--selected');
+  htmlBoxOpen.classList.remove('u-no-clicking');
+  htmlBoxStatus.innerHTML = 'Closed';
+  htmlBoxStatus.classList.remove('u-clr-main');
+  htmlBoxClose.innerHTML = 'Open';
+};
 // #endregion
 
 // #region ***  Data Access - get___                     ***********
@@ -145,6 +190,16 @@ const loadLettersToday = function () {
   handleData(url, showLetters);
 };
 
+const loadLatestLetter = function () {
+  const url = `http://192.168.168.169:5000/api/v1/events/letters/latest/`;
+  handleData(url, showLatestLetter);
+};
+
+const loadLatestLock = function () {
+  const url = `http://192.168.168.169:5000/api/v1/events/lock/latest/`;
+  handleData(url, showLatestLock);
+};
+
 const getUsers = function () {
   const url = `http://192.168.168.169:5000/api/v1/users/`;
   handleData(url, showUsers);
@@ -161,24 +216,12 @@ const listenToUIIndex = function () {
   // togle box lock
   htmlBoxOpen.addEventListener('click', function () {
     console.log('Setting box Unlocked');
-    this.classList.remove('c-btn--unselected');
-    this.classList.add('c-btn--selected');
-    this.classList.add('u-no-clicking');
-    // other element
-    htmlBoxClose.classList.add('c-btn--unselected');
-    htmlBoxClose.classList.remove('c-btn--selected');
-    htmlBoxClose.classList.remove('u-no-clicking');
+    boxOpen();
     socket.emit('F2B_openBox');
   });
   htmlBoxClose.addEventListener('click', function () {
     console.log('Setting box Locked');
-    this.classList.remove('c-btn--unselected');
-    this.classList.add('c-btn--selected');
-    this.classList.add('u-no-clicking');
-    // other element
-    htmlBoxOpen.classList.add('c-btn--unselected');
-    htmlBoxOpen.classList.remove('c-btn--selected');
-    htmlBoxOpen.classList.remove('u-no-clicking');
+    boxClose();
     socket.emit('F2B_closeBox');
   });
 
@@ -226,6 +269,15 @@ const listenToSocketIndex = function () {
       loadHistoryAll();
     } else {
       loadHistoryToday();
+    }
+  });
+  socket.on('B2F_changed_lock', function (payload) {
+    // console.log(payload);
+    const lock_status = payload.lock_status;
+    if (lock_status == true) {
+      boxOpen();
+    } else {
+      boxClose();
     }
   });
 };
@@ -317,9 +369,12 @@ const init = function () {
     htmlHistoryAll = document.querySelector('.js-historyall');
     htmlLidStatus = document.querySelector('.js-lid');
     htmlLettersToday = document.querySelector('.js-brievenaantal');
+    htmlBoxStatus = document.querySelector('.js-lockStatus');
     loadHistoryToday();
     loadLidStatus();
     loadLettersToday();
+    loadLatestLetter();
+    loadLatestLock();
     listenToUIIndex();
     listenToSocketIndex();
   } else if (htmlEdit) {

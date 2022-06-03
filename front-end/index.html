@@ -89,9 +89,9 @@
                                 <div class="o-layout__item u-1-of-2-bp3">
                                     <h3 class="c-info__sub u-mb-clear">Your Mailbox lid is:</h3>
                                     <h3 class="c-info__sub u-mb-clear js-lid">--</h3>
-                                    <p class="c-info__small u-mb-xxl">Last change: <span>--</span></p>
+                                    <p class="c-info__small u-mb-xxl">Last change: <span class="js-lastLid">--</span></p>
                                     <h3 class="c-info__sub u-mb-clear">Your Lock is:</h3>
-                                    <h3 class="c-info__sub u-mb-xs">--</h3>
+                                    <h3 class="c-info__sub u-mb-xs js-lockStatus">--</h3>
                                     <div class="o-layout u-gap--md u-mb-xxl">
                                         <button
                                             class="o-layout__item c-btn c-btn--selected u-2-of-5 u-1-of-6-bp3 js-boxclose">Lock</button>
@@ -101,8 +101,8 @@
                                 </div>
                                 <div class="o-layout__item u-1-of-2-bp3">
                                     <h3 class="c-info__sub u-mb-clear">Total deposits today:</h3>
-                                    <h3 class="c-info__sub u-mb-clear">--</h3>
-                                    <p class="c-info__small">Last change</p>
+                                    <h3 class="c-info__sub u-mb-clear js-brievenaantal">--</h3>
+                                    <p class="c-info__small">Last change: <span class="js-lastDeposit">--</span></p>
                                 </div>
                             </div>
                     </article>
@@ -112,18 +112,18 @@
                         <h2 class="c-info u-mb-xs u-mb-xl-bp3">History</h2>
                         <div class="o-layout u-gap--md u-mb-md">
                             <button
-                                class="o-layout__item c-btn--sml c-btn--selected u-2-of-5 u-1-of-6-bp3">Today</button>
+                                class="o-layout__item c-btn--sml c-btn--selected u-2-of-5 u-1-of-6-bp3 js-historytoday">Today</button>
                             <button
-                                class="o-layout__item c-btn--sml c-btn--unselected u-2-of-5 u-1-of-6-bp3">All</button>
+                                class="o-layout__item c-btn--sml c-btn--unselected u-2-of-5 u-1-of-6-bp3 js-historyall">All</button>
                         </div>
-                        <table class="c-table js-table">
+                        <table class="c-table">
                             <thead>
                                 <tr>
                                     <th>Time</th>
                                     <th>Event</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="js-table">
                                 <tr>
                                     <td>--</td>
                                     <td>--</td>

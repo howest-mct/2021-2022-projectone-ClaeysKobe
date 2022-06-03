@@ -1011,7 +1011,8 @@ margin .c-mobile-nav {
 .c-table th,
 .c-table td {
     text-align: left;
-    padding: 0px 94px 15px 0px;
+    padding: 0px 56px 24px 0px;
+    size: 100%;
 }
 
 .c-table__body {

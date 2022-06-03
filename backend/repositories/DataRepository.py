@@ -58,8 +58,17 @@ class DataRepository:
         return Database.get_rows(sql)
 
     @staticmethod
+    def read_latest_letter():
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 3 order by date DESC LIMIT 1"
+
+    @staticmethod
     def read_latest_lid():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC LIMIT 1"
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 5 order by date DESC LIMIT 1"
+        return Database.get_one_row(sql)
+
+    @staticmethod
+    def read_latest_lock():
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 7 order by date DESC LIMIT 1"
         return Database.get_one_row(sql)
 
     @staticmethod
@@ -75,9 +84,9 @@ class DataRepository:
         return Database.execute_sql(sql, params)
 
     @staticmethod
-    def insert_box_scanner(parid, beschrijving):
-        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES( (Select gebruikersID from gebruiker where rfid_code like %s) , 7, now(), %s, null)"
-        params = [parid, beschrijving]
+    def insert_box_scanner(parid, beschrijving, waarde):
+        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES( (Select gebruikersID from gebruiker where rfid_code like %s) , 7, now(), %s, %s)"
+        params = [parid, beschrijving, waarde]
         return Database.execute_sql(sql, params)
 
     @staticmethod

@@ -87,28 +87,54 @@ const showLatestLock = function (payload) {
 const showUsers = function (payload) {
   let stringHTML = ``;
   let rfid = '';
+  let registreerdatum = '';
   for (const gebruiker of payload.gebruikers) {
     if (gebruiker.rfid_code != null) {
-      rfid = 'Yes';
+      rfid = `<svg xmlns="http://www.w3.org/2000/svg" width="32.55" height="23.5" viewBox="0 0 32.55 23.5">
+            <path id="check_FILL0_wght400_GRAD0_opsz48"
+                d="M18.9,35.7,7.7,24.5l2.15-2.15L18.9,31.4,38.1,12.2l2.15,2.15Z"
+                transform="translate(-7.7 -12.2)" fill="#24d406" />
+          </svg>`;
     } else {
-      rfid = 'No';
+      rfid = '--';
     }
+    if (gebruiker.registreerdatum != null) {
+      const datum = gebruiker.registreerdatum.split(' ');
+      registreerdatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
+    } else {
+      registreerdatum = 'Unknown';
+    }
+
     stringHTML += `
-    <tr>
-        <td>${rfid}</td>
-        <td>${gebruiker.naam}</td>
-        <td class="js-edit">
-            <a href="edit.html?userID=${gebruiker.gebruikersID}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <path id="edit_FILL1_wght400_GRAD0_opsz48"
-                  d="M27.34,10.812,23.288,6.76l2.66-2.66L30,8.153ZM6,28.1V24.047L21.958,8.089l4.053,4.053L10.053,28.1Z"
-                  transform="translate(-6 -4.1)" />
+      <tr>
+        <td class="u-pd-rght-l">${gebruiker.naam}</td>
+        <td class="u-pd-rght-s">
+            ${rfid}
+        </td>
+        <td class="u-pd-rght-m">${registreerdatum}</td>
+        <td class="u-pd-rght-xs js-removeuser" data-userid="${gebruiker.gebruikersID}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="36" viewBox="0 0 32 36">
+                <path id="delete_FILL0_wght400_GRAD0_opsz48_1_"
+                    data-name="delete_FILL0_wght400_GRAD0_opsz48 (1)"
+                    d="M13.05,42a3.076,3.076,0,0,1-3-3V10.5H8v-3h9.4V6H30.6V7.5H40v3H37.95V39a3.076,3.076,0,0,1-3,3Zm21.9-31.5H13.05V39h21.9ZM18.35,34.7h3V14.75h-3Zm8.3,0h3V14.75h-3ZM13.05,10.5V39h0Z"
+                    transform="translate(-8 -6)" />
+            </svg>
+        </td>
+        <td class="u-pd-rght-xs js-edit">
+          <a href="edit.html?userID=${gebruiker.gebruikersID}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36.65" height="36.626"
+                  viewBox="0 0 36.65 36.626">
+                  <path id="edit_FILL0_wght400_GRAD0_opsz48_2_"
+                      data-name="edit_FILL0_wght400_GRAD0_opsz48 (2)"
+                      d="M9,39h2.2L35.45,14.75l-1.1-1.1-1.1-1.1L9,36.8ZM6,42V35.6L35.4,6.2a2.8,2.8,0,0,1,2.125-.825,2.971,2.971,0,0,1,2.125.875L41.8,8.4a2.853,2.853,0,0,1,.85,2.1,2.853,2.853,0,0,1-.85,2.1L12.4,42ZM39.5,10.45,37.45,8.4Zm-4.05,4.3-1.1-1.1-1.1-1.1Z"
+                      transform="translate(-6 -5.374)" />
               </svg>
             </a>
         </td>
-    </tr>`;
+      </tr>`;
   }
   document.querySelector('.js-tableUsers').innerHTML = stringHTML;
+  listenToDeleteUser();
 };
 
 const showUserInfo = function (payload) {
@@ -118,7 +144,6 @@ const showUserInfo = function (payload) {
   setValueAndId('js-parName', payload.gebruikers.naam);
   setValueAndId('js-parPwrd', payload.gebruikers.wachtwoord);
   listenToUpdateUser();
-  listenToDeleteUser();
 };
 
 const showRFIDInfo = function (payload) {
@@ -308,14 +333,16 @@ const listenToUpdateUser = function () {
 };
 
 const listenToDeleteUser = function () {
-  document
-    .querySelector('.js-removeuser')
-    .addEventListener('click', function () {
-      let urlParams = new URLSearchParams(window.location.search);
-      let userID = urlParams.get('userID');
+  const btns = document.querySelectorAll('.js-removeuser');
+  for (const btn of btns) {
+    btn.addEventListener('click', function () {
+      // console.log('click');
+      const userID = this.dataset.userid;
+      // console.log(userID);
       const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
       handleData(url, backToList, null, 'DELETE');
     });
+  }
 };
 
 const listenToContinue = function () {

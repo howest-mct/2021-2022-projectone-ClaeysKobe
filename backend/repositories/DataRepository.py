@@ -108,7 +108,7 @@ class DataRepository:
 
     @staticmethod
     def insert_user(rfid, naam, pswrd):
-        sql = "insert into gebruiker (naam, wachtwoord, rfid_code) Select %s, %s, %s Where not exists(select * from gebruiker where rfid_code=%s)"
+        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum) Select %s, %s, %s, now() Where not exists(select * from gebruiker where rfid_code=%s)"
         params = [naam, pswrd, rfid, rfid]
         return Database.execute_sql(sql, params)
 

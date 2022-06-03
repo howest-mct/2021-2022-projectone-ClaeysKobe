@@ -8,6 +8,7 @@ let htmlBoxOpen,
   htmlLettersToday,
   htmlLidStatus,
   htmlIndex,
+  htmlLogin,
   htmlAdd,
   htmlEdit,
   htmlUser,
@@ -161,6 +162,14 @@ const showRFIDInfo = function (payload) {
   document.querySelector('.js-adduser').removeAttribute('hidden');
   listenToSubmit();
 };
+
+const callbackShow = function (jsonObj) {
+  console.log(jsonObj);
+};
+
+const showloginError = function (jsonObj) {
+  console.log(jsonObj);
+};
 // #endregion
 
 // #region ***  Callback-No Visualisation - callback___  ***********
@@ -199,6 +208,17 @@ const boxClose = function () {
   htmlBoxStatus.innerHTML = 'Closed';
   htmlBoxStatus.classList.remove('u-clr-main');
   htmlBoxClose.innerHTML = 'Open';
+};
+
+const LoginAcces = function (jsonObj) {
+  handleData(
+    `http://${lanIP}/api/v1/protected/`,
+    callbackShow,
+    callbackError,
+    'GET',
+    null,
+    token
+  );
 };
 // #endregion
 
@@ -321,6 +341,10 @@ const listenToSocketAdd = function () {
   });
 };
 
+const listenToSocketLogin = function () {
+  socket.on('B2F_rfidlogin', function () {});
+};
+
 const listenToUpdateUser = function () {
   document
     .querySelector('.js-updateuser')
@@ -384,6 +408,23 @@ const listenToToggleNav = function () {
     });
   }
 };
+
+const listenToLogin = function () {
+  document.querySelector('.js-login').addEventListener('click', function () {
+    console.log('click');
+    const body = JSON.stringify({
+      username: document.querySelector('.js-userName').value,
+      password: document.querySelector('.js-passWord').value,
+    });
+    handleData(
+      `http://${lanIP}/api/v1/login/`,
+      LoginAcces,
+      showloginError,
+      'POST',
+      body
+    );
+  });
+};
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -395,6 +436,7 @@ const init = function () {
   htmlUser = document.querySelector('.js-userPage');
   htmlEdit = document.querySelector('.js-editPage');
   htmlAdd = document.querySelector('.js-addPage');
+  htmlLogin = document.querySelector('.js-loginPage');
 
   // execute when correct page
   if (htmlIndex) {
@@ -425,6 +467,9 @@ const init = function () {
   } else if (htmlAdd) {
     listenToContinue();
     listenToSocketAdd();
+  } else if (htmlLogin) {
+    listenToLogin();
+    listenToSocketLogin();
   }
 
   // event listeners and loads

@@ -91,24 +91,24 @@ class DataRepository:
 
     @staticmethod
     def read_users():
-        sql = "SELECT * FROM projectonedb.gebruiker"
+        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum FROM projectonedb.gebruiker"
         return Database.get_rows(sql)
 
     @staticmethod
     def read_user(userID):
-        sql = "SELECT * FROM projectonedb.gebruiker where gebruikersID = %s"
+        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum FROM projectonedb.gebruiker where gebruikersID = %s"
         params = [userID]
         return Database.get_one_row(sql, params)
 
     @staticmethod
     def update_user(rfid, naam, pswrd, gebruikersid):
-        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = %s WHERE gebruikersID = %s"
+        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = AES_ENCRYPT('%s', 'secretsMustBeKept') WHERE gebruikersID = %s"
         params = [rfid, naam, pswrd, gebruikersid]
         return Database.execute_sql(sql, params)
 
     @staticmethod
     def insert_user(rfid, naam, pswrd):
-        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum) Select %s, %s, %s, now() Where not exists(select * from gebruiker where rfid_code=%s)"
+        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum) Select %s, AES_ENCRYPT('%s', 'secretsMustBeKept'), %s, now() Where not exists(select * from gebruiker where rfid_code=%s)"
         params = [naam, pswrd, rfid, rfid]
         return Database.execute_sql(sql, params)
 
@@ -124,7 +124,18 @@ class DataRepository:
         return Database.execute_sql(sql)
 
     @staticmethod
-    def check_gebruiker(rfid_code):
-        sql = "SELECT naam FROM gebruiker WHERE rfid_code like %s"
+    def check_rfid(rfid_code):
+        sql = "SELECT naam FROM gebruiker WHERE rfid_code = %s"
         params = [rfid_code]
         return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def check_gebruiker(naam, wachtwoord):
+        sql = "SELECT * FROM gebruiker WHERE naam = %s and wachtwoord = AES_ENCRYPT('%s', 'secretsMustBeKept')"
+        params = [naam, wachtwoord]
+        return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def test_gebruiker():
+        sql = "SELECT AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord` FROM `gebruiker` WHERE `rfid_code` = '55452030326'"
+        return Database.get_one_row(sql)

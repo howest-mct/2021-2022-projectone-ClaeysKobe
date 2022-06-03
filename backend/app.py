@@ -1,18 +1,19 @@
+from selenium import webdriver
+from mfrc522 import SimpleMFRC522
+from repositories.DataRepository import DataRepository
+from flask import Flask, jsonify, request
+from flask_socketio import SocketIO, emit, send
+from flask_cors import CORS
+import netifaces as ni
+import threading
+import datetime
+from classes.spi_class import SpiClass
+from classes.lcd_class import LCD_Module
+from helpers.klasseknop import Button
 import time
 from RPi import GPIO
-from helpers.klasseknop import Button
-from classes.lcd_class import LCD_Module
-from classes.spi_class import SpiClass
-import threading
-import netifaces as ni
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit, send
-from flask import Flask, jsonify, request
-from repositories.DataRepository import DataRepository
-from mfrc522 import SimpleMFRC522
-
-from selenium import webdriver
 
 # from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
@@ -67,9 +68,12 @@ def setup_gpio():
     # lock status
     global lock_opened
     answer = DataRepository.read_latest_lock()
-    answer = answer['waarde']
-    if answer == 1:
-        lock_opened = True
+    if answer is not None:
+        answer = answer['waarde']
+        if answer == 1:
+            lock_opened = True
+        else:
+            lock_opened = False
     else:
         lock_opened = False
 
@@ -94,6 +98,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'geheim!'
 socketio = SocketIO(app, cors_allowed_origins="*", logger=False,
                     engineio_logger=False, ping_timeout=1)
+app.config['JWT_SECRET_KEY'] = 'Secret!12345698790! loijsfmlqkjs'
+jwt = JWTManager(app)
 
 CORS(app)
 
@@ -110,6 +116,39 @@ endpoint = '/api/v1'
 @app.route('/')
 def hallo():
     return "Server is running."
+
+
+@app.route(endpoint + '/login/', methods=['POST'])
+def login():
+    gegevens = DataRepository.json_or_formdata(request)
+
+    print(gegevens)
+    username = gegevens['username']
+    password = gegevens['password']
+
+    if not username:
+        return jsonify(message="missing parameter!"), 400
+    if not password:
+        return jsonify(message="missing parameter!"), 400
+
+    answer = DataRepository.check_gebruiker(username, password)
+    if answer == 1:
+
+        expires = datetime.timedelta(seconds=10)
+        access_token = create_access_token(
+            identity=username, expires_delta=expires)
+
+        print(access_token)
+        return jsonify(message="This is a public endpoint to generate a token", access_token=access_token), 200
+    else:
+        return jsonify(message="Username and/or password are incorrect"), 401
+
+
+@app.route(endpoint + '/protected/', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(message="This is a protected endpoint: ", logged_in_as=current_user), 200
 
 
 @app.route(endpoint + '/events/today/', methods=['GET'])
@@ -176,6 +215,13 @@ def latest_lock():
 def gebruikers():
     if request.method == 'GET':
         data = DataRepository.read_users()
+        for gebruiker in data:
+            wachtwoord = gebruiker['wachtwoord']
+            if wachtwoord is not None:
+                wachtwoord = str(wachtwoord, 'utf-8')
+                gebruiker['wachtwoord'] = wachtwoord
+            else:
+                gebruiker['wachtwoord'] = 'onbekend'
         if data is not None:
             return jsonify(gebruikers=data), 200
         else:
@@ -196,6 +242,12 @@ def gebruikers():
 def gebruiker(UserID):
     if request.method == 'GET':
         data = DataRepository.read_user(UserID)
+        wachtwoord = data['wachtwoord']
+        if wachtwoord is not None:
+            wachtwoord = str(wachtwoord, 'utf-8')
+            data['wachtwoord'] = wachtwoord
+        else:
+            data['wachtwoord'] = 'onbekend'
         if data is not None:
             return jsonify(gebruikers=data), 200
         else:
@@ -324,7 +376,7 @@ def read_rfid():
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
             if register_rfid == False:
-                gebruiker = DataRepository.check_gebruiker(rfid_id)
+                gebruiker = DataRepository.check_rfid(rfid_id)
                 if gebruiker is not None:
                     gebruiker = gebruiker['naam']
                     lock_opened = not lock_opened

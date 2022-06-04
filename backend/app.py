@@ -6,7 +6,7 @@ from flask_socketio import SocketIO, emit, send
 from flask_cors import CORS
 import netifaces as ni
 import threading
-import datetime
+from datetime import datetime
 from classes.spi_class import SpiClass
 from classes.lcd_class import LCD_Module
 from helpers.klasseknop import Button
@@ -27,6 +27,7 @@ btnPin = Button(21)
 # Default variables
 magnet_status = 0
 prev_magnet_status = 0
+laatst_geledigd = datetime.now()
 lock_opened = False
 register_rfid = False
 login_rfid = False
@@ -198,6 +199,16 @@ def sensors_letters():
             return jsonify(data="ERROR"), 404
 
 
+@app.route(endpoint + '/events/letters/count/', methods=['GET'])
+def get_latest_letter_count():
+    if request.method == 'GET':
+        data = DataRepository.get_latest_letters(laatst_geledigd)
+        if data is not None:
+            return jsonify(letters=data), 200
+        else:
+            return jsonify(data="geen"), 200
+
+
 @app.route(endpoint + '/events/letters/latest/', methods=['GET'])
 def latest_letters():
     if request.method == 'GET':
@@ -296,6 +307,7 @@ def open_box():
     lock_opened = True
     led_strip_lock = True
     socketio.emit('B2F_refresh_history', broadcast=True)
+    socketio.emit('B2F_emptyd_letters', broadcast=True)
     time.sleep(0.1)
 
 
@@ -379,6 +391,7 @@ def read_rfid():
     global lock_opened
     global register_rfid
     global login_rfid
+    global laatst_geledigd
     while True:
         id, text = reader.read()
         if id != "":
@@ -398,7 +411,8 @@ def read_rfid():
                         if lock_opened == True:
                             beschrijving = f"{gebruiker} Unlocked your mailbox"
                             print(beschrijving)
-
+                            laatst_geledigd = datetime.now()
+                            socketio.emit('B2F_emptyd_letters', broadcast=True)
                         else:
                             beschrijving = f"{gebruiker} Locked your mailbox"
                             print(beschrijving)
@@ -438,6 +452,7 @@ def read_ldr():
                 ldr1, ldr2, ldr3, ldr4, ldr5)
             answer = DataRepository.add_letter()
             show_brieven_vandaag()
+            socketio.emit('B2F_new_letter', broadcast=True)
         ldr6 = spiObj.read_channel(32)
         if ldr6 > 850:
             led_strip_ldr = True

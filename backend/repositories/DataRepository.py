@@ -60,6 +60,7 @@ class DataRepository:
     @staticmethod
     def read_latest_letter():
         sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 3 order by date DESC LIMIT 1"
+        return Database.get_one_row(sql)
 
     @staticmethod
     def read_latest_lid():
@@ -144,3 +145,9 @@ class DataRepository:
     def truncate_events():
         sql = "TRUNCATE TABLE projectonedb.brievenbusevent"
         return Database.execute_sql(sql)
+
+    @staticmethod
+    def get_latest_letters(date):
+        sql = "SELECT count(*) as `Aantal` FROM brievenbusevent WHERE NOT(date > now() OR date < %s) and ActieID = 3"
+        params = [date]
+        return Database.get_one_row(sql, params)

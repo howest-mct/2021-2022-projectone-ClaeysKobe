@@ -75,7 +75,12 @@ const showLetters = function (payload) {
 };
 
 const showLatestLetter = function (payload) {
-  document.querySelector('.js-lastDeposit').innerHTML = payload.data;
+  // console.log(`Latest letter: ${payload.data.date}`);
+  let datum = payload.data.date.split(' ');
+  let tijdStip = datum[4];
+  tijdStip = tijdStip.split(':');
+  tijdStip = tijdStip[0] + ':' + tijdStip[1];
+  document.querySelector('.js-lastDeposit').innerHTML = tijdStip;
 };
 
 const showLatestLock = function (payload) {
@@ -175,6 +180,19 @@ const showSucces = function (jsonObj) {
     '.js-truncateResult'
   ).innerHTML = `Data succesfully removed`;
 };
+
+const showLastLetters = function (jsonObj) {
+  console.log(jsonObj);
+  if (jsonObj.letters.Aantal > 0) {
+    document.querySelector(
+      '.js-latestLetterCount'
+    ).innerHTML = `<span class="c-dot u-clr-main"></span> You have unchecked post!`;
+  } else {
+    document.querySelector(
+      '.js-latestLetterCount'
+    ).innerHTML = `<span class="c-dot"></span> No post currently in your mailbox.`;
+  }
+};
 // #endregion
 
 // #region ***  Callback-No Visualisation - callback___  ***********
@@ -267,6 +285,11 @@ const getUserInfo = function (UserID) {
   const url = `http://192.168.168.169:5000/api/v1/user/${UserID}/`;
   handleData(url, showUserInfo);
 };
+
+const getLatestLetters = function () {
+  const url = `http://192.168.168.169:5000/api/v1/events/letters/count/`;
+  handleData(url, showLastLetters);
+};
 // #endregion
 
 // #region ***  Event Listeners - listenTo___            ***********
@@ -315,6 +338,13 @@ const listenToUIIndex = function () {
 const listenToSocket = function () {
   socket.on('connected', function () {
     console.log('verbonden met socket webserver');
+  });
+  socket.on('B2F_new_letter', function () {
+    getLatestLetters();
+    loadLatestLetter();
+  });
+  socket.on('B2F_emptyd_letters', function () {
+    getLatestLetters();
   });
 };
 
@@ -489,6 +519,7 @@ const init = function () {
   }
 
   // event listeners and loads
+  getLatestLetters();
   listenToSocket();
   listenToToggleNav();
 };

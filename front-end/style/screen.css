@@ -722,6 +722,20 @@ a:focus {
     }
 }
 
+/*
+    Component: Dot
+    ---
+    Dots
+*/
+
+.c-dot {
+    height: 25px;
+    width: 25px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: block;
+    padding-top: 24px;
+}
 
 /*
     Component: titel
@@ -917,13 +931,14 @@ a:focus {
     ---
     Dedicated mobile nav component
 */
-margin .c-mobile-nav {
-    position: fixed;
+.c-mobile-nav {
+    position: absolute;
     top: 0;
     right: 0;
     left: 0;
     height: 100vh;
     pointer-events: none;
+    z-index: 10000;
 }
 
 .has-mobile-nav .c-mobile-nav {

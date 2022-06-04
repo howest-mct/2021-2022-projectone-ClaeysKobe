@@ -162,7 +162,7 @@ def sens_today():
             return jsonify(data="ERROR"), 404
 
 
-@app.route(endpoint + '/events/', methods=['GET'])
+@app.route(endpoint + '/events/', methods=['GET', 'DELETE'])
 def sensors():
     if request.method == 'GET':
         data = DataRepository.read_sensor_gesch()
@@ -170,6 +170,12 @@ def sensors():
             return jsonify(sensors=data), 200
         else:
             return jsonify(data="ERROR"), 404
+    if request.method == 'DELETE':
+        data = DataRepository.truncate_events()
+        if data is not None:
+            return jsonify(answer="succes"), 202
+        else:
+            return jsonify(answer="ERROR"), 400
 
 
 @app.route(endpoint + '/events/lid/', methods=['GET'])

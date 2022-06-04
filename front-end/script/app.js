@@ -11,6 +11,7 @@ let htmlBoxOpen,
   htmlLogin,
   htmlAdd,
   htmlEdit,
+  htmlSettings,
   htmlUser,
   historyToday,
   historyAll;
@@ -167,6 +168,12 @@ const callbackShow = function (jsonObj) {
 
 const showloginError = function (jsonObj) {
   console.log(jsonObj);
+};
+
+const showSucces = function (jsonObj) {
+  document.querySelector(
+    '.js-truncateResult'
+  ).innerHTML = `Data succesfully removed`;
 };
 // #endregion
 
@@ -419,6 +426,16 @@ const listenToLogin = function () {
     );
   });
 };
+
+const listenToReset = function () {
+  document.querySelector('.js-reset').addEventListener('click', function () {
+    console.log('click');
+    if (confirm('Delete all records?')) {
+      handleData(`http://${lanIP}/api/v1/events/`, showSucces, null, 'DELETE');
+    } else {
+    }
+  });
+};
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -431,6 +448,7 @@ const init = function () {
   htmlEdit = document.querySelector('.js-editPage');
   htmlAdd = document.querySelector('.js-addPage');
   htmlLogin = document.querySelector('.js-loginPage');
+  htmlSettings = document.querySelector('.js-settingsPage');
 
   // execute when correct page
   if (htmlIndex) {
@@ -465,6 +483,8 @@ const init = function () {
     socket.emit('F2B_waitingForLogin');
     listenToLogin();
     listenToSocketLogin();
+  } else if (htmlSettings) {
+    listenToReset();
   }
 
   // event listeners and loads

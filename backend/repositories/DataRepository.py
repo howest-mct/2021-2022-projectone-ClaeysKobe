@@ -139,3 +139,8 @@ class DataRepository:
     def test_gebruiker():
         sql = "SELECT AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord` FROM `gebruiker` WHERE `rfid_code` = '55452030326'"
         return Database.get_one_row(sql)
+
+    @staticmethod
+    def truncate_events():
+        sql = "TRUNCATE TABLE projectonedb.brievenbusevent"
+        return Database.execute_sql(sql)

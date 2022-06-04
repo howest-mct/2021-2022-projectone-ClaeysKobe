@@ -480,6 +480,7 @@ const init = function () {
     socket.emit('F2B_waitingForRegister');
     listenToSocketAdd();
   } else if (htmlLogin) {
+    console.log('?');
     socket.emit('F2B_waitingForLogin');
     listenToLogin();
     listenToSocketLogin();

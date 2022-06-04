@@ -322,7 +322,7 @@ def login_via_rfid():
 
 
 @socketio.on('F2B_waitingForRegister')
-def register_rfid():
+def register_rfid_set():
     global register_rfid
     register_rfid = True
 
@@ -384,14 +384,16 @@ def read_rfid():
         if id != "":
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
+            print(register_rfid)
             if register_rfid == False:
                 gebruiker = DataRepository.check_rfid(rfid_id)
                 if gebruiker is not None:
                     gebruiker = gebruiker['naam']
                     lock_opened = not lock_opened
+                    print(login_rfid)
                     if login_rfid == True:
                         socketio.emit('B2F_loginPermitted')
-                        login_rfid == False
+                        login_rfid = False
                     else:
                         if lock_opened == True:
                             beschrijving = f"{gebruiker} Unlocked your mailbox"

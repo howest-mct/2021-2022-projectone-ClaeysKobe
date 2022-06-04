@@ -48,7 +48,7 @@ const handleData = function (
     .catch(function (error) {
       console.warn(`>>fout bij verwerken json: ${error}`);
       if (callbackErrorFunctionName) {
-        callbackErrorFunctionName(undefined);
+        callbackErrorFunctionName(error);
       }
     });
 };

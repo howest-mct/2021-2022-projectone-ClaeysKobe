@@ -102,13 +102,13 @@ class DataRepository:
 
     @staticmethod
     def update_user(rfid, naam, pswrd, gebruikersid):
-        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = AES_ENCRYPT('%s', 'secretsMustBeKept') WHERE gebruikersID = %s"
+        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = AES_ENCRYPT(%s, 'secretsMustBeKept') WHERE gebruikersID = %s"
         params = [rfid, naam, pswrd, gebruikersid]
         return Database.execute_sql(sql, params)
 
     @staticmethod
     def insert_user(rfid, naam, pswrd):
-        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum) Select %s, AES_ENCRYPT('%s', 'secretsMustBeKept'), %s, now() Where not exists(select * from gebruiker where rfid_code=%s)"
+        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum) Select %s, AES_ENCRYPT(%s, 'secretsMustBeKept'), %s, now() Where not exists(select * from gebruiker where rfid_code=%s)"
         params = [naam, pswrd, rfid, rfid]
         return Database.execute_sql(sql, params)
 

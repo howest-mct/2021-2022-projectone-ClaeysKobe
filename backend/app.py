@@ -135,9 +135,9 @@ def login():
     answer = DataRepository.check_gebruiker(username, password)
     if answer is not None:
         print("succesvol ingelogd")
-        expires = datetime.timedelta(seconds=10)
+        # expires = datetime.timedelta(seconds=10)  expires_delta=expires
         access_token = create_access_token(
-            identity=username, expires_delta=expires)
+            identity=username)
 
         print(access_token)
         return jsonify(message="This is a public endpoint to generate a token", access_token=access_token), 200
@@ -309,21 +309,16 @@ def open_box():
     time.sleep(0.1)
 
 
-@socketio.on('F2B_name4rfid')
-def write_to_rfid():
-    global register_rfid
-    try:
-        time.sleep(0.1)
-        register_rfid = True
-    finally:
-        play()
-        time.sleep(0.1)
-
-
 @socketio.on('F2B_waitingForLogin')
 def login_via_rfid():
     global login_rfid
     login_rfid = True
+
+
+@socketio.on('F2B_waitingForRegister')
+def register_rfid():
+    global register_rfid
+    register_rfid = True
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.

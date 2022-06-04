@@ -157,14 +157,12 @@ const showUserInfo = function (payload) {
 
 const showRFIDInfo = function (payload) {
   // console.log('YEEY');
-  document.querySelector('.js-parRfid').removeAttribute('hidden');
   setValueAndId('js-parRfid', payload.rfid);
-  document.querySelector('.js-adduser').removeAttribute('hidden');
   listenToSubmit();
 };
 
 const callbackShow = function (jsonObj) {
-  console.log(jsonObj);
+  window.location.href = 'home.html';
 };
 
 const showloginError = function (jsonObj) {
@@ -343,7 +341,7 @@ const listenToSocketAdd = function () {
 
 const listenToSocketLogin = function () {
   socket.on('B2F_loginPermitted', function () {
-    console.log('Ingelogd!');
+    window.location.href = 'home.html';
   });
 };
 
@@ -377,12 +375,6 @@ const listenToDeleteUser = function () {
       handleData(url, backToList, null, 'DELETE');
     });
   }
-};
-
-const listenToContinue = function () {
-  document.querySelector('.js-continue').addEventListener('click', function () {
-    socket.emit('F2B_name4rfid');
-  });
 };
 
 const listenToSubmit = function () {
@@ -462,12 +454,12 @@ const init = function () {
     if (userID) {
       getUserInfo(userID);
     } else {
-      window.location.href = 'index.html';
+      window.location.href = 'home.html';
     }
   } else if (htmlUser) {
     getUsers();
   } else if (htmlAdd) {
-    listenToContinue();
+    socket.emit('F2B_waitingForRegister');
     listenToSocketAdd();
   } else if (htmlLogin) {
     socket.emit('F2B_waitingForLogin');

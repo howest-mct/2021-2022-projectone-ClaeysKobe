@@ -6,6 +6,7 @@ from flask_socketio import SocketIO, emit, send
 from flask_cors import CORS
 import netifaces as ni
 import threading
+import os
 from datetime import datetime
 from classes.spi_class import SpiClass
 from classes.lcd_class import LCD_Module
@@ -23,6 +24,7 @@ buzzerPin = 23
 magnetPin = 17
 transistorPin = 27
 btnPin = Button(21)
+shutdownBtnPin = Button(5)
 
 # Default variables
 magnet_status = 0
@@ -36,7 +38,10 @@ led_strip_lock = False
 led_waarde = False
 prev_led_waarde = False
 brieven_vandaag = f""
-ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+try:
+    ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+except Exception:
+    ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 # Code voor Hardware
 
 
@@ -78,6 +83,13 @@ def setup_gpio():
             lock_opened = False
     else:
         lock_opened = False
+
+
+def lees_shutdown_knop(pin):
+    if shutdownBtnPin.pressed:
+        print("**** button pressed: shutting down PI ****")
+        time.sleep(5)
+        os.system("sudo shutdown -h now")
 
 
 def lees_knop(pin):
@@ -184,7 +196,7 @@ def sensors_lid():
     if request.method == 'GET':
         data = DataRepository.read_latest_lid()
         if data is not None:
-            return jsonify(sensors=data), 200
+            return jsonify(status=data), 200
         else:
             return jsonify(data="ERROR"), 404
 
@@ -380,8 +392,7 @@ def read_sensor_magnet():
                 magnet_status, beschrijving)
             answer = DataRepository.insert_lid(magnet_status, beschrijving)
             print(f"New magnet value: {answer}")
-            socketio.emit('B2F_change_magnet', {
-                          'status': magnet_status}, broadcast=True)
+            socketio.emit('B2F_change_magnet', broadcast=True)
             socketio.emit('B2F_refresh_history', broadcast=True)
         prev_magnet_status = magnet_status
         time.sleep(0.5)
@@ -435,6 +446,7 @@ def read_rfid():
 
 def wait_for_button():
     btnPin.on_press(lees_knop)
+    shutdownBtnPin.on_press(lees_shutdown_knop)
     time.sleep(0.1)
 
 

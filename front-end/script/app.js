@@ -54,18 +54,19 @@ const showHistoryAll = function (jsonObject) {
 
 const showLidStatus = function (payload) {
   // console.log(payload.sensors);
-  let tijdStip = payload.sensors.date;
-  tijdStip = tijdStip.split(' ');
-  tijdStip = tijdStip[4];
-  tijdStip = tijdStip.split(':');
-  tijdStip = tijdStip[0] + ':' + tijdStip[1];
-  if (payload.status == 0) {
+  const status = payload.status.waarde;
+  if (status == 0) {
     htmlLidStatus.innerHTML = `Gesloten`;
     htmlLidStatus.classList.remove('u-clr-main');
   } else {
     htmlLidStatus.innerHTML = `Geopend`;
     htmlLidStatus.classList.add('u-clr-main');
   }
+  let tijdStip = payload.status.date;
+  tijdStip = tijdStip.split(' ');
+  tijdStip = tijdStip[4];
+  tijdStip = tijdStip.split(':');
+  tijdStip = tijdStip[0] + ':' + tijdStip[1];
   document.querySelector('.js-lastLid').innerHTML = tijdStip;
 };
 
@@ -84,6 +85,7 @@ const showLatestLetter = function (payload) {
 };
 
 const showLatestLock = function (payload) {
+  // console.log(payload)
   if (payload.data.waarde == 1) {
     boxOpen();
   } else {
@@ -182,11 +184,11 @@ const showSucces = function (jsonObj) {
 };
 
 const showLastLetters = function (jsonObj) {
-  console.log(jsonObj);
+  // console.log(jsonObj);
   if (jsonObj.letters.Aantal > 0) {
     document.querySelector(
       '.js-latestLetterCount'
-    ).innerHTML = `<span class="c-dot u-clr-main"></span> You have unchecked post!`;
+    ).innerHTML = `<span class="c-dot u-bgclr-main"></span> You have unchecked post!`;
   } else {
     document.querySelector(
       '.js-latestLetterCount'
@@ -350,7 +352,7 @@ const listenToSocket = function () {
 
 const listenToSocketIndex = function () {
   socket.on('B2F_change_magnet', function (payload) {
-    showLidStatus(payload);
+    loadLidStatus();
   });
   socket.on('B2F_refresh_history', function (payload) {
     if (historyAll == true) {
@@ -427,7 +429,6 @@ const listenToSubmit = function () {
     const url = `http://192.168.168.169:5000/api/v1/users/`;
     handleData(url, backToList, null, 'POST', body);
     console.log('verzonden');
-    console.log(body);
   });
 };
 
@@ -442,7 +443,6 @@ const listenToToggleNav = function () {
 
 const listenToLogin = function () {
   document.querySelector('.js-login').addEventListener('click', function () {
-    console.log('click');
     const body = JSON.stringify({
       username: document.querySelector('.js-userName').value,
       password: document.querySelector('.js-passWord').value,
@@ -459,7 +459,6 @@ const listenToLogin = function () {
 
 const listenToReset = function () {
   document.querySelector('.js-reset').addEventListener('click', function () {
-    console.log('click');
     if (confirm('Delete all records?')) {
       handleData(`http://${lanIP}/api/v1/events/`, showSucces, null, 'DELETE');
     } else {
@@ -510,7 +509,6 @@ const init = function () {
     socket.emit('F2B_waitingForRegister');
     listenToSocketAdd();
   } else if (htmlLogin) {
-    console.log('?');
     socket.emit('F2B_waitingForLogin');
     listenToLogin();
     listenToSocketLogin();

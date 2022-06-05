@@ -1163,6 +1163,10 @@ a:focus {
     color: #d40606 !important;
 }
 
+.u-bgclr-main {
+    background-color: #24D406 !important;
+}
+
 /*
     Utilities: z-index
     ---

@@ -547,6 +547,7 @@ a:focus {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 32px;
 }
 
 .c-nav-trigger__svg {
@@ -947,7 +948,7 @@ a:focus {
 
 .c-mobile-nav__header {
     display: flex;
-    align-items: center;
+    align-items: start;
     justify-content: space-between;
     margin-bottom: 16px;
 }

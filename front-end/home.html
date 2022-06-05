@@ -26,7 +26,7 @@
     <script src="script/app.js"></script>
 </head>
 
-<body class="js-editPage">
+<body class="js-indexPage">
     <header class="o-row--header u-z-index-hgh">
         <div class="c-header">
             <div class="c-header__logo">
@@ -47,7 +47,7 @@
             <div class="c-header__nav c-header__nav--main">
                 <nav class="c-nav">
                     <ul class="o-list c-nav__list u-mb-clear">
-                        <li class="c-nav__item"><a href="home.html" class="c-link">Home</a></li>
+                        <li class="c-nav__item"><a href="home.html" class="c-link c-link--active">Home</a></li>
                         <li class="c-nav__item"><a href="users.html" class="c-link">Users</a></li>
                         <li class="c-nav__item"><a href="settings.html" class="c-link">Settings</a></li>
                     </ul>
@@ -58,7 +58,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="31.05" viewBox="0 0 32 31.05">
                         <path id="person_FILL0_wght400_GRAD0_opsz48"
                             d="M24,23.95a7.193,7.193,0,0,1-7.5-7.5A7.193,7.193,0,0,1,24,8.95a7.193,7.193,0,0,1,7.5,7.5,7.193,7.193,0,0,1-7.5,7.5ZM8,40V35.3a5.5,5.5,0,0,1,.95-3.25A6.1,6.1,0,0,1,11.4,30a37.583,37.583,0,0,1,6.425-2.25A25.973,25.973,0,0,1,24,27a24.88,24.88,0,0,1,6.15.775A42.593,42.593,0,0,1,36.55,30a6.028,6.028,0,0,1,2.5,2.05A5.5,5.5,0,0,1,40,35.3V40Zm3-3H37V35.3a2.739,2.739,0,0,0-.475-1.525A3.011,3.011,0,0,0,35.35,32.7a26.551,26.551,0,0,0-5.85-2.125A25.869,25.869,0,0,0,24,30a26.573,26.573,0,0,0-5.55.575A25.4,25.4,0,0,0,12.6,32.7,3.008,3.008,0,0,0,11,35.3ZM24,20.95a4.361,4.361,0,0,0,4.5-4.5,4.361,4.361,0,0,0-4.5-4.5,4.361,4.361,0,0,0-4.5,4.5,4.361,4.361,0,0,0,4.5,4.5Zm0-4.5ZM24,37Z"
-                            transform="translate(-8 -8.95)" fill="#24d406" />
+                            transform="translate(-8 -8.95)" fill="#0d121a" />
                     </svg>
                 </a>
             </div>
@@ -74,37 +74,62 @@
     </header>
     <section>
         <img class="c-intro__image" src="img/IMG_7899.JPEG" alt="header picture">
-        </span><h2 class="c-intro__text js-latestLetterCount"></h2>
+        <h2 class="c-intro__text js-latestLetterCount"></h2>
     </section>
     <section class="o-row o-row--lg">
         <div class="o-container">
-            <h2 class="u-mb-md js-name">Kobe Claeys</h2>
-            <form class="o-layout">
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label for="name">Name</label>
-                    <br>
-                    <input class="c-input js-parName" type="text" name="name" id="name">
+            <div class="o-layout-bp3 u-gap--lg">
+                <div class="o-layout__item u-4-of-6-bp3">
+                    <article class="o-section o-section--lg">
+                        <h2 class="c-info">Info</h3>
+                            <div class="o-layout-bp3">
+                                <div class="o-layout__item u-1-of-2-bp3">
+                                    <h3 class="c-info__sub u-mb-clear">Your Mailbox lid is:</h3>
+                                    <h3 class="c-info__sub u-mb-clear js-lid">--</h3>
+                                    <p class="c-info__small u-mb-xxl">Last change: <span class="js-lastLid">--</span></p>
+                                    <h3 class="c-info__sub u-mb-clear">Your Lock is:</h3>
+                                    <h3 class="c-info__sub u-mb-xs js-lockStatus">--</h3>
+                                    <div class="o-layout u-gap--md u-mb-xxl">
+                                        <button
+                                            class="o-layout__item c-btn c-btn--selected u-2-of-5 u-1-of-6-bp3 js-boxclose">Lock</button>
+                                        <button
+                                            class="o-layout__item c-btn c-btn--unselected u-2-of-5 u-1-of-6-bp3 js-boxopen">Unlock</button>
+                                    </div>
+                                </div>
+                                <div class="o-layout__item u-1-of-2-bp3">
+                                    <h3 class="c-info__sub u-mb-clear">Total deposits today:</h3>
+                                    <h3 class="c-info__sub u-mb-clear js-brievenaantal">--</h3>
+                                    <p class="c-info__small">Last change: <span class="js-lastDeposit">--</span></p>
+                                </div>
+                            </div>
+                    </article>
                 </div>
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-lg" for="password">Password</label>
-                    <br>
-                    <input class="c-input js-parPwrd" type="password" name="password" id="password">
+                <div class="o-layout__item u-1-of-6-bp3">
+                    <article class="o-section o-section--lg">
+                        <h2 class="c-info u-mb-xs u-mb-xl-bp3">History</h2>
+                        <div class="o-layout u-gap--md u-mb-md">
+                            <button
+                                class="o-layout__item c-btn--sml c-btn--selected u-2-of-5 u-1-of-6-bp3 js-historytoday">Today</button>
+                            <button
+                                class="o-layout__item c-btn--sml c-btn--unselected u-2-of-5 u-1-of-6-bp3 js-historyall">All</button>
+                        </div>
+                        <table class="c-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                </tr>
+                            </thead>
+                            <tbody class="js-table">
+                                <tr>
+                                    <td>--</td>
+                                    <td>--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </article>
                 </div>
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-lg" for="rfid">RFID</label>
-                    <br>
-                    <input class="c-input js-parRfid" type="text" name="rfid" id="rfid" readonly>
-                </div>
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-lg" for="regdate">Register Date</label>
-                    <br>
-                    <input class="c-input js-parRegDate" type="text" name="regdate" id="regdate" readonly>
-                </div>
-            </form>
-            <button class="o-layout__item c-btn c-btn--selected js-updateuser">Save</button>
-            <br>
-            <br>
-            <a href="users.html"><button class="o-layout__item c-btn c-btn--unselected">cancel</button></a>
+            </div>
         </div>
     </section>
     <aside class="c-mobile-nav">

@@ -26,7 +26,7 @@
     <script src="script/app.js"></script>
 </head>
 
-<body class="js-editPage">
+<body class="js-userPage">
     <header class="o-row--header u-z-index-hgh">
         <div class="c-header">
             <div class="c-header__logo">
@@ -48,7 +48,7 @@
                 <nav class="c-nav">
                     <ul class="o-list c-nav__list u-mb-clear">
                         <li class="c-nav__item"><a href="home.html" class="c-link">Home</a></li>
-                        <li class="c-nav__item"><a href="users.html" class="c-link">Users</a></li>
+                        <li class="c-nav__item"><a href="users.html" class="c-link c-link--active">Users</a></li>
                         <li class="c-nav__item"><a href="settings.html" class="c-link">Settings</a></li>
                     </ul>
                 </nav>
@@ -58,7 +58,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="31.05" viewBox="0 0 32 31.05">
                         <path id="person_FILL0_wght400_GRAD0_opsz48"
                             d="M24,23.95a7.193,7.193,0,0,1-7.5-7.5A7.193,7.193,0,0,1,24,8.95a7.193,7.193,0,0,1,7.5,7.5,7.193,7.193,0,0,1-7.5,7.5ZM8,40V35.3a5.5,5.5,0,0,1,.95-3.25A6.1,6.1,0,0,1,11.4,30a37.583,37.583,0,0,1,6.425-2.25A25.973,25.973,0,0,1,24,27a24.88,24.88,0,0,1,6.15.775A42.593,42.593,0,0,1,36.55,30a6.028,6.028,0,0,1,2.5,2.05A5.5,5.5,0,0,1,40,35.3V40Zm3-3H37V35.3a2.739,2.739,0,0,0-.475-1.525A3.011,3.011,0,0,0,35.35,32.7a26.551,26.551,0,0,0-5.85-2.125A25.869,25.869,0,0,0,24,30a26.573,26.573,0,0,0-5.55.575A25.4,25.4,0,0,0,12.6,32.7,3.008,3.008,0,0,0,11,35.3ZM24,20.95a4.361,4.361,0,0,0,4.5-4.5,4.361,4.361,0,0,0-4.5-4.5,4.361,4.361,0,0,0-4.5,4.5,4.361,4.361,0,0,0,4.5,4.5Zm0-4.5ZM24,37Z"
-                            transform="translate(-8 -8.95)" fill="#24d406" />
+                            transform="translate(-8 -8.95)" fill="#0d121a" />
                     </svg>
                 </a>
             </div>
@@ -74,39 +74,62 @@
     </header>
     <section>
         <img class="c-intro__image" src="img/IMG_7899.JPEG" alt="header picture">
-        </span><h2 class="c-intro__text js-latestLetterCount"></h2>
+        <h2 class="c-intro__text js-latestLetterCount"></h2>
     </section>
     <section class="o-row o-row--lg">
         <div class="o-container">
-            <h2 class="u-mb-md js-name">Kobe Claeys</h2>
-            <form class="o-layout">
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label for="name">Name</label>
-                    <br>
-                    <input class="c-input js-parName" type="text" name="name" id="name">
+            <div class="o-layout o-layout--justify-space-between o-layout--align-center">
+                <div class="o-layout__item u-1-of-6 u-1-of-6-bp3">
+                    <h2 class="c-users__title u-mb-sm">Users</h2>
                 </div>
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-lg" for="password">Password</label>
-                    <br>
-                    <input class="c-input js-parPwrd" type="password" name="password" id="password">
+                <div class="o-layout__item u-1-of-6">
+                    <a href="register.html">
+                        <svg id="Component_18_1" data-name="Component 18 – 1" xmlns="http://www.w3.org/2000/svg" width="144"
+                            height="32" viewBox="0 0 144 32">
+                            <g id="btn">
+                                <rect id="Rectangle_1" data-name="Rectangle 1" width="144" height="32" rx="6"
+                                    fill="#010700" />
+                                <text id="Toevoegen" transform="translate(16 4)" fill="#fff" font-size="18"
+                                    font-family="DMSans-Medium, DM Sans" font-weight="500">
+                                    <tspan x="2.541" y="18">Toevoegen</tspan>
+                                </text>
+                            </g>
+                            <path id="add_FILL1_wght400_GRAD0_opsz48"
+                                d="M18.929,30V21.071H10V18.929h8.929V10h2.143v8.929H30v2.143H21.071V30Z"
+                                transform="translate(106 -4)" fill="#fff" />
+                        </svg>
+                    </a>
                 </div>
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-lg" for="rfid">RFID</label>
-                    <br>
-                    <input class="c-input js-parRfid" type="text" name="rfid" id="rfid" readonly>
-                </div>
-                <div class="o-layout__item u-1-of-4-bp3 u-mb-xl">
-                    <label class="u-pb-lg" for="regdate">Register Date</label>
-                    <br>
-                    <input class="c-input js-parRegDate" type="text" name="regdate" id="regdate" readonly>
-                </div>
-            </form>
-            <button class="o-layout__item c-btn c-btn--selected js-updateuser">Save</button>
-            <br>
-            <br>
-            <a href="users.html"><button class="o-layout__item c-btn c-btn--unselected">cancel</button></a>
+            </div>
         </div>
     </section>
+    <hr>
+    <div class="o-container">
+        <table class="c-styled-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>RFID</th>
+                    <th>Register Date</th>
+                </tr>
+            </thead>
+            <tbody class=" js-tableUsers">
+                <tr>
+                    <td class="u-pd-rght-l">--</td>
+                    <td class="u-pd-rght-s">
+                        --
+                    </td>
+                    <td class="u-pd-rght-m">--</td>
+                    <td class="u-pd-rght-xs">
+                        --
+                    </td>
+                    <td class="u-pd-rght-xs">
+                        --
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <aside class="c-mobile-nav">
         <div class="c-mobile-nav__bg"></div>
         <div class="c-mobile-nav__body">

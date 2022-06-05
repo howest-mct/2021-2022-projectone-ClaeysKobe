@@ -1,18 +1,20 @@
+from selenium import webdriver
+from mfrc522 import SimpleMFRC522
+from repositories.DataRepository import DataRepository
+from flask import Flask, jsonify, request
+from flask_socketio import SocketIO, emit, send
+from flask_cors import CORS
+import netifaces as ni
+import threading
+import os
+from datetime import datetime
+from classes.spi_class import SpiClass
+from classes.lcd_class import LCD_Module
+from helpers.klasseknop import Button
 import time
 from RPi import GPIO
-from helpers.klasseknop import Button
-from classes.lcd_class import LCD_Module
-from classes.spi_class import SpiClass
-import threading
-import netifaces as ni
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit, send
-from flask import Flask, jsonify, request
-from repositories.DataRepository import DataRepository
-from mfrc522 import SimpleMFRC522
-
-from selenium import webdriver
 
 # from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
@@ -22,18 +24,24 @@ buzzerPin = 23
 magnetPin = 17
 transistorPin = 27
 btnPin = Button(21)
+shutdownBtnPin = Button(5)
 
 # Default variables
 magnet_status = 0
 prev_magnet_status = 0
+laatst_geledigd = datetime.now()
 lock_opened = False
 register_rfid = False
+login_rfid = False
 led_strip_ldr = False
 led_strip_lock = False
 led_waarde = False
 prev_led_waarde = False
 brieven_vandaag = f""
-ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+try:
+    ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+except Exception:
+    ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 # Code voor Hardware
 
 
@@ -44,6 +52,11 @@ def setup_gpio():
     GPIO.setup(buzzerPin, GPIO.OUT)
     GPIO.setup(transistorPin, GPIO.OUT)
     GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # magnet pin
+    global magnet_status
+    global prev_magnet_status
+    magnet_status = GPIO.input(magnetPin)
+    prev_magnet_status = GPIO.input(magnetPin)
     # rfid-reader
     global reader
     reader = SimpleMFRC522()
@@ -59,6 +72,24 @@ def setup_gpio():
     brieven_vandaag = brieven_vandaag[0]
     brieven_vandaag = brieven_vandaag['Aantal']
     show_brieven_vandaag()
+    # lock status
+    global lock_opened
+    answer = DataRepository.read_latest_lock()
+    if answer is not None:
+        answer = answer['waarde']
+        if answer == 1:
+            lock_opened = True
+        else:
+            lock_opened = False
+    else:
+        lock_opened = False
+
+
+def lees_shutdown_knop(pin):
+    if shutdownBtnPin.pressed:
+        print("**** button pressed: shutting down PI ****")
+        time.sleep(5)
+        os.system("sudo shutdown -h now")
 
 
 def lees_knop(pin):
@@ -81,6 +112,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'geheim!'
 socketio = SocketIO(app, cors_allowed_origins="*", logger=False,
                     engineio_logger=False, ping_timeout=1)
+app.config['JWT_SECRET_KEY'] = 'Secret!12345698790! loijsfmlqkjs'
+jwt = JWTManager(app)
 
 CORS(app)
 
@@ -99,6 +132,39 @@ def hallo():
     return "Server is running."
 
 
+@app.route(endpoint + '/login/', methods=['POST'])
+def login():
+    gegevens = DataRepository.json_or_formdata(request)
+
+    print(gegevens)
+    username = gegevens['username']
+    password = gegevens['password']
+
+    if not username:
+        return jsonify(message="missing parameter!"), 400
+    if not password:
+        return jsonify(message="missing parameter!"), 400
+
+    answer = DataRepository.check_gebruiker(username, password)
+    if answer is not None:
+        print("succesvol ingelogd")
+        # expires = datetime.timedelta(seconds=10) , expires_delta=expires
+        access_token = create_access_token(
+            identity=username)
+
+        print(access_token)
+        return jsonify(message="This is a public endpoint to generate a token", access_token=access_token), 200
+    else:
+        return jsonify(message="Username and/or password are incorrect"), 401
+
+
+@app.route(endpoint + '/protected/', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(message="This is a protected endpoint: ", logged_in_as=current_user), 200
+
+
 @app.route(endpoint + '/events/today/', methods=['GET'])
 def sens_today():
     if request.method == 'GET':
@@ -109,7 +175,7 @@ def sens_today():
             return jsonify(data="ERROR"), 404
 
 
-@app.route(endpoint + '/events/', methods=['GET'])
+@app.route(endpoint + '/events/', methods=['GET', 'DELETE'])
 def sensors():
     if request.method == 'GET':
         data = DataRepository.read_sensor_gesch()
@@ -117,6 +183,12 @@ def sensors():
             return jsonify(sensors=data), 200
         else:
             return jsonify(data="ERROR"), 404
+    if request.method == 'DELETE':
+        data = DataRepository.truncate_events()
+        if data is not None:
+            return jsonify(answer="succes"), 202
+        else:
+            return jsonify(answer="ERROR"), 400
 
 
 @app.route(endpoint + '/events/lid/', methods=['GET'])
@@ -124,7 +196,7 @@ def sensors_lid():
     if request.method == 'GET':
         data = DataRepository.read_latest_lid()
         if data is not None:
-            return jsonify(sensors=data), 200
+            return jsonify(status=data), 200
         else:
             return jsonify(data="ERROR"), 404
 
@@ -134,15 +206,52 @@ def sensors_letters():
     if request.method == 'GET':
         data = DataRepository.read_brieven_today()
         if data is not None:
-            return jsonify(sensors=data), 200
+            return jsonify(letters=data), 200
         else:
             return jsonify(data="ERROR"), 404
+
+
+@app.route(endpoint + '/events/letters/count/', methods=['GET'])
+def get_latest_letter_count():
+    if request.method == 'GET':
+        data = DataRepository.get_latest_letters(laatst_geledigd)
+        if data is not None:
+            return jsonify(letters=data), 200
+        else:
+            return jsonify(data="geen"), 200
+
+
+@app.route(endpoint + '/events/letters/latest/', methods=['GET'])
+def latest_letters():
+    if request.method == 'GET':
+        data = DataRepository.read_latest_letter()
+        if data is not None:
+            return jsonify(data=data), 200
+        else:
+            return jsonify(data="--"), 200
+
+
+@app.route(endpoint + '/events/lock/latest/', methods=['GET'])
+def latest_lock():
+    if request.method == 'GET':
+        data = DataRepository.read_latest_lock()
+        if data is not None:
+            return jsonify(data=data), 200
+        else:
+            return jsonify(data="--"), 200
 
 
 @app.route(endpoint + '/users/', methods=['GET', 'POST'])
 def gebruikers():
     if request.method == 'GET':
         data = DataRepository.read_users()
+        for gebruiker in data:
+            wachtwoord = gebruiker['wachtwoord']
+            if wachtwoord is not None:
+                wachtwoord = str(wachtwoord, 'utf-8')
+                gebruiker['wachtwoord'] = wachtwoord
+            else:
+                gebruiker['wachtwoord'] = 'onbekend'
         if data is not None:
             return jsonify(gebruikers=data), 200
         else:
@@ -163,6 +272,12 @@ def gebruikers():
 def gebruiker(UserID):
     if request.method == 'GET':
         data = DataRepository.read_user(UserID)
+        wachtwoord = data['wachtwoord']
+        if wachtwoord is not None:
+            wachtwoord = str(wachtwoord, 'utf-8')
+            data['wachtwoord'] = wachtwoord
+        else:
+            data['wachtwoord'] = 'onbekend'
         if data is not None:
             return jsonify(gebruikers=data), 200
         else:
@@ -188,49 +303,52 @@ def gebruiker(UserID):
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
-    # Send to the client!
-    socketio.emit('B2F_change_magnet', {
-        'status': magnet_status}, broadcast=True)
     time.sleep(0.1)
 
 
 @socketio.on('F2B_openBox')
 def open_box():
+    global lock_opened
+    global led_strip_lock
     print('Box opened via PC')
     # Add change to database
     answer = DataRepository.insert_rfid_value(0, "Lock geopend")
     answer = DataRepository.insert_box_site(1, "Lock geopend")
     print(answer)
     # Send to the client!
-    led_strip_lock == True
-    socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
+    lock_opened = True
+    led_strip_lock = True
     socketio.emit('B2F_refresh_history', broadcast=True)
+    socketio.emit('B2F_emptyd_letters', broadcast=True)
     time.sleep(0.1)
 
 
 @socketio.on('F2B_closeBox')
 def open_box():
+    global lock_opened
+    global led_strip_lock
     print('Box closed via PC')
     # Add change to database
     answer = DataRepository.insert_rfid_value(1, "Lock gesloten")
     answer = DataRepository.insert_box_site(1, "Lock gesloten")
     print(answer)
     # Send to the client!
-    led_strip_lock == False
-    socketio.emit('B2F_change_magnet', {'status': answer}, broadcast=True)
+    lock_opened = False
+    led_strip_lock = False
     socketio.emit('B2F_refresh_history', broadcast=True)
     time.sleep(0.1)
 
 
-@socketio.on('F2B_name4rfid')
-def write_to_rfid():
+@socketio.on('F2B_waitingForLogin')
+def login_via_rfid():
+    global login_rfid
+    login_rfid = True
+
+
+@socketio.on('F2B_waitingForRegister')
+def register_rfid_set():
     global register_rfid
-    try:
-        time.sleep(0.1)
-        register_rfid = True
-    finally:
-        play()
-        time.sleep(0.1)
+    register_rfid = True
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
@@ -274,8 +392,7 @@ def read_sensor_magnet():
                 magnet_status, beschrijving)
             answer = DataRepository.insert_lid(magnet_status, beschrijving)
             print(f"New magnet value: {answer}")
-            socketio.emit('B2F_change_magnet', {
-                          'status': magnet_status}, broadcast=True)
+            socketio.emit('B2F_change_magnet', broadcast=True)
             socketio.emit('B2F_refresh_history', broadcast=True)
         prev_magnet_status = magnet_status
         time.sleep(0.5)
@@ -284,27 +401,39 @@ def read_sensor_magnet():
 def read_rfid():
     global lock_opened
     global register_rfid
+    global login_rfid
+    global laatst_geledigd
     while True:
         id, text = reader.read()
         if id != "":
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
+            print(register_rfid)
             if register_rfid == False:
-                gebruiker = DataRepository.check_gebruiker(rfid_id)
+                gebruiker = DataRepository.check_rfid(rfid_id)
                 if gebruiker is not None:
                     gebruiker = gebruiker['naam']
                     lock_opened = not lock_opened
-                    if lock_opened == True:
-                        beschrijving = f"{gebruiker} Unlocked your mailbox"
-                        print(beschrijving)
-
+                    print(login_rfid)
+                    if login_rfid == True:
+                        socketio.emit('B2F_loginPermitted')
+                        login_rfid = False
                     else:
-                        beschrijving = f"{gebruiker} Locked your mailbox"
-                        print(beschrijving)
-                    answer = DataRepository.insert_rfid_value(id, beschrijving)
-                    answer = DataRepository.insert_box_scanner(
-                        id, beschrijving)
-                    socketio.emit('B2F_refresh_history', broadcast=True)
+                        if lock_opened == True:
+                            beschrijving = f"{gebruiker} Unlocked your mailbox"
+                            print(beschrijving)
+                            laatst_geledigd = datetime.now()
+                            socketio.emit('B2F_emptyd_letters', broadcast=True)
+                        else:
+                            beschrijving = f"{gebruiker} Locked your mailbox"
+                            print(beschrijving)
+                        answer = DataRepository.insert_rfid_value(
+                            id, beschrijving)
+                        answer = DataRepository.insert_box_scanner(
+                            id, beschrijving, lock_opened)
+                        socketio.emit('B2F_changed_lock', {
+                            "lock_status": lock_opened}, broadcast=True)
+                        socketio.emit('B2F_refresh_history', broadcast=True)
                 else:
                     print("Ongeregistreede gebruiker probeerde in te loggen")
                 time.sleep(0.5)
@@ -317,6 +446,7 @@ def read_rfid():
 
 def wait_for_button():
     btnPin.on_press(lees_knop)
+    shutdownBtnPin.on_press(lees_shutdown_knop)
     time.sleep(0.1)
 
 
@@ -334,6 +464,7 @@ def read_ldr():
                 ldr1, ldr2, ldr3, ldr4, ldr5)
             answer = DataRepository.add_letter()
             show_brieven_vandaag()
+            socketio.emit('B2F_new_letter', broadcast=True)
         ldr6 = spiObj.read_channel(32)
         if ldr6 > 850:
             led_strip_ldr = True

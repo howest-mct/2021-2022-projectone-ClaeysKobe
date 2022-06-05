@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>YouGotMailBox</title>
+    <meta name="description" content="YouGotMailbox">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="msapplication-TileColor" content="#e85e00">
+    <meta name="theme-color" content="#e85e00">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style/normalize.css">
+    <link rel="stylesheet" href="style/screen.css">
+
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+        integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+        crossorigin="anonymous"></script>
+    <script src="script/datahandler.js"></script>
+    <script src="script/app.js"></script>
+</head>
+
+<body class="js-addPage">
+    <div class="o-layout o-layout--justify-center o-layout--align-center">
+        <div class="o-layout__item o-layout--justify-center u-1-of-2-bp3">
+            <div class="o-welcome">
+                <svg class="u-mb-md" id="Logo" xmlns="http://www.w3.org/2000/svg" width="51" height="144"
+                    viewBox="0 0 51 144">
+                    <rect id="Rectangle_6" data-name="Rectangle 6" width="51" height="7" fill="#010700" />
+                    <rect id="Rectangle_7" data-name="Rectangle 7" width="6" height="113" transform="translate(45 31)"
+                        fill="#24d406" />
+                    <rect id="Rectangle_8" data-name="Rectangle 8" width="51" height="7" transform="translate(0 137)"
+                        fill="#24d406" />
+                    <rect id="Rectangle_9" data-name="Rectangle 9" width="7" height="103" fill="#010700" />
+                    <rect id="Rectangle_10" data-name="Rectangle 10" width="6" height="14" transform="translate(45)"
+                        fill="#010700" />
+                </svg>
+                <h2 class="u-mb-sm">Welcome</h2>
+                <h3 class="u-mb-xxxl">Please enter your details.</h3>
+                <form class="c-welcome-form">
+                    <input class="c-reg-input u-mb-24 js-parName" type="text" name="name" id="name"
+                        placeholder="Fill in your name">
+                    <input class="c-reg-input u-mb-24 js-parPwrd" type="password" name="password" id="password"
+                        placeholder="Fill in your password">
+                    <input class="c-reg-input u-mb-24 js-parRfid" type="text" name="rfid-tag" id="rfid-tag"
+                        placeholder="Waiting for RFID-scan" readonly>
+                </form>
+                <div class="c-registerbtn u-mb-lg">
+                    <button class="c-btn--lg js-adduser">Register now!</button>
+                </div>
+                <p>Already have an account? <a href="index.html">Login</a> now!</p>
+            </div>
+        </div>
+        <div class="o-layout__item u-1-of-2-bp3">
+            <img class="c-bigpic" src="img/xps-8pb7Hq539Zw-unsplash.jpg" alt="XPS (dell) side picture">
+        </div>
+    </div>
+</body>

@@ -58,8 +58,18 @@ class DataRepository:
         return Database.get_rows(sql)
 
     @staticmethod
+    def read_latest_letter():
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 3 order by date DESC LIMIT 1"
+        return Database.get_one_row(sql)
+
+    @staticmethod
     def read_latest_lid():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC LIMIT 1"
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 5 order by date DESC LIMIT 1"
+        return Database.get_one_row(sql)
+
+    @staticmethod
+    def read_latest_lock():
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 7 order by date DESC LIMIT 1"
         return Database.get_one_row(sql)
 
     @staticmethod
@@ -75,31 +85,31 @@ class DataRepository:
         return Database.execute_sql(sql, params)
 
     @staticmethod
-    def insert_box_scanner(parid, beschrijving):
-        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES( (Select gebruikersID from gebruiker where rfid_code like %s) , 7, now(), %s, null)"
-        params = [parid, beschrijving]
+    def insert_box_scanner(parid, beschrijving, waarde):
+        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES( (Select gebruikersID from gebruiker where rfid_code like %s) , 7, now(), %s, %s)"
+        params = [parid, beschrijving, waarde]
         return Database.execute_sql(sql, params)
 
     @staticmethod
     def read_users():
-        sql = "SELECT * FROM projectonedb.gebruiker"
+        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum FROM projectonedb.gebruiker"
         return Database.get_rows(sql)
 
     @staticmethod
     def read_user(userID):
-        sql = "SELECT * FROM projectonedb.gebruiker where gebruikersID = %s"
+        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum FROM projectonedb.gebruiker where gebruikersID = %s"
         params = [userID]
         return Database.get_one_row(sql, params)
 
     @staticmethod
     def update_user(rfid, naam, pswrd, gebruikersid):
-        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = %s WHERE gebruikersID = %s"
+        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = AES_ENCRYPT(%s, 'secretsMustBeKept') WHERE gebruikersID = %s"
         params = [rfid, naam, pswrd, gebruikersid]
         return Database.execute_sql(sql, params)
 
     @staticmethod
     def insert_user(rfid, naam, pswrd):
-        sql = "insert into gebruiker (naam, wachtwoord, rfid_code) Select %s, %s, %s Where not exists(select * from gebruiker where rfid_code=%s)"
+        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum) Select %s, AES_ENCRYPT(%s, 'secretsMustBeKept'), %s, now() Where not exists(select * from gebruiker where rfid_code=%s)"
         params = [naam, pswrd, rfid, rfid]
         return Database.execute_sql(sql, params)
 
@@ -115,7 +125,29 @@ class DataRepository:
         return Database.execute_sql(sql)
 
     @staticmethod
-    def check_gebruiker(rfid_code):
-        sql = "SELECT naam FROM gebruiker WHERE rfid_code like %s"
+    def check_rfid(rfid_code):
+        sql = "SELECT naam FROM gebruiker WHERE rfid_code = %s"
         params = [rfid_code]
+        return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def check_gebruiker(naam, wachtwoord):
+        sql = "SELECT * FROM gebruiker WHERE naam = %s and wachtwoord = AES_ENCRYPT(%s, 'secretsMustBeKept')"
+        params = [naam, wachtwoord]
+        return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def test_gebruiker():
+        sql = "SELECT AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord` FROM `gebruiker` WHERE `rfid_code` = '55452030326'"
+        return Database.get_one_row(sql)
+
+    @staticmethod
+    def truncate_events():
+        sql = "TRUNCATE TABLE projectonedb.brievenbusevent"
+        return Database.execute_sql(sql)
+
+    @staticmethod
+    def get_latest_letters(date):
+        sql = "SELECT count(*) as `Aantal` FROM brievenbusevent WHERE NOT(date > now() OR date < %s) and ActieID = 3"
+        params = [date]
         return Database.get_one_row(sql, params)

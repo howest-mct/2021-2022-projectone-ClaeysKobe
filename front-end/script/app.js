@@ -10,11 +10,14 @@ let htmlBoxOpen,
   htmlIndex,
   htmlLogin,
   htmlAdd,
+  htmlProfile,
   htmlEdit,
   htmlSettings,
   htmlUser,
   historyToday,
-  historyAll;
+  historyAll,
+  currentUser,
+  token;
 
 const lanIP = `${window.location.hostname}:5000`;
 const socket = io(`http://${lanIP}`);
@@ -177,6 +180,10 @@ const showloginError = function (jsonObj) {
   console.log(jsonObj);
 };
 
+const callbackError = function (jsonObj) {
+  console.log(jsonObj);
+};
+
 const showSucces = function (jsonObj) {
   document.querySelector(
     '.js-truncateResult'
@@ -236,6 +243,8 @@ const boxClose = function () {
 };
 
 const LoginAcces = function (jsonObj) {
+  token = jsonObj.access_token;
+  console.log(token);
   handleData(
     `http://${lanIP}/api/v1/protected/`,
     callbackShow,
@@ -244,6 +253,12 @@ const LoginAcces = function (jsonObj) {
     null,
     token
   );
+};
+
+const setCurrentUser = function () {
+  document
+    .querySelector('.js-currentUser')
+    .setAttribute('href', `user.html?${currentUser}`);
 };
 // #endregion
 
@@ -478,6 +493,7 @@ const init = function () {
   htmlAdd = document.querySelector('.js-addPage');
   htmlLogin = document.querySelector('.js-loginPage');
   htmlSettings = document.querySelector('.js-settingsPage');
+  htmlProfile = document.querySelector('.js-profilePage');
 
   // execute when correct page
   if (htmlIndex) {
@@ -488,6 +504,7 @@ const init = function () {
     htmlLidStatus = document.querySelector('.js-lid');
     htmlLettersToday = document.querySelector('.js-brievenaantal');
     htmlBoxStatus = document.querySelector('.js-lockStatus');
+    setCurrentUser();
     loadHistoryToday();
     loadLidStatus();
     loadLettersToday();
@@ -499,11 +516,13 @@ const init = function () {
     let urlParams = new URLSearchParams(window.location.search);
     let userID = urlParams.get('userID');
     if (userID) {
+      setCurrentUser();
       getUserInfo(userID);
     } else {
       window.location.href = 'home.html';
     }
   } else if (htmlUser) {
+    setCurrentUser();
     getUsers();
   } else if (htmlAdd) {
     socket.emit('F2B_waitingForRegister');
@@ -513,7 +532,10 @@ const init = function () {
     listenToLogin();
     listenToSocketLogin();
   } else if (htmlSettings) {
+    setCurrentUser();
     listenToReset();
+  } else if (htmlProfile) {
+    setCurrentUser();
   }
 
   // event listeners and loads

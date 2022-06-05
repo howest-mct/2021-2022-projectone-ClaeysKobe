@@ -148,7 +148,7 @@ def login():
     answer = DataRepository.check_gebruiker(username, password)
     if answer is not None:
         print("succesvol ingelogd")
-        # expires = datetime.timedelta(seconds=10)  expires_delta=expires
+        # expires = datetime.timedelta(seconds=10) , expires_delta=expires
         access_token = create_access_token(
             identity=username)
 

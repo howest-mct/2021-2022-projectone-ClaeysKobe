@@ -163,13 +163,19 @@ a:focus {
 */
 
 .o-welcome {
+    margin: 20px auto;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     text-align: center;
-    height: 100vh;
+}
+
+@media (min-width: 992px) {
+    .o-welcome {
+        height: 100vh;
+    }
 }
 
 /*
@@ -933,11 +939,11 @@ a:focus {
     Dedicated mobile nav component
 */
 .c-mobile-nav {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     left: 0;
-    height: 100vh;
+    height: 100%;
     pointer-events: none;
     z-index: 10000;
 }

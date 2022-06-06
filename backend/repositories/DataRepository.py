@@ -79,9 +79,9 @@ class DataRepository:
         return Database.execute_sql(sql, params)
 
     @staticmethod
-    def insert_box_site(status, beschrijving):
-        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES(null, 7, now(), %s, %s)"
-        params = [beschrijving, status]
+    def insert_box_site(status, beschrijving, user):
+        sql = "INSERT INTO brievenbusevent(gebruikersid, actieid, date, opmerking, waarde) VALUES(%s, 7, now(), %s, %s)"
+        params = [user, beschrijving, status]
         return Database.execute_sql(sql, params)
 
     @staticmethod
@@ -162,4 +162,10 @@ class DataRepository:
     def get_id_by_rfid(rfid):
         sql = "SELECT gebruikersID FROM gebruiker WHERE rfid_code = %s"
         params = [rfid]
+        return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def check_name(rfid_code):
+        sql = "SELECT naam FROM gebruiker WHERE gebruikersID = %s"
+        params = [rfid_code]
         return Database.get_one_row(sql, params)

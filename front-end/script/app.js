@@ -228,7 +228,7 @@ const boxOpen = function () {
   htmlBoxClose.classList.remove('u-no-clicking');
   htmlBoxStatus.innerHTML = 'Open';
   htmlBoxStatus.classList.add('u-clr-main');
-  htmlBoxOpen.innerHTML = 'Close';
+  htmlBoxClose.innerHTML = 'Close';
 };
 
 const boxClose = function () {
@@ -242,7 +242,7 @@ const boxClose = function () {
   htmlBoxOpen.classList.remove('u-no-clicking');
   htmlBoxStatus.innerHTML = 'Closed';
   htmlBoxStatus.classList.remove('u-clr-main');
-  htmlBoxClose.innerHTML = 'Open';
+  htmlBoxOpen.innerHTML = 'Open';
 };
 
 const LoginAcces = function (jsonObj) {
@@ -317,14 +317,18 @@ const getLatestLetters = function () {
 const listenToUIIndex = function () {
   // togle box lock
   htmlBoxOpen.addEventListener('click', function () {
-    console.log('Setting box Unlocked');
-    boxOpen();
-    socket.emit('F2B_openBox');
+    if (currentUser != '') {
+      console.log('Setting box Unlocked');
+      boxOpen();
+      socket.emit('F2B_openBox', { userID: currentUser });
+    }
   });
   htmlBoxClose.addEventListener('click', function () {
-    console.log('Setting box Locked');
-    boxClose();
-    socket.emit('F2B_closeBox');
+    if (currentUser != '') {
+      console.log('Setting box Locked');
+      boxClose();
+      socket.emit('F2B_closeBox', { userID: currentUser });
+    }
   });
 
   // toggle history showings

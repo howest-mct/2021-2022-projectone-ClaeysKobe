@@ -308,13 +308,17 @@ def initial_connection():
 
 
 @socketio.on('F2B_openBox')
-def open_box():
+def open_box(payload):
     global lock_opened
     global led_strip_lock
     print('Box opened via PC')
+    userID = payload['userID']
+    naam = DataRepository.check_name(userID)
+    naam = naam['naam']
     # Add change to database
     answer = DataRepository.insert_rfid_value(0, "Lock geopend")
-    answer = DataRepository.insert_box_site(1, "Lock geopend")
+    answer = DataRepository.insert_box_site(
+        1, f"{naam} unlocked your mailbox", userID)
     print(answer)
     # Send to the client!
     lock_opened = True
@@ -325,13 +329,17 @@ def open_box():
 
 
 @socketio.on('F2B_closeBox')
-def open_box():
+def open_box(payload):
     global lock_opened
     global led_strip_lock
     print('Box closed via PC')
+    userID = payload['userID']
+    naam = DataRepository.check_name(userID)
+    naam = naam['naam']
     # Add change to database
     answer = DataRepository.insert_rfid_value(1, "Lock gesloten")
-    answer = DataRepository.insert_box_site(1, "Lock gesloten")
+    answer = DataRepository.insert_box_site(
+        0, f"{naam} Locked your mailbox", userID)
     print(answer)
     # Send to the client!
     lock_opened = False

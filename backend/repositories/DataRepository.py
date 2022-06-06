@@ -151,3 +151,15 @@ class DataRepository:
         sql = "SELECT count(*) as `Aantal` FROM brievenbusevent WHERE NOT(date > now() OR date < %s) and ActieID = 3"
         params = [date]
         return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def get_id(name):
+        sql = "SELECT gebruikersID FROM gebruiker WHERE naam = %s"
+        params = [name]
+        return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def get_id_by_rfid(rfid):
+        sql = "SELECT gebruikersID FROM gebruiker WHERE rfid_code = %s"
+        params = [rfid]
+        return Database.get_one_row(sql, params)

@@ -173,6 +173,9 @@ const showRFIDInfo = function (payload) {
 };
 
 const callbackShow = function (jsonObj) {
+  // console.log(jsonObj.logged_in_as.gebruikersID);
+  sessionStorage.setItem('currentUser', jsonObj.logged_in_as.gebruikersID);
+  currentUser = jsonObj.logged_in_as.gebruikersID;
   window.location.href = 'home.html';
 };
 
@@ -256,9 +259,10 @@ const LoginAcces = function (jsonObj) {
 };
 
 const setCurrentUser = function () {
+  currentUser = sessionStorage.getItem('currentUser');
   document
     .querySelector('.js-currentUser')
-    .setAttribute('href', `user.html?${currentUser}`);
+    .setAttribute('href', `profile.html?userID=${currentUser}`);
 };
 // #endregion
 
@@ -394,7 +398,8 @@ const listenToSocketAdd = function () {
 };
 
 const listenToSocketLogin = function () {
-  socket.on('B2F_loginPermitted', function () {
+  socket.on('B2F_loginPermitted', function (payload) {
+    sessionStorage.setItem('currentUser', payload.userID);
     window.location.href = 'home.html';
   });
 };
@@ -535,11 +540,20 @@ const init = function () {
     setCurrentUser();
     listenToReset();
   } else if (htmlProfile) {
-    setCurrentUser();
+    let urlParams = new URLSearchParams(window.location.search);
+    let userID = urlParams.get('userID');
+    if (userID) {
+      console.log(userID);
+      setCurrentUser();
+      getUserInfo(userID);
+    } else {
+      window.location.href = 'home.html';
+    }
   }
 
   // event listeners and loads
   getLatestLetters();
+  setCurrentUser();
   listenToSocket();
   listenToToggleNav();
 };

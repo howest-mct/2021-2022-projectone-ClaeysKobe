@@ -162,7 +162,8 @@ def login():
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()
-    return jsonify(message="This is a protected endpoint: ", logged_in_as=current_user), 200
+    id = DataRepository.get_id(current_user)
+    return jsonify(message="This is a protected endpoint: ", logged_in_as=id), 200
 
 
 @app.route(endpoint + '/events/today/', methods=['GET'])
@@ -416,7 +417,10 @@ def read_rfid():
                     lock_opened = not lock_opened
                     print(login_rfid)
                     if login_rfid == True:
-                        socketio.emit('B2F_loginPermitted')
+                        user_id = DataRepository.get_id_by_rfid(rfid_id)
+                        user_id = user_id['gebruikersID']
+                        socketio.emit('B2F_loginPermitted',
+                                      {"userID": user_id})
                         login_rfid = False
                     else:
                         if lock_opened == True:

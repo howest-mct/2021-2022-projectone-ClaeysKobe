@@ -316,7 +316,7 @@ def open_box(payload):
     naam = DataRepository.check_name(userID)
     naam = naam['naam']
     # Add change to database
-    answer = DataRepository.insert_rfid_value(0, "Lock geopend")
+    answer = DataRepository.insert_rfid_value(1, "Lock geopend")
     answer = DataRepository.insert_box_site(
         1, f"{naam} unlocked your mailbox", userID)
     print(answer)
@@ -337,7 +337,7 @@ def open_box(payload):
     naam = DataRepository.check_name(userID)
     naam = naam['naam']
     # Add change to database
-    answer = DataRepository.insert_rfid_value(1, "Lock gesloten")
+    answer = DataRepository.insert_rfid_value(0, "Lock gesloten")
     answer = DataRepository.insert_box_site(
         0, f"{naam} Locked your mailbox", userID)
     print(answer)
@@ -417,13 +417,10 @@ def read_rfid():
         if id != "":
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
-            print(register_rfid)
             if register_rfid == False:
                 gebruiker = DataRepository.check_rfid(rfid_id)
                 if gebruiker is not None:
                     gebruiker = gebruiker['naam']
-                    lock_opened = not lock_opened
-                    print(login_rfid)
                     if login_rfid == True:
                         user_id = DataRepository.get_id_by_rfid(rfid_id)
                         user_id = user_id['gebruikersID']
@@ -431,6 +428,7 @@ def read_rfid():
                                       {"userID": user_id})
                         login_rfid = False
                     else:
+                        lock_opened = not lock_opened
                         if lock_opened == True:
                             beschrijving = f"{gebruiker} Unlocked your mailbox"
                             print(beschrijving)

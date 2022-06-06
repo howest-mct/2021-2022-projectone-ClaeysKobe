@@ -1168,6 +1168,10 @@ a:focus {
     background-color: #24D406 !important;
 }
 
+.u-bdclr-red {
+    border-color: #d40606 !important;
+}
+
 /*
     Utilities: z-index
     ---

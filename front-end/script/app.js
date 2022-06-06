@@ -169,7 +169,6 @@ const showUserInfo = function (payload) {
 const showRFIDInfo = function (payload) {
   // console.log('YEEY');
   setValueAndId('js-parRfid', payload.rfid);
-  listenToSubmit();
 };
 
 const callbackShow = function (jsonObj) {
@@ -317,14 +316,14 @@ const getLatestLetters = function () {
 const listenToUIIndex = function () {
   // togle box lock
   htmlBoxOpen.addEventListener('click', function () {
-    if (currentUser != '') {
+    if (currentUser != null) {
       console.log('Setting box Unlocked');
       boxOpen();
       socket.emit('F2B_openBox', { userID: currentUser });
     }
   });
   htmlBoxClose.addEventListener('click', function () {
-    if (currentUser != '') {
+    if (currentUser != null) {
       console.log('Setting box Locked');
       boxClose();
       socket.emit('F2B_closeBox', { userID: currentUser });
@@ -445,14 +444,20 @@ const listenToSubmit = function () {
     const rfid = document.querySelector('.js-parRfid').value;
     const name = document.querySelector('.js-parName').value;
     const pwrd = document.querySelector('.js-parPwrd').value;
-    const body = JSON.stringify({
-      rfid: rfid,
-      naam: name,
-      wachtwoord: pwrd,
-    });
-    const url = `http://192.168.168.169:5000/api/v1/users/`;
-    handleData(url, backToList, null, 'POST', body);
-    console.log('verzonden');
+    if (name == '') {
+      document.querySelector('.js-parName').classList.add('u-bdclr-red');
+    } else if (pwrd == '') {
+      document.querySelector('.js-parPwrd').classList.add('u-bdclr-red');
+    } else {
+      let body = JSON.stringify({
+        rfid: rfid,
+        naam: name,
+        wachtwoord: pwrd,
+      });
+      const url = `http://192.168.168.169:5000/api/v1/users/`;
+      handleData(url, backToList, null, 'POST', body);
+      console.log('verzonden');
+    }
   });
 };
 
@@ -535,6 +540,7 @@ const init = function () {
     getUsers();
   } else if (htmlAdd) {
     socket.emit('F2B_waitingForRegister');
+    listenToSubmit();
     listenToSocketAdd();
   } else if (htmlLogin) {
     socket.emit('F2B_waitingForLogin');

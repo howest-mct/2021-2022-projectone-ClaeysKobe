@@ -316,7 +316,7 @@ def open_box(payload):
     naam = DataRepository.check_name(userID)
     naam = naam['naam']
     # Add change to database
-    answer = DataRepository.insert_rfid_value(1, "Lock geopend")
+    answer = DataRepository.insert_rfid_value(1, "Lock opened")
     answer = DataRepository.insert_box_site(
         1, f"{naam} unlocked your mailbox", userID)
     print(answer)
@@ -337,7 +337,7 @@ def open_box(payload):
     naam = DataRepository.check_name(userID)
     naam = naam['naam']
     # Add change to database
-    answer = DataRepository.insert_rfid_value(0, "Lock gesloten")
+    answer = DataRepository.insert_rfid_value(0, "Lock closed")
     answer = DataRepository.insert_box_site(
         0, f"{naam} Locked your mailbox", userID)
     print(answer)
@@ -392,10 +392,10 @@ def read_sensor_magnet():
         if magnet_status != prev_magnet_status:
             beschrijving = ''
             if magnet_status == 0:
-                beschrijving = "Brievenbusklep gesloten"
+                beschrijving = "Lid closed"
                 led_strip_lock == True
             else:
-                beschrijving = "brievenbusklep geopend"
+                beschrijving = "Lid opened"
                 led_strip_lock == False
             answer = DataRepository.insert_magnet_value(
                 magnet_status, beschrijving)

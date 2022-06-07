@@ -59,10 +59,10 @@ const showLidStatus = function (payload) {
   // console.log(payload.sensors);
   const status = payload.status.waarde;
   if (status == 0) {
-    htmlLidStatus.innerHTML = `Gesloten`;
+    htmlLidStatus.innerHTML = `Closed`;
     htmlLidStatus.classList.remove('u-clr-main');
   } else {
-    htmlLidStatus.innerHTML = `Geopend`;
+    htmlLidStatus.innerHTML = `Opened`;
     htmlLidStatus.classList.add('u-clr-main');
   }
   let tijdStip = payload.status.date;
@@ -494,6 +494,14 @@ const listenToReset = function () {
     }
   });
 };
+
+const listenToLogout = function () {
+  document.querySelector('.js-logout').addEventListener('click', function () {
+    sessionStorage.setItem('currentUser', '');
+    currentUser = '';
+    window.location.href = 'index.html';
+  });
+};
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -556,6 +564,7 @@ const init = function () {
       console.log(userID);
       setCurrentUser();
       getUserInfo(userID);
+      listenToLogout();
     } else {
       window.location.href = 'home.html';
     }

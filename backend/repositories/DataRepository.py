@@ -44,32 +44,32 @@ class DataRepository:
 
     @staticmethod
     def read_sensor_gesch():
-        sql = "SELECT * from brievenbusevent order by date DESC"
+        sql = "SELECT * from brievenbusevent where deleted = 0 order by date DESC"
         return Database.get_rows(sql)
 
     @staticmethod
     def read_sensor_gesch_today():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC"
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and deleted = 0 order by date DESC"
         return Database.get_rows(sql)
 
     @staticmethod
     def read_brieven_today():
-        sql = "select count(*) as `Aantal` from brievenbusevent where cast(date as Date) = cast(now() as Date) and actieID = 3"
+        sql = "select count(*) as `Aantal` from brievenbusevent where cast(date as Date) = cast(now() as Date) and actieID = 3 and deleted = 0"
         return Database.get_rows(sql)
 
     @staticmethod
     def read_latest_letter():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 3 order by date DESC LIMIT 1"
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 3 and deleted = 0 order by date DESC LIMIT 1"
         return Database.get_one_row(sql)
 
     @staticmethod
     def read_latest_lid():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 5 order by date DESC LIMIT 1"
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 5 and deleted = 0 order by date DESC LIMIT 1"
         return Database.get_one_row(sql)
 
     @staticmethod
     def read_latest_lock():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 7 order by date DESC LIMIT 1"
+        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 7 and deleted = 0 order by date DESC LIMIT 1"
         return Database.get_one_row(sql)
 
     @staticmethod
@@ -121,7 +121,7 @@ class DataRepository:
 
     @staticmethod
     def add_letter():
-        sql = "insert into projectonedb.brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 3, now(), 'Post ontvangen', null);"
+        sql = "insert into brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 3, now(), 'Post ontvangen', null);"
         return Database.execute_sql(sql)
 
     @staticmethod
@@ -143,12 +143,12 @@ class DataRepository:
 
     @staticmethod
     def truncate_events():
-        sql = "TRUNCATE TABLE projectonedb.brievenbusevent"
+        sql = "UPDATE brievenbusevent set deleted = 1"
         return Database.execute_sql(sql)
 
     @staticmethod
     def get_latest_letters(date):
-        sql = "SELECT count(*) as `Aantal` FROM brievenbusevent WHERE NOT(date > now() OR date < %s) and ActieID = 3"
+        sql = "SELECT count(*) as `Aantal` FROM brievenbusevent WHERE NOT(date > now() OR date < %s) and ActieID = 3 and deleted = 0"
         params = [date]
         return Database.get_one_row(sql, params)
 

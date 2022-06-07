@@ -324,7 +324,7 @@ def open_box(payload):
     lock_opened = True
     led_strip_lock = True
     socketio.emit('B2F_refresh_history', broadcast=True)
-    socketio.emit('B2F_emptyd_letters', broadcast=True)
+    socketio.emit('B2F_new_lock_value', {'status': 'Aan'}, broadcast=True)
     time.sleep(0.1)
 
 
@@ -345,6 +345,7 @@ def open_box(payload):
     lock_opened = False
     led_strip_lock = False
     socketio.emit('B2F_refresh_history', broadcast=True)
+    socketio.emit('B2F_new_lock_value', {'status': 'Uit'}, broadcast=True)
     time.sleep(0.1)
 
 

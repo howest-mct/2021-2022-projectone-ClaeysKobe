@@ -259,55 +259,56 @@ const LoginAcces = function (jsonObj) {
 
 const setCurrentUser = function () {
   currentUser = sessionStorage.getItem('currentUser');
-  document
-    .querySelector('.js-currentUser')
-    .setAttribute('href', `profile.html?userID=${currentUser}`);
+  const links = document.querySelectorAll('.js-currentUser');
+  for (const link of links) {
+    link.setAttribute('href', `profile.html?userID=${currentUser}`);
+  }
 };
 // #endregion
 
 // #region ***  Data Access - get___                     ***********
 const loadHistoryToday = function () {
-  const url = `http://192.168.168.169:5000/api/v1/events/today/`;
+  const url = `http://${lanIP}/api/v1/events/today/`;
   handleData(url, showHistoryToday);
 };
 
 const loadHistoryAll = function () {
-  const url = `http://192.168.168.169:5000/api/v1/events/`;
+  const url = `http://${lanIP}/api/v1/events/`;
   handleData(url, showHistoryAll);
 };
 
 const loadLidStatus = function () {
-  const url = `http://192.168.168.169:5000/api/v1/events/lid/`;
+  const url = `http://${lanIP}/api/v1/events/lid/`;
   handleData(url, showLidStatus);
 };
 
 const loadLettersToday = function () {
-  const url = `http://192.168.168.169:5000/api/v1/events/letters/`;
+  const url = `http://${lanIP}/api/v1/events/letters/`;
   handleData(url, showLetters);
 };
 
 const loadLatestLetter = function () {
-  const url = `http://192.168.168.169:5000/api/v1/events/letters/latest/`;
+  const url = `http://${lanIP}/api/v1/events/letters/latest/`;
   handleData(url, showLatestLetter);
 };
 
 const loadLatestLock = function () {
-  const url = `http://192.168.168.169:5000/api/v1/events/lock/latest/`;
+  const url = `http://${lanIP}/api/v1/events/lock/latest/`;
   handleData(url, showLatestLock);
 };
 
 const getUsers = function () {
-  const url = `http://192.168.168.169:5000/api/v1/users/`;
+  const url = `http://${lanIP}/api/v1/users/`;
   handleData(url, showUsers);
 };
 
 const getUserInfo = function (UserID) {
-  const url = `http://192.168.168.169:5000/api/v1/user/${UserID}/`;
+  const url = `http://${lanIP}/api/v1/user/${UserID}/`;
   handleData(url, showUserInfo);
 };
 
 const getLatestLetters = function () {
-  const url = `http://192.168.168.169:5000/api/v1/events/letters/count/`;
+  const url = `http://${lanIP}/api/v1/events/letters/count/`;
   handleData(url, showLastLetters);
 };
 // #endregion
@@ -383,6 +384,13 @@ const listenToSocketIndex = function () {
       loadHistoryToday();
     }
   });
+  socket.on('B2F_new_lock_value', function (payload) {
+    if (payload.status == 'Aan') {
+      boxOpen();
+    } else {
+      boxClose();
+    }
+  });
   socket.on('B2F_changed_lock', function (payload) {
     // console.log(payload);
     const lock_status = payload.lock_status;
@@ -421,7 +429,7 @@ const listenToUpdateUser = function () {
       });
       let urlParams = new URLSearchParams(window.location.search);
       let userID = urlParams.get('userID');
-      const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
+      const url = `http://${lanIP}/api/v1/user/${userID}/`;
       handleData(url, backToList, null, 'PUT', body);
     });
 };
@@ -433,7 +441,7 @@ const listenToDeleteUser = function () {
       // console.log('click');
       const userID = this.dataset.userid;
       // console.log(userID);
-      const url = `http://192.168.168.169:5000/api/v1/user/${userID}/`;
+      const url = `http://${lanIP}/api/v1/user/${userID}/`;
       handleData(url, backToList, null, 'DELETE');
     });
   }
@@ -454,7 +462,7 @@ const listenToSubmit = function () {
         naam: name,
         wachtwoord: pwrd,
       });
-      const url = `http://192.168.168.169:5000/api/v1/users/`;
+      const url = `http://${lanIP}/api/v1/users/`;
       handleData(url, backToList, null, 'POST', body);
       console.log('verzonden');
     }

@@ -64,7 +64,7 @@ class DataRepository:
 
     @staticmethod
     def read_latest_lid():
-        sql = "select * from brievenbusevent where cast(date as Date) = cast(now() as Date) and ActieID = 5 and deleted = 0 order by date DESC LIMIT 1"
+        sql = "select * from brievenbusevent where ActieID = 5 and deleted = 0 order by date DESC LIMIT 1"
         return Database.get_one_row(sql)
 
     @staticmethod

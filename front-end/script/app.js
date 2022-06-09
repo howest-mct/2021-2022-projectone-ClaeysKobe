@@ -230,11 +230,11 @@ const showLastLetters = function (jsonObj) {
   if (jsonObj.letters.Aantal > 0) {
     document.querySelector(
       '.js-latestLetterCount'
-    ).innerHTML = `<span class="c-dot u-bgclr-main"></span> You have unchecked post!`;
+    ).innerHTML = `<span class="c-dot u-bgclr-main"></span> You have unchecked mail!`;
   } else {
     document.querySelector(
       '.js-latestLetterCount'
-    ).innerHTML = `<span class="c-dot"></span> No post currently in your mailbox.`;
+    ).innerHTML = `<span class="c-dot"></span> No mail currently in your mailbox.`;
   }
 };
 // #endregion

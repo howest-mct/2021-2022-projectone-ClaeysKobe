@@ -297,6 +297,14 @@ const setCurrentUser = function () {
     link.setAttribute('href', `profile.html?userID=${currentUser}`);
   }
 };
+
+const loadHistory = function () {
+  if (historyToday == true) {
+    loadHistoryToday();
+  } else {
+    loadHistoryAll();
+  }
+};
 // #endregion
 
 // #region ***  Data Access - get___                     ***********
@@ -421,11 +429,7 @@ const listenToPage = function () {
         pageID = listLength;
       }
       document.querySelector('.js-pageNumber').innerHTML = pageID + 1;
-      if (historyToday == true) {
-        loadHistoryToday();
-      } else {
-        loadHistoryAll();
-      }
+      loadHistory();
     });
   }
 };
@@ -448,11 +452,13 @@ const listenToSocketIndex = function () {
     loadLidStatus();
   });
   socket.on('B2F_refresh_history', function (payload) {
-    if (historyAll == true) {
-      loadHistoryAll();
-    } else {
-      loadHistoryToday();
-    }
+    loadPageNumbers();
+    loadHistory();
+    // if (historyAll == true) {
+    //   loadHistoryAll();
+    // } else {
+    //   loadHistoryToday();
+    // }
   });
   socket.on('B2F_new_lock_value', function (payload) {
     if (payload.status == 'Aan') {

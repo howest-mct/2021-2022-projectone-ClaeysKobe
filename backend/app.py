@@ -20,7 +20,7 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 # from selenium.webdriver.chrome.options import Options
 
 
-buzzerPin = 23
+goPin = 23
 magnetPin = 17
 transistorPin = 27
 btnPin = Button(21)
@@ -49,7 +49,7 @@ def setup_gpio():
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
 
-    GPIO.setup(buzzerPin, GPIO.OUT)
+    GPIO.setup(goPin, GPIO.OUT)
     GPIO.setup(transistorPin, GPIO.OUT)
     GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     # magnet pin
@@ -367,27 +367,6 @@ def register_rfid_set():
 # werk enkel met de packages gevent en gevent-websocket.
 
 
-def buzz(noteFreq, duration):
-    halveWaveTime = 1 / (noteFreq * 2)
-    waves = int(duration * noteFreq)
-    for i in range(waves):
-        GPIO.output(buzzerPin, True)
-        time.sleep(halveWaveTime)
-        GPIO.output(buzzerPin, False)
-        time.sleep(halveWaveTime)
-
-
-def play():
-    t = 0
-    notes = [262]
-    duration = [2]
-    for n in notes:
-        buzz(n, duration[t])
-        time.sleep(duration[t] * 0.1)
-        t += 1
-#buzz(262, 0.5)
-
-
 def read_sensor_magnet():
     while True:
         global magnet_status
@@ -419,6 +398,7 @@ def read_rfid():
     while True:
         id, text = reader.read()
         if id != "":
+            GPIO.output(goPin, True)
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
             if register_rfid == False:
@@ -456,6 +436,7 @@ def read_rfid():
                 register_rfid = False
             time.sleep(1)
             id = ""
+            GPIO.output(goPin, False)
 
 
 def wait_for_button():

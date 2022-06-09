@@ -121,7 +121,7 @@ class DataRepository:
 
     @staticmethod
     def add_letter():
-        sql = "insert into brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 3, now(), 'Post ontvangen', null);"
+        sql = "insert into brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 3, now(), 'New mail!', null);"
         return Database.execute_sql(sql)
 
     @staticmethod

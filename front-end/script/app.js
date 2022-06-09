@@ -525,64 +525,77 @@ const init = function () {
   htmlSettings = document.querySelector('.js-settingsPage');
   htmlProfile = document.querySelector('.js-profilePage');
 
-  // execute when correct page
-  if (htmlIndex) {
-    htmlBoxOpen = document.querySelector('.js-boxopen');
-    htmlBoxClose = document.querySelector('.js-boxclose');
-    htmlHistoryToday = document.querySelector('.js-historytoday');
-    htmlHistoryAll = document.querySelector('.js-historyall');
-    htmlLidStatus = document.querySelector('.js-lid');
-    htmlLettersToday = document.querySelector('.js-brievenaantal');
-    htmlBoxStatus = document.querySelector('.js-lockStatus');
-    setCurrentUser();
-    loadHistoryToday();
-    loadLidStatus();
-    loadLettersToday();
-    loadLatestLetter();
-    loadLatestLock();
-    listenToUIIndex();
-    listenToSocketIndex();
-  } else if (htmlEdit) {
-    let urlParams = new URLSearchParams(window.location.search);
-    let userID = urlParams.get('userID');
-    if (userID) {
+  setCurrentUser();
+
+  if (currentUser) {
+    // execute when correct page
+    if (htmlIndex) {
+      htmlBoxOpen = document.querySelector('.js-boxopen');
+      htmlBoxClose = document.querySelector('.js-boxclose');
+      htmlHistoryToday = document.querySelector('.js-historytoday');
+      htmlHistoryAll = document.querySelector('.js-historyall');
+      htmlLidStatus = document.querySelector('.js-lid');
+      htmlLettersToday = document.querySelector('.js-brievenaantal');
+      htmlBoxStatus = document.querySelector('.js-lockStatus');
       setCurrentUser();
-      getUserInfo(userID);
-    } else {
-      window.location.href = 'home.html';
+      loadHistoryToday();
+      loadLidStatus();
+      loadLettersToday();
+      loadLatestLetter();
+      loadLatestLock();
+      listenToUIIndex();
+      listenToSocketIndex();
+    } else if (htmlEdit) {
+      let urlParams = new URLSearchParams(window.location.search);
+      let userID = urlParams.get('userID');
+      if (userID) {
+        setCurrentUser();
+        getUserInfo(userID);
+      } else {
+        window.location.href = 'home.html';
+      }
+    } else if (htmlUser) {
+      setCurrentUser();
+      getUsers();
+    } else if (htmlAdd) {
+      socket.emit('F2B_waitingForRegister');
+      listenToSubmit();
+      listenToSocketAdd();
+    } else if (htmlLogin) {
+      socket.emit('F2B_waitingForLogin');
+      listenToLogin();
+      listenToSocketLogin();
+    } else if (htmlSettings) {
+      setCurrentUser();
+      listenToReset();
+    } else if (htmlProfile) {
+      let urlParams = new URLSearchParams(window.location.search);
+      let userID = urlParams.get('userID');
+      if (userID) {
+        console.log(userID);
+        setCurrentUser();
+        getUserInfo(userID);
+        listenToLogout();
+      } else {
+        window.location.href = 'home.html';
+      }
     }
-  } else if (htmlUser) {
-    setCurrentUser();
-    getUsers();
-  } else if (htmlAdd) {
-    socket.emit('F2B_waitingForRegister');
-    listenToSubmit();
-    listenToSocketAdd();
+
+    // event listeners and loads
+    getLatestLetters();
+    listenToSocket();
+    listenToToggleNav();
   } else if (htmlLogin) {
     socket.emit('F2B_waitingForLogin');
     listenToLogin();
     listenToSocketLogin();
-  } else if (htmlSettings) {
-    setCurrentUser();
-    listenToReset();
-  } else if (htmlProfile) {
-    let urlParams = new URLSearchParams(window.location.search);
-    let userID = urlParams.get('userID');
-    if (userID) {
-      console.log(userID);
-      setCurrentUser();
-      getUserInfo(userID);
-      listenToLogout();
-    } else {
-      window.location.href = 'home.html';
-    }
+  } else if (htmlAdd) {
+    socket.emit('F2B_waitingForRegister');
+    listenToSubmit();
+    listenToSocketAdd();
+  } else {
+    window.location.href = 'index.html';
   }
-
-  // event listeners and loads
-  getLatestLetters();
-  setCurrentUser();
-  listenToSocket();
-  listenToToggleNav();
 };
 
 document.addEventListener('DOMContentLoaded', init);

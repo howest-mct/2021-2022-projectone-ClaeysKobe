@@ -311,6 +311,7 @@ def initial_connection():
 def open_box(payload):
     global lock_opened
     global led_strip_lock
+    global laatst_geledigd
     print('Box opened via PC')
     userID = payload['userID']
     naam = DataRepository.check_name(userID)
@@ -323,6 +324,8 @@ def open_box(payload):
     # Send to the client!
     lock_opened = True
     led_strip_lock = True
+    laatst_geledigd = datetime.now()
+    socketio.emit('B2F_emptyd_letters', broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
     socketio.emit('B2F_new_lock_value', {'status': 'Aan'}, broadcast=True)
     time.sleep(0.1)

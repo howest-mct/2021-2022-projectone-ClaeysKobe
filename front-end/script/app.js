@@ -18,6 +18,7 @@ let htmlBoxOpen,
   historyAll,
   currentUser,
   pageID = 0,
+  listLength,
   token;
 
 const lanIP = `${window.location.hostname}:5000`;
@@ -31,15 +32,24 @@ const showPageNumbers = function (jsonObject) {
   const array = jsonObject.sensors;
   const array_length = array.length;
   const pageCount = Math.ceil(array_length / 5);
-  let pagesHTML = '';
-  for (let i = 0; i < pageCount; i++) {
-    pagesHTML += `<li class="c-table__nav--item js-tableNavItem" data-pageid="${i}"><a class="c-table__nav--href">${
-      i + 1
-    }</a></li>`;
-  }
-  document.querySelector('.js-tableNav').innerHTML = pagesHTML;
-  ListenToPage();
+  listLength = pageCount - 1;
+  listenToPage();
 };
+
+// const showPageNumbers = function (jsonObject) {
+//   // load page numbers
+//   const array = jsonObject.sensors;
+//   const array_length = array.length;
+//   const pageCount = Math.ceil(array_length / 5);
+//   let pagesHTML = '';
+//   for (let i = 0; i < pageCount; i++) {
+//     pagesHTML += `<li class="c-table__nav--item js-tableNavItem" data-pageid="${i}"><a class="c-table__nav--href">${
+//       i + 1
+//     }</a></li>`;
+//   }
+//   document.querySelector('.js-tableNav').innerHTML = pagesHTML;
+//   ListenToPage();
+// };
 
 const showHistoryToday = function (jsonObject) {
   // console.log(jsonObject.sensors);
@@ -62,17 +72,20 @@ const showHistoryToday = function (jsonObject) {
 };
 
 const showHistoryAll = function (jsonObject) {
-  // console.log(jsonObject);
-  // let stringHTML = '';
-  // for (const sensorInfo of jsonObject.sensors) {
-  //   const datum = sensorInfo.date.split(' ');
-  //   const showDatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
-  //   stringHTML += `<tr>
-  //                           <td>${showDatum}</td>
-  //                           <td>${sensorInfo.opmerking}</td>
-  //                       </tr>`;
-  // }
-  // document.querySelector('.js-table').innerHTML = stringHTML;
+  let stringHTML = '';
+  for (let i = pageID * 5; i < pageID * 5 + 5; i++) {
+    // console.log(jsonObject.sensors[i]);
+    const sensorInfo = jsonObject.sensors[i];
+    if (sensorInfo != null) {
+      const datum = sensorInfo.date.split(' ');
+      const showDatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
+      stringHTML += `<tr>
+                                <td>${showDatum}</td>
+                                <td>${sensorInfo.opmerking}</td>
+                            </tr>`;
+    }
+  }
+  document.querySelector('.js-table').innerHTML = stringHTML;
 };
 
 const showLidStatus = function (payload) {
@@ -385,13 +398,30 @@ const listenToUIIndex = function () {
   });
 };
 
-const ListenToPage = function () {
+const listenToPage = function () {
   const pages = document.querySelectorAll('.js-tableNavItem');
   for (const page of pages) {
     page.addEventListener('click', function () {
-      pageID = this.getAttribute('data-pageid');
+      const action = this.getAttribute('data-pageid');
+      if (action == 'home') {
+        pageID = 0;
+      } else if (action == 'back') {
+        if (pageID == 0) {
+          pageID = 0;
+        } else {
+          pageID = pageID - 1;
+        }
+      } else if (action == 'front') {
+        if (pageID == listLength) {
+          pageID = listLength;
+        } else {
+          pageID = pageID + 1;
+        }
+      } else {
+        pageID = listLength;
+      }
+      document.querySelector('.js-pageNumber').innerHTML = pageID + 1;
       if (historyToday == true) {
-        console.log('oi');
         loadHistoryToday();
       } else {
         loadHistoryAll();
@@ -577,8 +607,9 @@ const init = function () {
       htmlLidStatus = document.querySelector('.js-lid');
       htmlLettersToday = document.querySelector('.js-brievenaantal');
       htmlBoxStatus = document.querySelector('.js-lockStatus');
-      setCurrentUser();
       loadPageNumbers();
+      loadHistoryToday();
+      setCurrentUser();
       loadLidStatus();
       loadLettersToday();
       loadLatestLetter();

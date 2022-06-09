@@ -1076,6 +1076,31 @@ a:focus {
     border-bottom: 1px solid #dddddd;
 }
 
+.c-table__nav {
+    float: left;
+    padding-left: 0;
+}
+
+.c-table__nav--item {
+    float: left;
+    list-style: none;
+    border: 1px solid #dddddd;
+}
+
+.c-table__nav--href {
+    display: block;
+    text-align: center;
+    min-width: 36px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 16px;
+}
+
+.c-table__nav--active {
+    background-color: #24D406;
+    border: 1px solid #24D406;
+}
+
 /*
     Component: UserTable
     ---
@@ -1316,6 +1341,10 @@ a:focus {
     padding-right: 24px !important;
 }
 
+.u-mb-hd {
+    margin-bottom: 24px !important;
+}
+
 @media (min-width: 992px) {
     .u-mb-xl-bp3 {
         margin-bottom: 48px !important;
@@ -1335,6 +1364,10 @@ a:focus {
 
     .u-pd-rght-xs {
         padding-right: 48px !important;
+    }
+
+    .u-mb-hd {
+        margin-bottom: 56px !important;
     }
 }
 

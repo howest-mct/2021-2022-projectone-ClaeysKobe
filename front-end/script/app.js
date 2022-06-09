@@ -14,9 +14,10 @@ let htmlBoxOpen,
   htmlEdit,
   htmlSettings,
   htmlUser,
-  historyToday,
+  historyToday = true,
   historyAll,
   currentUser,
+  pageID = 0,
   token;
 
 const lanIP = `${window.location.hostname}:5000`;
@@ -25,34 +26,53 @@ const socket = io(`http://${lanIP}`);
 
 // #region ***  Callback-Visualisation - show___         ***********
 
+const showPageNumbers = function (jsonObject) {
+  // load page numbers
+  const array = jsonObject.sensors;
+  const array_length = array.length;
+  const pageCount = Math.ceil(array_length / 5);
+  let pagesHTML = '';
+  for (let i = 0; i < pageCount; i++) {
+    pagesHTML += `<li class="c-table__nav--item js-tableNavItem" data-pageid="${i}"><a class="c-table__nav--href">${
+      i + 1
+    }</a></li>`;
+  }
+  document.querySelector('.js-tableNav').innerHTML = pagesHTML;
+  ListenToPage();
+};
+
 const showHistoryToday = function (jsonObject) {
   // console.log(jsonObject.sensors);
   let stringHTML = '';
-  for (const sensorInfo of jsonObject.sensors) {
-    let datum = sensorInfo.date.split(' ');
-    let tijdStip = datum[4];
-    tijdStip = tijdStip.split(':');
-    tijdStip = tijdStip[0] + ':' + tijdStip[1];
-    stringHTML += `<tr>
-                            <td>${tijdStip}</td>
-                            <td>${sensorInfo.opmerking}</td>
-                        </tr>`;
+  for (let i = pageID * 5; i < pageID * 5 + 5; i++) {
+    // console.log(jsonObject.sensors[i]);
+    const sensorInfo = jsonObject.sensors[i];
+    if (sensorInfo != null) {
+      let datum = sensorInfo.date.split(' ');
+      let tijdStip = datum[4];
+      tijdStip = tijdStip.split(':');
+      tijdStip = tijdStip[0] + ':' + tijdStip[1];
+      stringHTML += `<tr>
+                              <td>${tijdStip}</td>
+                              <td>${sensorInfo.opmerking}</td>
+                          </tr>`;
+    }
   }
   document.querySelector('.js-table').innerHTML = stringHTML;
 };
 
 const showHistoryAll = function (jsonObject) {
   // console.log(jsonObject);
-  let stringHTML = '';
-  for (const sensorInfo of jsonObject.sensors) {
-    const datum = sensorInfo.date.split(' ');
-    const showDatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
-    stringHTML += `<tr>
-                            <td>${showDatum}</td>
-                            <td>${sensorInfo.opmerking}</td>
-                        </tr>`;
-  }
-  document.querySelector('.js-table').innerHTML = stringHTML;
+  // let stringHTML = '';
+  // for (const sensorInfo of jsonObject.sensors) {
+  //   const datum = sensorInfo.date.split(' ');
+  //   const showDatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
+  //   stringHTML += `<tr>
+  //                           <td>${showDatum}</td>
+  //                           <td>${sensorInfo.opmerking}</td>
+  //                       </tr>`;
+  // }
+  // document.querySelector('.js-table').innerHTML = stringHTML;
 };
 
 const showLidStatus = function (payload) {
@@ -267,6 +287,11 @@ const setCurrentUser = function () {
 // #endregion
 
 // #region ***  Data Access - get___                     ***********
+const loadPageNumbers = function () {
+  const url = `http://${lanIP}/api/v1/events/today/`;
+  handleData(url, showPageNumbers);
+};
+
 const loadHistoryToday = function () {
   const url = `http://${lanIP}/api/v1/events/today/`;
   handleData(url, showHistoryToday);
@@ -358,6 +383,21 @@ const listenToUIIndex = function () {
     // load history
     loadHistoryAll();
   });
+};
+
+const ListenToPage = function () {
+  const pages = document.querySelectorAll('.js-tableNavItem');
+  for (const page of pages) {
+    page.addEventListener('click', function () {
+      pageID = this.getAttribute('data-pageid');
+      if (historyToday == true) {
+        console.log('oi');
+        loadHistoryToday();
+      } else {
+        loadHistoryAll();
+      }
+    });
+  }
 };
 
 const listenToSocket = function () {
@@ -538,7 +578,7 @@ const init = function () {
       htmlLettersToday = document.querySelector('.js-brievenaantal');
       htmlBoxStatus = document.querySelector('.js-lockStatus');
       setCurrentUser();
-      loadHistoryToday();
+      loadPageNumbers();
       loadLidStatus();
       loadLettersToday();
       loadLatestLetter();

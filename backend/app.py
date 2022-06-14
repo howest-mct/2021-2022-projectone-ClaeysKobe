@@ -20,11 +20,12 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 # from selenium.webdriver.chrome.options import Options
 
 
-goPin = 23
-magnetPin = 17
-transistorPin = 27
-btnPin = Button(21)
-shutdownBtnPin = Button(5)
+goPin = 21
+magnetPin = 27
+transistorPin = 17
+btnPin = Button(6)
+shutdownBtnPin = Button(13)
+EmptiedBtnPin = Button(19)
 
 # Default variables
 magnet_status = 0
@@ -37,6 +38,7 @@ led_strip_ldr = False
 led_strip_lock = False
 led_waarde = False
 prev_led_waarde = False
+auto_empty = True
 brieven_vandaag = f""
 try:
     ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
@@ -61,8 +63,8 @@ def setup_gpio():
     global reader
     reader = SimpleMFRC522()
     # lcd
-    global lcd_module
-    lcd_module = LCD_Module(16, 20)
+    # global lcd_module
+    # lcd_module = LCD_Module(16, 20)
     # spi
     global spiObj
     spiObj = SpiClass(0, 1)
@@ -71,7 +73,7 @@ def setup_gpio():
     brieven_vandaag = DataRepository.read_brieven_today()
     brieven_vandaag = brieven_vandaag[0]
     brieven_vandaag = brieven_vandaag['Aantal']
-    show_brieven_vandaag()
+    # show_brieven_vandaag()
     # lock status
     global lock_opened
     answer = DataRepository.read_latest_lock()
@@ -324,8 +326,9 @@ def open_box(payload):
     # Send to the client!
     lock_opened = True
     led_strip_lock = True
-    laatst_geledigd = datetime.now()
-    socketio.emit('B2F_emptyd_letters', broadcast=True)
+    if auto_empty == True:
+        laatst_geledigd = datetime.now()
+        socketio.emit('B2F_emptyd_letters', broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
     socketio.emit('B2F_new_lock_value', {'status': 'Aan'}, broadcast=True)
     time.sleep(0.1)
@@ -362,6 +365,18 @@ def login_via_rfid():
 def register_rfid_set():
     global register_rfid
     register_rfid = True
+
+
+@socketio.on('F2B_emptywbutton')
+def change_to_button():
+    global auto_empty
+    auto_empty = False
+
+
+@socketio.on('F2B_emptyauto')
+def change_to_auto():
+    global auto_empty
+    auto_empty = True
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
@@ -416,8 +431,10 @@ def read_rfid():
                         if lock_opened == True:
                             beschrijving = f"{gebruiker} Unlocked your mailbox"
                             print(beschrijving)
-                            laatst_geledigd = datetime.now()
-                            socketio.emit('B2F_emptyd_letters', broadcast=True)
+                            if auto_empty == True:
+                                laatst_geledigd = datetime.now()
+                                socketio.emit(
+                                    'B2F_emptyd_letters', broadcast=True)
                         else:
                             beschrijving = f"{gebruiker} Locked your mailbox"
                             print(beschrijving)

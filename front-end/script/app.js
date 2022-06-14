@@ -586,6 +586,33 @@ const listenToLogout = function () {
     window.location.href = 'index.html';
   });
 };
+
+const listenToOption = function () {
+  const empytwbutton = document.querySelector('.js-emptywbutton');
+  const emptyauto = document.querySelector('.js-emptyauto');
+  empytwbutton.addEventListener('click', function () {
+    this.classList.add('u-no-clicking');
+    this.classList.remove('c-btn--unselected');
+    this.classList.add('c-btn--selected');
+    // other element
+    emptyauto.classList.add('c-btn--unselected');
+    emptyauto.classList.remove('c-btn--selected');
+    emptyauto.classList.remove('u-no-clicking');
+    // console.log('clickkk');
+    socket.emit('F2B_emptywbutton');
+  });
+  emptyauto.addEventListener('click', function () {
+    this.classList.add('u-no-clicking');
+    this.classList.remove('c-btn--unselected');
+    this.classList.add('c-btn--selected');
+    // other element
+    empytwbutton.classList.add('c-btn--unselected');
+    empytwbutton.classList.remove('c-btn--selected');
+    empytwbutton.classList.remove('u-no-clicking');
+    console.log('clickkk');
+    socket.emit('F2B_emptyauto');
+  });
+};
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -645,6 +672,7 @@ const init = function () {
     } else if (htmlSettings) {
       setCurrentUser();
       listenToReset();
+      listenToOption();
     } else if (htmlProfile) {
       let urlParams = new URLSearchParams(window.location.search);
       let userID = urlParams.get('userID');

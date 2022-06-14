@@ -19,6 +19,8 @@ let htmlBoxOpen,
   currentUser,
   pageID = 0,
   listLength,
+  empytwbutton,
+  emptyauto,
   token;
 
 const lanIP = `${window.location.hostname}:5000`;
@@ -298,6 +300,10 @@ const setCurrentUser = function () {
   }
 };
 
+const setSetting = function (jsonObj) {
+  console.log('aaa', jsonObj);
+};
+
 const loadHistory = function () {
   if (historyToday == true) {
     loadHistoryToday();
@@ -356,6 +362,11 @@ const getUserInfo = function (UserID) {
 const getLatestLetters = function () {
   const url = `http://${lanIP}/api/v1/events/letters/count/`;
   handleData(url, showLastLetters);
+};
+
+const getLatestSetting = function () {
+  const url = `http://${lanIP}/api/v1/events/settings/latest/`;
+  handleData(url, setSetting);
 };
 // #endregion
 
@@ -588,8 +599,6 @@ const listenToLogout = function () {
 };
 
 const listenToOption = function () {
-  const empytwbutton = document.querySelector('.js-emptywbutton');
-  const emptyauto = document.querySelector('.js-emptyauto');
   empytwbutton.addEventListener('click', function () {
     this.classList.add('u-no-clicking');
     this.classList.remove('c-btn--unselected');
@@ -609,8 +618,29 @@ const listenToOption = function () {
     empytwbutton.classList.add('c-btn--unselected');
     empytwbutton.classList.remove('c-btn--selected');
     empytwbutton.classList.remove('u-no-clicking');
-    console.log('clickkk');
+    // console.log('clickkk');
     socket.emit('F2B_emptyauto');
+  });
+};
+
+const listenToSocketSettings = function () {
+  socket.on('B2F_changedtoemptywbutton', function () {
+    empytwbutton.classList.add('u-no-clicking');
+    empytwbutton.classList.remove('c-btn--unselected');
+    empytwbutton.classList.add('c-btn--selected');
+    // other element
+    emptyauto.classList.add('c-btn--unselected');
+    emptyauto.classList.remove('c-btn--selected');
+    emptyauto.classList.remove('u-no-clicking');
+  });
+  socket.on('B2F_changedtoauto', function () {
+    emptyauto.classList.add('u-no-clicking');
+    emptyauto.classList.remove('c-btn--unselected');
+    emptyauto.classList.add('c-btn--selected');
+    // other element
+    empytwbutton.classList.add('c-btn--unselected');
+    empytwbutton.classList.remove('c-btn--selected');
+    empytwbutton.classList.remove('u-no-clicking');
   });
 };
 // #endregion
@@ -670,9 +700,13 @@ const init = function () {
       listenToLogin();
       listenToSocketLogin();
     } else if (htmlSettings) {
+      empytwbutton = document.querySelector('.js-emptywbutton');
+      emptyauto = document.querySelector('.js-emptyauto');
+      getLatestSetting();
       setCurrentUser();
       listenToReset();
       listenToOption();
+      listenToSocketSettings();
     } else if (htmlProfile) {
       let urlParams = new URLSearchParams(window.location.search);
       let userID = urlParams.get('userID');

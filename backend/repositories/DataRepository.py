@@ -169,3 +169,23 @@ class DataRepository:
         sql = "SELECT naam FROM gebruiker WHERE gebruikersID = %s"
         params = [rfid_code]
         return Database.get_one_row(sql, params)
+
+    @staticmethod
+    def emptied_box():
+        sql = "insert into brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 9, now(), 'New mail!', null);"
+        return Database.execute_sql(sql)
+
+    @staticmethod
+    def read_latest_empty():
+        sql = 'SELECT date FROM brievenbusevent WHERE gebruikersID = %s'
+
+    @staticmethod
+    def set_latest_setting(setting):
+        sql = 'insert into Settingschange (`value`, time) values (%s, now());'
+        params = [setting]
+        return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def get_latest_setting():
+        sql = 'select value from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC LIMIT 1'
+        return Database.get_one_row(sql)

@@ -38,7 +38,14 @@ led_strip_ldr = False
 led_strip_lock = False
 led_waarde = False
 prev_led_waarde = False
-auto_empty = True
+latest_setting = DataRepository.get_latest_setting()
+if latest_setting is not None:
+    if latest_setting == 1:
+        auto_empty = True
+    else:
+        auto_empty = False
+else:
+    auto_empty = False
 brieven_vandaag = f""
 try:
     ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
@@ -303,6 +310,16 @@ def gebruiker(UserID):
             return jsonify(data="ERROR"), 404
 
 
+@app.route(endpoint + '/settings/latest/', methods=['GET'])
+def latest_setting():
+    if request.method == 'GET':
+        data = DataRepository.get_latest_setting()
+        if data is not None:
+            return jsonify(data=data), 200
+        else:
+            return jsonify(data=data), 201
+
+
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
@@ -328,6 +345,7 @@ def open_box(payload):
     led_strip_lock = True
     if auto_empty == True:
         laatst_geledigd = datetime.now()
+        answer = DataRepository.emptied_box()
         socketio.emit('B2F_emptyd_letters', broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
     socketio.emit('B2F_new_lock_value', {'status': 'Aan'}, broadcast=True)
@@ -371,12 +389,14 @@ def register_rfid_set():
 def change_to_button():
     global auto_empty
     auto_empty = False
+    socketio.emit('B2F_changedtoemptywbutton', broadcast=True)
 
 
 @socketio.on('F2B_emptyauto')
 def change_to_auto():
     global auto_empty
     auto_empty = True
+    socketio.emit('B2F_changedtoauto', broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
@@ -433,6 +453,7 @@ def read_rfid():
                             print(beschrijving)
                             if auto_empty == True:
                                 laatst_geledigd = datetime.now()
+                                answer = DataRepository.emptied_box()
                                 socketio.emit(
                                     'B2F_emptyd_letters', broadcast=True)
                         else:

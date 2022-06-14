@@ -389,6 +389,7 @@ def register_rfid_set():
 def change_to_button():
     global auto_empty
     auto_empty = False
+    answer = DataRepository.set_latest_setting(0)
     socketio.emit('B2F_changedtoemptywbutton', broadcast=True)
 
 
@@ -396,6 +397,7 @@ def change_to_button():
 def change_to_auto():
     global auto_empty
     auto_empty = True
+    answer = DataRepository.set_latest_setting(1)
     socketio.emit('B2F_changedtoauto', broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>YouGotMailBox | Users</title>
+    <title>YouGotMailBox | Stats</title>
     <meta name="description" content="YouGotMailbox">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="msapplication-TileColor" content="#e85e00">
@@ -81,56 +81,41 @@
         <div class="o-container">
             <div class="o-layout o-layout--justify-space-between o-layout--align-center">
                 <div class="o-layout__item u-1-of-6 u-1-of-6-bp3">
-                    <h2 class="c-users__title u-mb-sm">Users</h2>
-                </div>
-                <div class="o-layout__item u-1-of-6">
-                    <a href="register.html">
-                        <svg id="Component_18_1" data-name="Component 18 – 1" xmlns="http://www.w3.org/2000/svg"
-                            width="144" height="32" viewBox="0 0 144 32">
-                            <g id="btn">
-                                <rect id="Rectangle_1" data-name="Rectangle 1" width="144" height="32" rx="6"
-                                    fill="#010700" />
-                                <text id="Toevoegen" transform="translate(16 4)" fill="#fff" font-size="18"
-                                    font-family="DMSans-Medium, DM Sans" font-weight="500">
-                                    <tspan x="2.541" y="18">Toevoegen</tspan>
-                                </text>
-                            </g>
-                            <path id="add_FILL1_wght400_GRAD0_opsz48"
-                                d="M18.929,30V21.071H10V18.929h8.929V10h2.143v8.929H30v2.143H21.071V30Z"
-                                transform="translate(106 -4)" fill="#fff" />
-                        </svg>
-                    </a>
+                    <h2 class="c-users__title u-mb-sm">Stats</h2>
                 </div>
             </div>
         </div>
-    </section>
-    <hr>
-    <div class="o-container">
-        <table class="c-styled-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>RFID</th>
-                    <th>Register Date</th>
-                </tr>
-            </thead>
-            <tbody class=" js-tableUsers">
-                <tr>
-                    <td class="u-pd-rght-l">--</td>
-                    <td class="u-pd-rght-s">
-                        --
-                    </td>
-                    <td class="u-pd-rght-m">--</td>
-                    <td class="u-pd-rght-xs">
-                        --
-                    </td>
-                    <td class="u-pd-rght-xs">
-                        --
-                    </td>
-                </tr>
-            </tbody>
+        table id="q-graph">
+        <caption>Quarterly Results</caption>
+        <thead>
+            <tr>
+                <th></th>
+                <th class="sent">Invoiced</th>
+                <th class="paid">Collected</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="qtr" id="q1">
+                <th scope="row">Q1</th>
+                <td class="sent bar">
+                    <p>$18,450.00</p>
+                </td>
+                <td class="paid bar">
+                    <p>$16,500.00</p>
+                </td>
+            </tr>
+            <tr class="qtr" id="q2">
+                <th scope="row">Q2</th>
+                <td class="sent bar">
+                    <p>$34,340.72</p>
+                </td>
+                <td class="paid bar">
+                    <p>$32,340.72</p>
+                </td>
+            </tr>
+        </tbody>
         </table>
-    </div>
+    </section>
     <aside class="c-mobile-nav">
         <div class="c-mobile-nav__bg"></div>
         <div class="c-mobile-nav__body">

@@ -20,12 +20,12 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 # from selenium.webdriver.chrome.options import Options
 
 
-goPin = 21
-magnetPin = 27
+goPin = 27
+magnetPin = 21
 transistorPin = 17
-btnPin = Button(6)
-shutdownBtnPin = Button(13)
-EmptiedBtnPin = Button(19)
+btnPin = Button(26)
+shutdownBtnPin = Button(16)
+EmptiedBtnPin = Button(13)
 
 # Default variables
 magnet_status = 0
@@ -70,8 +70,8 @@ def setup_gpio():
     global reader
     reader = SimpleMFRC522()
     # lcd
-    # global lcd_module
-    # lcd_module = LCD_Module(16, 20)
+    global lcd_module
+    lcd_module = LCD_Module(16, 20)
     # spi
     global spiObj
     spiObj = SpiClass(0, 1)
@@ -80,7 +80,7 @@ def setup_gpio():
     brieven_vandaag = DataRepository.read_brieven_today()
     brieven_vandaag = brieven_vandaag[0]
     brieven_vandaag = brieven_vandaag['Aantal']
-    # show_brieven_vandaag()
+    show_brieven_vandaag()
     # lock status
     global lock_opened
     answer = DataRepository.read_latest_lock()

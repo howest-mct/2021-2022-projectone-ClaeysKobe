@@ -49,8 +49,10 @@ else:
 brieven_vandaag = f""
 try:
     ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+    ip_type = "WLAN0"
 except Exception:
     ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+    ip_type = f"ETH0"
 # Code voor Hardware
 
 
@@ -104,7 +106,7 @@ def lees_shutdown_knop(pin):
 def lees_knop(pin):
     if btnPin.pressed:
         print("**** button pressed: showing IP ****")
-        lcd_module.write_message(ip)
+        lcd_module.write_ip_message(ip_type, ip)
         time.sleep(5)
         show_brieven_vandaag()
 

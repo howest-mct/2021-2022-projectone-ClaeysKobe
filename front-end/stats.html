@@ -22,11 +22,12 @@
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
         integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script/datahandler.js"></script>
     <script src="script/app.js"></script>
 </head>
 
-<body class="js-userPage">
+<body class="js-statsPage">
     <header class="o-row--header u-z-index-hgh">
         <div class="c-header">
             <div class="c-header__logo">
@@ -85,36 +86,15 @@
                 </div>
             </div>
         </div>
-        table id="q-graph">
-        <caption>Quarterly Results</caption>
-        <thead>
-            <tr>
-                <th></th>
-                <th class="sent">Invoiced</th>
-                <th class="paid">Collected</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="qtr" id="q1">
-                <th scope="row">Q1</th>
-                <td class="sent bar">
-                    <p>$18,450.00</p>
-                </td>
-                <td class="paid bar">
-                    <p>$16,500.00</p>
-                </td>
-            </tr>
-            <tr class="qtr" id="q2">
-                <th scope="row">Q2</th>
-                <td class="sent bar">
-                    <p>$34,340.72</p>
-                </td>
-                <td class="paid bar">
-                    <p>$32,340.72</p>
-                </td>
-            </tr>
-        </tbody>
-        </table>
+        <div class="c-graphs o-layout o-layout--align-center o-layout--align-content-center">
+            <div class="o-layout__item c-graph-buttons">
+                <button class="js-prev-week-btn">prev week</button>
+                <button class="js-next-week-btn">next week</button>
+            </div>
+            <div class="o-layout__item u-1-of-2-bp3 mailGraph">
+                <canvas class="day"></canvas>
+            </div>
+        </div>
     </section>
     <aside class="c-mobile-nav">
         <div class="c-mobile-nav__bg"></div>

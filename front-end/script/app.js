@@ -9,6 +9,7 @@ let htmlBoxOpen,
   htmlLidStatus,
   htmlIndex,
   htmlLogin,
+  htmlStats,
   htmlAdd,
   htmlProfile,
   htmlEdit,
@@ -21,6 +22,10 @@ let htmlBoxOpen,
   listLength,
   empytwbutton,
   emptyauto,
+  letterData = [],
+  LetterLabels = [],
+  letterChart,
+  weeknr = 0,
   token;
 
 const lanIP = `${window.location.hostname}:5000`;
@@ -311,6 +316,50 @@ const loadHistory = function () {
     loadHistoryAll();
   }
 };
+
+const makeMailGraph = function () {
+  const labels = LetterLabels;
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Amount of deposits',
+        data: letterData,
+        backgroundColor: '#24D406',
+        borderColor: '#24D406',
+      },
+    ],
+  };
+
+  const config = {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Amount of deposits this week',
+        },
+      },
+    },
+  };
+
+  const ctx = document.querySelector('.mailGraph');
+  letterChart = new Chart(ctx, config);
+};
+
+const updateCoffeMade = function (data) {
+  for (const log of data) {
+    letterData.push(log['Waarde']);
+    LetterLabels.push(log['day']);
+  }
+  // console.log(CoffeeData);
+  letterChart.update();
+};
 // #endregion
 
 // #region ***  Data Access - get___                     ***********
@@ -367,6 +416,10 @@ const getLatestLetters = function () {
 const getLatestSetting = function () {
   const url = `http://${lanIP}/api/v1/events/settings/latest/`;
   handleData(url, setSetting);
+};
+
+const getGraphData = function () {
+  socketio.emit('F2B_getLetterLogs', { weeknr: 0 });
 };
 // #endregion
 
@@ -643,6 +696,33 @@ const listenToSocketSettings = function () {
     empytwbutton.classList.remove('u-no-clicking');
   });
 };
+
+const listenToBtnStats = function () {
+  document
+    .querySelector('.js-prev-week-btn')
+    .addEventListener('click', function () {
+      letterData.length = 0;
+      LetterLabels.length = 0;
+      weeknr = weeknr - 1;
+      socketio.emit('F2B_getLetterLogs', { weeknr: weeknr });
+    });
+  document
+    .querySelector('.js-next-week-btn')
+    .addEventListener('click', function () {
+      weeknr = weeknr + 1;
+      if (weeknr > 0) {
+        weeknr = 0;
+      }
+      socketio.emit('F2B_getLetterLogs', { weeknr: weeknr });
+    });
+};
+
+const listenToSocketStats = function () {
+  socketio.on('B2F_letter_logs', function (payload) {
+    updateLetters(payload.data);
+  });
+};
+
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -657,6 +737,7 @@ const init = function () {
   htmlLogin = document.querySelector('.js-loginPage');
   htmlSettings = document.querySelector('.js-settingsPage');
   htmlProfile = document.querySelector('.js-profilePage');
+  htmlStats = document.querySelector('.js-statsPage');
 
   setCurrentUser();
 
@@ -715,6 +796,12 @@ const init = function () {
         setCurrentUser();
         getUserInfo(userID);
         listenToLogout();
+      } else if (htmlStats) {
+        console.log('test');
+        makeMailGraph();
+        getGraphData();
+        listenToBtnStats();
+        listenToSocketStats();
       } else {
         window.location.href = 'home.html';
       }

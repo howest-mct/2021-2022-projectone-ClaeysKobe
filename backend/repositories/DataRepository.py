@@ -189,3 +189,9 @@ class DataRepository:
     def get_latest_setting():
         sql = 'select value from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC LIMIT 1'
         return Database.get_one_row(sql)
+
+    @staticmethod
+    def load_graph_data(weeknr):
+        sql = 'select count(*) as `Aantal` from brievenbusevent where week(date, 5) = week(now() - %s, 5) and ActieID = 3'
+        params = [weeknr]
+        Database.get_one_row[weeknr]

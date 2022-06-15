@@ -402,6 +402,16 @@ def change_to_auto():
     answer = DataRepository.set_latest_setting(1)
     socketio.emit('B2F_changedtoauto', broadcast=True)
 
+
+@socketio.on('F2B_getLetterLogs')
+def open_box(payload):
+    weeknr = payload['weeknr']
+    data = DataRepository.load_graph_data(weeknr)
+    print(data)
+    aantal = data['Aantal']
+    socketio.emit('B2F_letter_logs', {'data': aantal}, broadcast=True)
+    time.sleep(0.1)
+
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 

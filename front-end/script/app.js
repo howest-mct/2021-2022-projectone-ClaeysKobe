@@ -306,7 +306,25 @@ const setCurrentUser = function () {
 };
 
 const setSetting = function (jsonObj) {
-  console.log('aaa', jsonObj);
+  // console.log('aaa', jsonObj);
+  const setting = jsonObj.data.value;
+  if (setting == 0) {
+    empytwbutton.classList.add('u-no-clicking');
+    empytwbutton.classList.remove('c-btn--unselected');
+    empytwbutton.classList.add('c-btn--selected');
+    // other element
+    emptyauto.classList.add('c-btn--unselected');
+    emptyauto.classList.remove('c-btn--selected');
+    emptyauto.classList.remove('u-no-clicking');
+  } else {
+    emptyauto.classList.add('u-no-clicking');
+    emptyauto.classList.remove('c-btn--unselected');
+    emptyauto.classList.add('c-btn--selected');
+    // other element
+    empytwbutton.classList.add('c-btn--unselected');
+    empytwbutton.classList.remove('c-btn--selected');
+    empytwbutton.classList.remove('u-no-clicking');
+  }
 };
 
 const loadHistory = function () {
@@ -352,12 +370,14 @@ const makeMailGraph = function () {
   letterChart = new Chart(ctx, config);
 };
 
-const updateCoffeMade = function (data) {
+const updateLetters = function (data) {
+  console.log(data);
   for (const log of data) {
-    letterData.push(log['Waarde']);
-    LetterLabels.push(log['day']);
+    if (log['Aantal'] > 0) {
+      letterData.push(log['Aantal']);
+      LetterLabels.push(log['Day']);
+    }
   }
-  // console.log(CoffeeData);
   letterChart.update();
 };
 // #endregion
@@ -414,12 +434,12 @@ const getLatestLetters = function () {
 };
 
 const getLatestSetting = function () {
-  const url = `http://${lanIP}/api/v1/events/settings/latest/`;
+  const url = `http://${lanIP}/api/v1/settings/latest/`;
   handleData(url, setSetting);
 };
 
 const getGraphData = function () {
-  socketio.emit('F2B_getLetterLogs', { weeknr: 0 });
+  socket.emit('F2B_getLetterLogs', { weeknr: 0 });
 };
 // #endregion
 
@@ -518,6 +538,7 @@ const listenToSocketIndex = function () {
   socket.on('B2F_refresh_history', function (payload) {
     loadPageNumbers();
     loadHistory();
+    loadLettersToday();
     // if (historyAll == true) {
     //   loadHistoryAll();
     // } else {
@@ -704,7 +725,7 @@ const listenToBtnStats = function () {
       letterData.length = 0;
       LetterLabels.length = 0;
       weeknr = weeknr - 1;
-      socketio.emit('F2B_getLetterLogs', { weeknr: weeknr });
+      socket.emit('F2B_getLetterLogs', { weeknr: weeknr });
     });
   document
     .querySelector('.js-next-week-btn')
@@ -713,12 +734,12 @@ const listenToBtnStats = function () {
       if (weeknr > 0) {
         weeknr = 0;
       }
-      socketio.emit('F2B_getLetterLogs', { weeknr: weeknr });
+      socket.emit('F2B_getLetterLogs', { weeknr: weeknr });
     });
 };
 
 const listenToSocketStats = function () {
-  socketio.on('B2F_letter_logs', function (payload) {
+  socket.on('B2F_letter_logs', function (payload) {
     updateLetters(payload.data);
   });
 };
@@ -788,6 +809,12 @@ const init = function () {
       listenToReset();
       listenToOption();
       listenToSocketSettings();
+    } else if (htmlStats) {
+      // console.log('test');
+      makeMailGraph();
+      getGraphData();
+      listenToSocketStats();
+      listenToBtnStats();
     } else if (htmlProfile) {
       let urlParams = new URLSearchParams(window.location.search);
       let userID = urlParams.get('userID');
@@ -796,12 +823,6 @@ const init = function () {
         setCurrentUser();
         getUserInfo(userID);
         listenToLogout();
-      } else if (htmlStats) {
-        console.log('test');
-        makeMailGraph();
-        getGraphData();
-        listenToBtnStats();
-        listenToSocketStats();
       } else {
         window.location.href = 'home.html';
       }

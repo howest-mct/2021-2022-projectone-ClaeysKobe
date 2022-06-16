@@ -172,7 +172,7 @@ class DataRepository:
 
     @staticmethod
     def emptied_box():
-        sql = "insert into brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 9, now(), 'New mail!', null);"
+        sql = "insert into brievenbusevent (gebruikersID, ActieID, date, opmerking, waarde) values (null, 9, now(), 'Emptied mailbox', null);"
         return Database.execute_sql(sql)
 
     @staticmethod
@@ -187,11 +187,11 @@ class DataRepository:
 
     @staticmethod
     def get_latest_setting():
-        sql = 'select value from brievenbusevent where cast(date as Date) = cast(now() as Date) order by date DESC LIMIT 1'
+        sql = 'select value from Settingschange where cast(time as Date) = cast(now() as Date) order by time DESC LIMIT 1'
         return Database.get_one_row(sql)
 
     @staticmethod
     def load_graph_data(weeknr):
-        sql = 'select count(*) as `Aantal` from brievenbusevent where week(date, 5) = week(now() - %s, 5) and ActieID = 3'
+        sql = 'select count(*) as `Aantal`, dayname(date) as `Day` from brievenbusevent where week(date, 5) = week(now() - %s, 5) and ActieID = 3 group by dayname(date)'
         params = [weeknr]
-        Database.get_one_row[weeknr]
+        return Database.get_rows(sql, params)

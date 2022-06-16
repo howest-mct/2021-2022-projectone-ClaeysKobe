@@ -3,7 +3,7 @@ from RPi import GPIO
 
 btn = 19
 btn2 = 13
-btn3 = 6
+btn3 = 26
 
 
 def setup():

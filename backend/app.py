@@ -430,8 +430,9 @@ def change_to_auto():
 @socketio.on('F2B_getLetterLogs')
 def get_logs(payload):
     weeknr = payload['weeknr']
+    # print(weeknr)
     data = DataRepository.load_graph_data(weeknr)
-    print(data)
+    # print(data)
     socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
     time.sleep(0.1)
 
@@ -552,6 +553,9 @@ def read_ldr():
             show_brieven_vandaag()
             socketio.emit('B2F_new_letter', broadcast=True)
             socketio.emit('B2F_refresh_history', broadcast=True)
+            data = DataRepository.load_graph_data(0)
+            socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
+            time.sleep(0.1)
         ldr6 = spiObj.read_channel(2)
         if ldr6 > 800:
             # print("WORKING")

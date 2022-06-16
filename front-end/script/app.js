@@ -336,6 +336,7 @@ const loadHistory = function () {
 };
 
 const makeMailGraph = function () {
+  const type = 'bar';
   const labels = LetterLabels;
   const data = {
     labels: labels,
@@ -350,18 +351,27 @@ const makeMailGraph = function () {
   };
 
   const config = {
-    type: 'line',
+    type: 'bar',
     data: data,
     options: {
       responsive: true,
       plugins: {
         legend: {
+          display: false,
           position: 'top',
         },
         title: {
           display: true,
           text: 'Amount of deposits this week',
         },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+      ticks: {
+        precision: 0,
       },
     },
   };
@@ -371,12 +381,11 @@ const makeMailGraph = function () {
 };
 
 const updateLetters = function (data) {
-  console.log(data);
-  for (const log of data) {
-    if (log['Aantal'] > 0) {
-      letterData.push(log['Aantal']);
-      LetterLabels.push(log['Day']);
-    }
+  // console.log(data);
+  for (const log of data.data) {
+    // console.log(log['Day']);
+    letterData.push(log['Aantal']);
+    LetterLabels.push(log['Day']);
   }
   letterChart.update();
 };
@@ -722,9 +731,8 @@ const listenToBtnStats = function () {
   document
     .querySelector('.js-prev-week-btn')
     .addEventListener('click', function () {
-      letterData.length = 0;
-      LetterLabels.length = 0;
       weeknr = weeknr - 1;
+      // console.log(weeknr);
       socket.emit('F2B_getLetterLogs', { weeknr: weeknr });
     });
   document
@@ -740,7 +748,9 @@ const listenToBtnStats = function () {
 
 const listenToSocketStats = function () {
   socket.on('B2F_letter_logs', function (payload) {
-    updateLetters(payload.data);
+    letterData.length = 0;
+    LetterLabels.length = 0;
+    updateLetters(payload);
   });
 };
 

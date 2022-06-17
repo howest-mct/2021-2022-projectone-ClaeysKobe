@@ -42,9 +42,8 @@ led_strip_lock = False
 led_waarde = False
 prev_led_waarde = False
 latest_setting = DataRepository.get_latest_setting()
-latest_setting = latest_setting['value']
-print(latest_setting)
 if latest_setting is not None:
+    latest_setting = latest_setting['value']
     if latest_setting == 1:
         auto_empty = True
     else:

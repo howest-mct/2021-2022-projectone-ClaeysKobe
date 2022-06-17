@@ -187,7 +187,7 @@ class DataRepository:
 
     @staticmethod
     def get_latest_setting():
-        sql = 'select value from Settingschange where cast(time as Date) = cast(now() as Date) order by time DESC LIMIT 1'
+        sql = 'select value from Settingschange order by time DESC LIMIT 1'
         return Database.get_one_row(sql)
 
     @staticmethod

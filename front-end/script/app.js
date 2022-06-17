@@ -336,7 +336,6 @@ const loadHistory = function () {
 };
 
 const makeMailGraph = function () {
-  const type = 'bar';
   const labels = LetterLabels;
   const data = {
     labels: labels,
@@ -344,8 +343,9 @@ const makeMailGraph = function () {
       {
         label: 'Amount of deposits',
         data: letterData,
-        backgroundColor: '#24D406',
+        backgroundColor: 'rgba(36, 212, 6, 0.5)',
         borderColor: '#24D406',
+        borderWidth: 4,
       },
     ],
   };

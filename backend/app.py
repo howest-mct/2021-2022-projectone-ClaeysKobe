@@ -68,7 +68,7 @@ def setup_gpio():
     GPIO.setup(goPin, GPIO.OUT)
     GPIO.setup(transistorPin, GPIO.OUT)
     GPIO.setup(mailPin, GPIO.OUT)
-    # GPIO.setup(relayPin, GPIO.OUT)
+    GPIO.setup(relayPin, GPIO.OUT)
     GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     # magnet pin
     global magnet_status
@@ -366,7 +366,7 @@ def open_box(payload):
     answer = DataRepository.insert_box_site(
         1, f"{naam} unlocked your mailbox", userID)
     print(answer)
-    # GPIO.output(relayPin, GPIO.HIGH)
+    GPIO.output(relayPin, GPIO.HIGH)
     # Send to the client!
     lock_opened = True
     led_strip_lock = True
@@ -393,7 +393,7 @@ def open_box(payload):
     answer = DataRepository.insert_box_site(
         0, f"{naam} Locked your mailbox", userID)
     print(answer)
-    # GPIO.output(relayPin, GPIO.LOW)
+    GPIO.output(relayPin, GPIO.LOW)
     # Send to the client!
     lock_opened = False
     led_strip_lock = False
@@ -495,7 +495,7 @@ def read_rfid():
                             beschrijving = f"{gebruiker} Unlocked your mailbox"
                             print(beschrijving)
                             led_strip_lock = True
-                            # GPIO.output(relayPin, GPIO.HIGH)
+                            GPIO.output(relayPin, GPIO.HIGH)
                             if auto_empty == True:
                                 laatst_geledigd = datetime.now()
                                 geledigd = True
@@ -507,7 +507,7 @@ def read_rfid():
                             beschrijving = f"{gebruiker} Locked your mailbox"
                             print(beschrijving)
                             led_strip_lock = False
-                            # GPIO.output(relayPin, GPIO.LOW)
+                            GPIO.output(relayPin, GPIO.LOW)
                             time.sleep(0.5)
                         answer = DataRepository.insert_rfid_value(
                             id, beschrijving)

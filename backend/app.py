@@ -292,7 +292,8 @@ def gebruikers():
         rfid = te_verzenden['rfid']
         naam = te_verzenden['naam']
         wachtwoord = te_verzenden['wachtwoord']
-        answer = DataRepository.insert_user(rfid, naam, wachtwoord)
+        email = te_verzenden['email']
+        answer = DataRepository.insert_user(rfid, naam, wachtwoord, email)
         if answer is not None:
             return jsonify(data=answer), 201
         else:
@@ -318,7 +319,9 @@ def gebruiker(UserID):
         rfid = te_verzenden['rfid']
         naam = te_verzenden['naam']
         wachtwoord = te_verzenden['wachtwoord']
-        answer = DataRepository.update_user(rfid, naam, wachtwoord, UserID)
+        email = te_verzenden['email']
+        answer = DataRepository.update_user(
+            rfid, naam, wachtwoord, UserID, email)
         if answer is not None:
             return jsonify(data=answer), 201
         else:

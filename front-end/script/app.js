@@ -148,6 +148,7 @@ const showLatestLock = function (payload) {
 const showUsers = function (payload) {
   let stringHTML = ``;
   let rfid = '';
+  let email = '';
   let registreerdatum = '';
   for (const gebruiker of payload.gebruikers) {
     if (gebruiker.rfid_code != null) {
@@ -165,12 +166,23 @@ const showUsers = function (payload) {
     } else {
       registreerdatum = 'Unknown';
     }
-
+    if (gebruiker.email != null) {
+      email = `<svg xmlns="http://www.w3.org/2000/svg" width="32.55" height="23.5" viewBox="0 0 32.55 23.5">
+            <path id="check_FILL0_wght400_GRAD0_opsz48"
+                d="M18.9,35.7,7.7,24.5l2.15-2.15L18.9,31.4,38.1,12.2l2.15,2.15Z"
+                transform="translate(-7.7 -12.2)" fill="#24d406" />
+          </svg>`;
+    } else {
+      email = '--';
+    }
     stringHTML += `
       <tr>
         <td class="u-pd-rght-l">${gebruiker.naam}</td>
-        <td class="u-pd-rght-s">
+        <td class="u-pd-rght-xs">
             ${rfid}
+        </td>
+        <td class="u-pd-rght-s">
+            ${email}
         </td>
         <td class="u-pd-rght-m">${registreerdatum}</td>
         <td class="u-pd-rght-xs js-removeuser" data-userid="${gebruiker.gebruikersID}">
@@ -201,16 +213,29 @@ const showUsers = function (payload) {
 const showUserInfo = function (payload) {
   // console.log(payload);
   let registreerdatum = '';
+  let rfid = '';
+  let email = '';
   if (payload.gebruikers.registreerdatum != null) {
     const datum = payload.gebruikers.registreerdatum.split(' ');
     registreerdatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
   } else {
     registreerdatum = 'Unknown';
   }
+  if (payload.gebruikers.registreerdatum != null) {
+    rfid = payload.gebruikers.rfid_code;
+  } else {
+    rfid = 'Unknown';
+  }
+  if (payload.gebruikers.email != null) {
+    email = payload.gebruikers.email;
+  } else {
+    email = '';
+  }
   document.querySelector('.js-name').innerHTML = payload.gebruikers.naam;
-  setValueAndId('js-parRfid', payload.gebruikers.rfid_code);
+  setValueAndId('js-parRfid', rfid);
   setValueAndId('js-parName', payload.gebruikers.naam);
   setValueAndId('js-parPwrd', payload.gebruikers.wachtwoord);
+  setValueAndId('js-parEmail', email);
   setValueAndId('js-parRegDate', registreerdatum);
   listenToUpdateUser();
 };
@@ -612,10 +637,12 @@ const listenToUpdateUser = function () {
       const rfid = document.querySelector('.js-parRfid').value;
       const name = document.querySelector('.js-parName').value;
       const pwrd = document.querySelector('.js-parPwrd').value;
+      const email = document.querySelector('.js-parEmail').value;
       const body = JSON.stringify({
         rfid: rfid,
         naam: name,
         wachtwoord: pwrd,
+        email: email,
       });
       let urlParams = new URLSearchParams(window.location.search);
       let userID = urlParams.get('userID');
@@ -642,6 +669,7 @@ const listenToSubmit = function () {
     const rfid = document.querySelector('.js-parRfid').value;
     const name = document.querySelector('.js-parName').value;
     const pwrd = document.querySelector('.js-parPwrd').value;
+    const email = document.querySelector('.js-parEmail').value;
     if (name == '') {
       document.querySelector('.js-parName').classList.add('u-bdclr-red');
     } else if (pwrd == '') {
@@ -651,6 +679,7 @@ const listenToSubmit = function () {
         rfid: rfid,
         naam: name,
         wachtwoord: pwrd,
+        email: email,
       });
       const url = `http://${lanIP}/api/v1/users/`;
       handleData(url, backToList, null, 'POST', body);

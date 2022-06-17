@@ -92,25 +92,25 @@ class DataRepository:
 
     @staticmethod
     def read_users():
-        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum FROM projectonedb.gebruiker"
+        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum, email FROM projectonedb.gebruiker"
         return Database.get_rows(sql)
 
     @staticmethod
     def read_user(userID):
-        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum FROM projectonedb.gebruiker where gebruikersID = %s"
+        sql = "SELECT gebruikersID, naam, AES_DECRYPT(`wachtwoord`, 'secretsMustBeKept') AS `wachtwoord`, rfid_code, registreerdatum, email FROM projectonedb.gebruiker where gebruikersID = %s"
         params = [userID]
         return Database.get_one_row(sql, params)
 
     @staticmethod
-    def update_user(rfid, naam, pswrd, gebruikersid):
-        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = AES_ENCRYPT(%s, 'secretsMustBeKept') WHERE gebruikersID = %s"
-        params = [rfid, naam, pswrd, gebruikersid]
+    def update_user(rfid, naam, pswrd, gebruikersid, email):
+        sql = "UPDATE gebruiker SET rfid_code = %s, naam = %s, wachtwoord = AES_ENCRYPT(%s, 'secretsMustBeKept'), email = %s WHERE gebruikersID = %s"
+        params = [rfid, naam, pswrd, email, gebruikersid]
         return Database.execute_sql(sql, params)
 
     @staticmethod
-    def insert_user(rfid, naam, pswrd):
-        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum) Select %s, AES_ENCRYPT(%s, 'secretsMustBeKept'), %s, now() Where not exists(select * from gebruiker where rfid_code=%s)"
-        params = [naam, pswrd, rfid, rfid]
+    def insert_user(rfid, naam, pswrd, email):
+        sql = "insert into gebruiker (naam, wachtwoord, rfid_code, registreerdatum, email) Select %s, AES_ENCRYPT(%s, 'secretsMustBeKept'), %s, now(), %s Where not exists(select * from gebruiker where rfid_code=%s)"
+        params = [naam, pswrd, rfid, email, rfid]
         return Database.execute_sql(sql, params)
 
     @staticmethod

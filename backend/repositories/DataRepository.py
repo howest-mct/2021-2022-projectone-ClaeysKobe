@@ -195,3 +195,8 @@ class DataRepository:
         sql = 'select count(*) as `Aantal`, dayname(date) as `Day` from brievenbusevent where week(date, 5) = week(now(), 5) + %s and ActieID = 3 group by dayname(date) order by date DESC'
         params = [weeknr]
         return Database.get_rows(sql, params)
+
+    @staticmethod
+    def get_emails():
+        sql = 'select email from gebruiker where email is not null'
+        return Database.get_rows(sql)

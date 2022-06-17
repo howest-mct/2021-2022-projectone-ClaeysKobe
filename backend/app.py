@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 from classes.spi_class import SpiClass
 from classes.lcd_class import LCD_Module
+from classes.email_class import Emailer
 from helpers.klasseknop import Button
 import time
 from RPi import GPIO
@@ -462,7 +463,7 @@ def read_sensor_magnet():
             socketio.emit('B2F_change_magnet', broadcast=True)
             socketio.emit('B2F_refresh_history', broadcast=True)
         prev_magnet_status = magnet_status
-        time.sleep(0.5)
+        time.sleep(0.2)
 
 
 def read_rfid():
@@ -535,6 +536,9 @@ def wait_for_button():
 
 
 def read_ldr():
+    sender = Emailer()
+    emails = DataRepository.get_emails()
+    emailSubject = 'U have unchecked mail!'
     global led_strip_ldr
     global brieven_vandaag
     global geledigd
@@ -558,6 +562,11 @@ def read_ldr():
             data = DataRepository.load_graph_data(0)
             socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
             time.sleep(0.1)
+            emailContent = f"U got a new deposit at {datetime.now()}."
+            for email in emails:
+                sendTo = email['email']
+                sender.sendmail(sendTo, emailSubject, emailContent)
+                time.sleep(0.5)
         ldr6 = spiObj.read_channel(2)
         if ldr6 > 800:
             # print("WORKING")

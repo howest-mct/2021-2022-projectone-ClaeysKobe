@@ -24,6 +24,15 @@ let htmlBoxOpen,
   emptyauto,
   letterData = [],
   LetterLabels = [],
+  weekDays = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ],
   letterChart,
   weeknr = 0,
   token;
@@ -382,11 +391,22 @@ const makeMailGraph = function () {
 
 const updateLetters = function (data) {
   // console.log(data);
-  for (const log of data.data) {
-    // console.log(log['Day']);
-    letterData.push(log['Aantal']);
-    LetterLabels.push(log['Day']);
+  for (let i = 0; i < 7; i++) {
+    let day = weekDays[i];
+    let found = false;
+    LetterLabels.push(day);
+    for (const log of data.data) {
+      if (log['Day'] == day) {
+        // console.log(log['Day']);
+        letterData.push(log['Aantal']);
+        found = true;
+      }
+    }
+    if (found == false) {
+      letterData.push(0);
+    }
   }
+
   letterChart.update();
 };
 // #endregion

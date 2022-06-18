@@ -254,10 +254,14 @@ const callbackShow = function (jsonObj) {
 
 const showloginError = function (jsonObj) {
   console.log(jsonObj);
+  const error = document.querySelector('.js-error');
+  error.classList.remove('u-hide');
 };
 
 const callbackError = function (jsonObj) {
   console.log(jsonObj);
+  const error = document.querySelector('.js-error');
+  error.classList.remove('u-hide');
 };
 
 const showSucces = function (jsonObj) {

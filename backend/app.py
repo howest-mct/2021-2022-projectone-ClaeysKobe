@@ -17,8 +17,8 @@ from RPi import GPIO
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 
 
-# from selenium import webdriver
-# from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 
 goPin = 22
@@ -108,6 +108,7 @@ def lees_shutdown_knop(pin):
     if shutdownBtnPin.pressed:
         if relay_low == False:
             print("**** button pressed: shutting down PI ****")
+            lcd_module.write_message("Pi shut down...")
             time.sleep(5)
             os.system("sudo shutdown -h now")
 
@@ -448,6 +449,15 @@ def get_logs(payload):
     socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
     time.sleep(0.1)
 
+
+@socketio.on('F2B_ShutdownPiPlease')
+def shut_down():
+    print("**** button pressed: shutting down PI ****")
+    lcd_module.write_message("Pi shut down...")
+    time.sleep(5)
+    os.system("sudo shutdown -h now")
+
+
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 
@@ -697,4 +707,6 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print('KeyboardInterrupt exception is caught')
     finally:
+        lcd_module.close_lcd()
+        spiObj.closespi()
         GPIO.cleanup()

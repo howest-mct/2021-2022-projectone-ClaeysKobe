@@ -726,6 +726,15 @@ const listenToReset = function () {
   });
 };
 
+const listenToShutDown = function () {
+  document.querySelector('.js-shutdown').addEventListener('click', function () {
+    if (confirm('Shut Down Pi?')) {
+      socket.emit('F2B_ShutdownPiPlease');
+    } else {
+    }
+  });
+};
+
 const listenToLogout = function () {
   document.querySelector('.js-logout').addEventListener('click', function () {
     sessionStorage.setItem('currentUser', '');
@@ -870,6 +879,7 @@ const init = function () {
       getLatestSetting();
       setCurrentUser();
       listenToReset();
+      listenToShutDown();
       listenToOption();
       listenToSocketSettings();
     } else if (htmlStats) {

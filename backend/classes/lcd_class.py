@@ -118,4 +118,5 @@ class LCD_Module:
 
     @staticmethod
     def close_lcd():
+        i2c.close()
         GPIO.cleanup()

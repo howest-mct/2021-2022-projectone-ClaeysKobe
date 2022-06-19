@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 from classes.spi_class import SpiClass
 from classes.lcd_class import LCD_Module
+from classes.email_class import Emailer
 from helpers.klasseknop import Button
 import time
 from RPi import GPIO
@@ -20,17 +21,20 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 # from selenium.webdriver.chrome.options import Options
 
 
-goPin = 21
-magnetPin = 27
+goPin = 22
+mailPin = 27
+magnetPin = 21
 transistorPin = 17
-btnPin = Button(6)
+relayPin = 6
+btnPin = Button(26)
+emptiedBtnPin = Button(19)
 shutdownBtnPin = Button(13)
-EmptiedBtnPin = Button(19)
 
 # Default variables
 magnet_status = 0
 prev_magnet_status = 0
 laatst_geledigd = datetime.now()
+geledigd = True
 lock_opened = False
 register_rfid = False
 login_rfid = False
@@ -40,17 +44,20 @@ led_waarde = False
 prev_led_waarde = False
 latest_setting = DataRepository.get_latest_setting()
 if latest_setting is not None:
+    latest_setting = latest_setting['value']
     if latest_setting == 1:
         auto_empty = True
     else:
         auto_empty = False
 else:
-    auto_empty = False
+    auto_empty = True
 brieven_vandaag = f""
 try:
     ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+    ip_type = "WLAN0"
 except Exception:
     ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+    ip_type = f"ETH0"
 # Code voor Hardware
 
 
@@ -60,6 +67,8 @@ def setup_gpio():
 
     GPIO.setup(goPin, GPIO.OUT)
     GPIO.setup(transistorPin, GPIO.OUT)
+    GPIO.setup(mailPin, GPIO.OUT)
+    GPIO.setup(relayPin, GPIO.OUT)
     GPIO.setup(magnetPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     # magnet pin
     global magnet_status
@@ -70,8 +79,8 @@ def setup_gpio():
     global reader
     reader = SimpleMFRC522()
     # lcd
-    # global lcd_module
-    # lcd_module = LCD_Module(16, 20)
+    global lcd_module
+    lcd_module = LCD_Module(16, 20)
     # spi
     global spiObj
     spiObj = SpiClass(0, 1)
@@ -80,7 +89,7 @@ def setup_gpio():
     brieven_vandaag = DataRepository.read_brieven_today()
     brieven_vandaag = brieven_vandaag[0]
     brieven_vandaag = brieven_vandaag['Aantal']
-    # show_brieven_vandaag()
+    show_brieven_vandaag()
     # lock status
     global lock_opened
     answer = DataRepository.read_latest_lock()
@@ -104,9 +113,22 @@ def lees_shutdown_knop(pin):
 def lees_knop(pin):
     if btnPin.pressed:
         print("**** button pressed: showing IP ****")
-        lcd_module.write_message(ip)
+        lcd_module.write_ip_message(ip_type, ip)
         time.sleep(5)
         show_brieven_vandaag()
+
+
+def empty_box(pin):
+    global laatst_geledigd
+    global geledigd
+    if auto_empty == False:
+        print("Box geledigd")
+        laatst_geledigd = datetime.now()
+        geledigd = True
+        answer = DataRepository.emptied_box()
+        socketio.emit('B2F_emptyd_letters', broadcast=True)
+        socketio.emit('B2F_refresh_history', broadcast=True)
+    time.sleep(1)
 
 
 def show_brieven_vandaag():
@@ -271,7 +293,8 @@ def gebruikers():
         rfid = te_verzenden['rfid']
         naam = te_verzenden['naam']
         wachtwoord = te_verzenden['wachtwoord']
-        answer = DataRepository.insert_user(rfid, naam, wachtwoord)
+        email = te_verzenden['email']
+        answer = DataRepository.insert_user(rfid, naam, wachtwoord, email)
         if answer is not None:
             return jsonify(data=answer), 201
         else:
@@ -297,7 +320,9 @@ def gebruiker(UserID):
         rfid = te_verzenden['rfid']
         naam = te_verzenden['naam']
         wachtwoord = te_verzenden['wachtwoord']
-        answer = DataRepository.update_user(rfid, naam, wachtwoord, UserID)
+        email = te_verzenden['email']
+        answer = DataRepository.update_user(
+            rfid, naam, wachtwoord, UserID, email)
         if answer is not None:
             return jsonify(data=answer), 201
         else:
@@ -331,6 +356,7 @@ def open_box(payload):
     global lock_opened
     global led_strip_lock
     global laatst_geledigd
+    global geledigd
     print('Box opened via PC')
     userID = payload['userID']
     naam = DataRepository.check_name(userID)
@@ -340,11 +366,13 @@ def open_box(payload):
     answer = DataRepository.insert_box_site(
         1, f"{naam} unlocked your mailbox", userID)
     print(answer)
+    GPIO.output(relayPin, GPIO.HIGH)
     # Send to the client!
     lock_opened = True
     led_strip_lock = True
     if auto_empty == True:
         laatst_geledigd = datetime.now()
+        geledigd = True
         answer = DataRepository.emptied_box()
         socketio.emit('B2F_emptyd_letters', broadcast=True)
     socketio.emit('B2F_refresh_history', broadcast=True)
@@ -365,6 +393,7 @@ def open_box(payload):
     answer = DataRepository.insert_box_site(
         0, f"{naam} Locked your mailbox", userID)
     print(answer)
+    GPIO.output(relayPin, GPIO.LOW)
     # Send to the client!
     lock_opened = False
     led_strip_lock = False
@@ -400,6 +429,16 @@ def change_to_auto():
     answer = DataRepository.set_latest_setting(1)
     socketio.emit('B2F_changedtoauto', broadcast=True)
 
+
+@socketio.on('F2B_getLetterLogs')
+def get_logs(payload):
+    weeknr = payload['weeknr']
+    # print(weeknr)
+    data = DataRepository.load_graph_data(weeknr)
+    # print(data)
+    socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
+    time.sleep(0.1)
+
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 
@@ -424,7 +463,7 @@ def read_sensor_magnet():
             socketio.emit('B2F_change_magnet', broadcast=True)
             socketio.emit('B2F_refresh_history', broadcast=True)
         prev_magnet_status = magnet_status
-        time.sleep(0.5)
+        time.sleep(0.2)
 
 
 def read_rfid():
@@ -432,12 +471,15 @@ def read_rfid():
     global register_rfid
     global login_rfid
     global laatst_geledigd
+    global led_strip_lock
+    global geledigd
     while True:
         id, text = reader.read()
         if id != "":
             GPIO.output(goPin, True)
             print("ID: %s\nText: %s" % (id, text))
             rfid_id = id
+            print("SCANNED")
             if register_rfid == False:
                 gebruiker = DataRepository.check_rfid(rfid_id)
                 if gebruiker is not None:
@@ -453,14 +495,21 @@ def read_rfid():
                         if lock_opened == True:
                             beschrijving = f"{gebruiker} Unlocked your mailbox"
                             print(beschrijving)
+                            led_strip_lock = True
+                            GPIO.output(relayPin, GPIO.HIGH)
                             if auto_empty == True:
                                 laatst_geledigd = datetime.now()
+                                geledigd = True
                                 answer = DataRepository.emptied_box()
                                 socketio.emit(
                                     'B2F_emptyd_letters', broadcast=True)
+                            time.sleep(0.5)
                         else:
                             beschrijving = f"{gebruiker} Locked your mailbox"
                             print(beschrijving)
+                            led_strip_lock = False
+                            GPIO.output(relayPin, GPIO.LOW)
+                            time.sleep(0.5)
                         answer = DataRepository.insert_rfid_value(
                             id, beschrijving)
                         answer = DataRepository.insert_box_scanner(
@@ -477,50 +526,78 @@ def read_rfid():
             time.sleep(1)
             id = ""
             GPIO.output(goPin, False)
+        time.sleep(1)
 
 
 def wait_for_button():
     btnPin.on_press(lees_knop)
     shutdownBtnPin.on_press(lees_shutdown_knop)
-    time.sleep(0.1)
+    emptiedBtnPin.on_press(empty_box)
+    time.sleep(0.5)
 
 
 def read_ldr():
+    sender = Emailer()
+    emails = DataRepository.get_emails()
+    emailSubject = 'U have unchecked mail!'
     global led_strip_ldr
+    global brieven_vandaag
+    global geledigd
     while True:
         ldr1 = spiObj.read_channel(0b1)
-        ldr2 = spiObj.read_channel(2)
+        ldr2 = spiObj.read_channel(32)
         ldr3 = spiObj.read_channel(4)
         ldr4 = spiObj.read_channel(8)
         ldr5 = spiObj.read_channel(16)
-        if ldr1 > 75 or ldr2 > 75 or ldr3 > 75 or ldr4 > 75 or ldr5 > 75:
+        # print(ldr1, ldr2, ldr3, ldr4, ldr5, ldr6)
+        if ldr1 > 300 or ldr2 > 300 or ldr3 > 300 or ldr4 > 300 or ldr5 > 300:
             print("Brief ontvangen")
+            geledigd = False
+            brieven_vandaag += 1
             answer = DataRepository.insert_ldr_values(
                 ldr1, ldr2, ldr3, ldr4, ldr5)
             answer = DataRepository.add_letter()
             show_brieven_vandaag()
             socketio.emit('B2F_new_letter', broadcast=True)
-        ldr6 = spiObj.read_channel(32)
-        if ldr6 > 850:
+            socketio.emit('B2F_refresh_history', broadcast=True)
+            data = DataRepository.load_graph_data(0)
+            socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
+            time.sleep(0.1)
+            emailContent = f"U got a new deposit at {datetime.now()}."
+            for email in emails:
+                sendTo = email['email']
+                sender.sendmail(sendTo, emailSubject, emailContent)
+                time.sleep(0.5)
+        ldr6 = spiObj.read_channel(2)
+        if ldr6 > 800:
+            # print("WORKING")
             led_strip_ldr = True
         else:
             led_strip_ldr = False
-        time.sleep(0.5)
+        time.sleep(0.05)
 
 
 def change_led():
     global prev_led_waarde
-    if led_strip_ldr == True and led_strip_lock == True:
-        led_waarde = True
-        GPIO.output(transistorPin, GPIO.HIGH)
-        DataRepository.insert_led(1)
-    else:
-        led_waarde = False
-        GPIO.output(transistorPin, GPIO.LOW)
-        if prev_led_waarde != led_waarde:
-            DataRepository.insert_led(0)
-    prev_led_waarde = led_waarde
-    time.sleep(1)
+    while True:
+        # print(led_strip_ldr, led_strip_lock)
+        if led_strip_ldr == True and led_strip_lock == True:
+            led_waarde = True
+            GPIO.output(transistorPin, GPIO.HIGH)
+            DataRepository.insert_led(1)
+        else:
+            led_waarde = False
+            GPIO.output(transistorPin, GPIO.LOW)
+            if prev_led_waarde != led_waarde:
+                DataRepository.insert_led(0)
+        time.sleep(0.5)
+        # print(geledigd)
+        if geledigd == False:
+            GPIO.output(mailPin, True)
+        else:
+            GPIO.output(mailPin, False)
+        prev_led_waarde = led_waarde
+        time.sleep(0.5)
 
 
 def start_thread_magnet():
@@ -553,7 +630,7 @@ def start_threads():
     start_thread_magnet()
     start_thread_rfid()
     start_thread_button()
-    # start_thread_read_ldr()
+    start_thread_read_ldr()
     start_thread_led()
 
 

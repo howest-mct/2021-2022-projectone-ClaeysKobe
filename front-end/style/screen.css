@@ -1259,6 +1259,16 @@ a:focus {
 }
 
 /*
+    Utilities: display none
+    ---
+    Utility classes to hide item
+*/
+
+.u-hide {
+    display: none !important;
+}
+
+/*
     Utilities: gap
     ---
     Utility classes to put gap between flex elements

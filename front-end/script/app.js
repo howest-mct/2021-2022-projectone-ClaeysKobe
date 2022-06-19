@@ -9,6 +9,7 @@ let htmlBoxOpen,
   htmlLidStatus,
   htmlIndex,
   htmlLogin,
+  htmlStats,
   htmlAdd,
   htmlProfile,
   htmlEdit,
@@ -21,6 +22,19 @@ let htmlBoxOpen,
   listLength,
   empytwbutton,
   emptyauto,
+  letterData = [],
+  LetterLabels = [],
+  weekDays = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ],
+  letterChart,
+  weeknr = 0,
   token;
 
 const lanIP = `${window.location.hostname}:5000`;
@@ -134,6 +148,7 @@ const showLatestLock = function (payload) {
 const showUsers = function (payload) {
   let stringHTML = ``;
   let rfid = '';
+  let email = '';
   let registreerdatum = '';
   for (const gebruiker of payload.gebruikers) {
     if (gebruiker.rfid_code != null) {
@@ -151,12 +166,23 @@ const showUsers = function (payload) {
     } else {
       registreerdatum = 'Unknown';
     }
-
+    if (gebruiker.email != null) {
+      email = `<svg xmlns="http://www.w3.org/2000/svg" width="32.55" height="23.5" viewBox="0 0 32.55 23.5">
+            <path id="check_FILL0_wght400_GRAD0_opsz48"
+                d="M18.9,35.7,7.7,24.5l2.15-2.15L18.9,31.4,38.1,12.2l2.15,2.15Z"
+                transform="translate(-7.7 -12.2)" fill="#24d406" />
+          </svg>`;
+    } else {
+      email = '--';
+    }
     stringHTML += `
       <tr>
         <td class="u-pd-rght-l">${gebruiker.naam}</td>
-        <td class="u-pd-rght-s">
+        <td class="u-pd-rght-xs">
             ${rfid}
+        </td>
+        <td class="u-pd-rght-s">
+            ${email}
         </td>
         <td class="u-pd-rght-m">${registreerdatum}</td>
         <td class="u-pd-rght-xs js-removeuser" data-userid="${gebruiker.gebruikersID}">
@@ -187,16 +213,29 @@ const showUsers = function (payload) {
 const showUserInfo = function (payload) {
   // console.log(payload);
   let registreerdatum = '';
+  let rfid = '';
+  let email = '';
   if (payload.gebruikers.registreerdatum != null) {
     const datum = payload.gebruikers.registreerdatum.split(' ');
     registreerdatum = datum[1] + ' ' + datum[2] + ' ' + datum[3];
   } else {
     registreerdatum = 'Unknown';
   }
+  if (payload.gebruikers.registreerdatum != null) {
+    rfid = payload.gebruikers.rfid_code;
+  } else {
+    rfid = 'Unknown';
+  }
+  if (payload.gebruikers.email != null) {
+    email = payload.gebruikers.email;
+  } else {
+    email = '';
+  }
   document.querySelector('.js-name').innerHTML = payload.gebruikers.naam;
-  setValueAndId('js-parRfid', payload.gebruikers.rfid_code);
+  setValueAndId('js-parRfid', rfid);
   setValueAndId('js-parName', payload.gebruikers.naam);
   setValueAndId('js-parPwrd', payload.gebruikers.wachtwoord);
+  setValueAndId('js-parEmail', email);
   setValueAndId('js-parRegDate', registreerdatum);
   listenToUpdateUser();
 };
@@ -215,10 +254,14 @@ const callbackShow = function (jsonObj) {
 
 const showloginError = function (jsonObj) {
   console.log(jsonObj);
+  const error = document.querySelector('.js-error');
+  error.classList.remove('u-hide');
 };
 
 const callbackError = function (jsonObj) {
   console.log(jsonObj);
+  const error = document.querySelector('.js-error');
+  error.classList.remove('u-hide');
 };
 
 const showSucces = function (jsonObj) {
@@ -301,7 +344,25 @@ const setCurrentUser = function () {
 };
 
 const setSetting = function (jsonObj) {
-  console.log('aaa', jsonObj);
+  // console.log('aaa', jsonObj);
+  const setting = jsonObj.data.value;
+  if (setting == 0) {
+    empytwbutton.classList.add('u-no-clicking');
+    empytwbutton.classList.remove('c-btn--unselected');
+    empytwbutton.classList.add('c-btn--selected');
+    // other element
+    emptyauto.classList.add('c-btn--unselected');
+    emptyauto.classList.remove('c-btn--selected');
+    emptyauto.classList.remove('u-no-clicking');
+  } else {
+    emptyauto.classList.add('u-no-clicking');
+    emptyauto.classList.remove('c-btn--unselected');
+    emptyauto.classList.add('c-btn--selected');
+    // other element
+    empytwbutton.classList.add('c-btn--unselected');
+    empytwbutton.classList.remove('c-btn--selected');
+    empytwbutton.classList.remove('u-no-clicking');
+  }
 };
 
 const loadHistory = function () {
@@ -310,6 +371,72 @@ const loadHistory = function () {
   } else {
     loadHistoryAll();
   }
+};
+
+const makeMailGraph = function () {
+  const labels = LetterLabels;
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Amount of deposits',
+        data: letterData,
+        backgroundColor: 'rgba(36, 212, 6, 0.5)',
+        borderColor: '#24D406',
+        borderWidth: 4,
+      },
+    ],
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false,
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Amount of deposits this week',
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+      ticks: {
+        precision: 0,
+      },
+    },
+  };
+
+  const ctx = document.querySelector('.mailGraph');
+  letterChart = new Chart(ctx, config);
+};
+
+const updateLetters = function (data) {
+  // console.log(data);
+  for (let i = 0; i < 7; i++) {
+    let day = weekDays[i];
+    let found = false;
+    LetterLabels.push(day);
+    for (const log of data.data) {
+      if (log['Day'] == day) {
+        // console.log(log['Day']);
+        letterData.push(log['Aantal']);
+        found = true;
+      }
+    }
+    if (found == false) {
+      letterData.push(0);
+    }
+  }
+
+  letterChart.update();
 };
 // #endregion
 
@@ -365,8 +492,12 @@ const getLatestLetters = function () {
 };
 
 const getLatestSetting = function () {
-  const url = `http://${lanIP}/api/v1/events/settings/latest/`;
+  const url = `http://${lanIP}/api/v1/settings/latest/`;
   handleData(url, setSetting);
+};
+
+const getGraphData = function () {
+  socket.emit('F2B_getLetterLogs', { weeknr: 0 });
 };
 // #endregion
 
@@ -465,6 +596,7 @@ const listenToSocketIndex = function () {
   socket.on('B2F_refresh_history', function (payload) {
     loadPageNumbers();
     loadHistory();
+    loadLettersToday();
     // if (historyAll == true) {
     //   loadHistoryAll();
     // } else {
@@ -509,10 +641,12 @@ const listenToUpdateUser = function () {
       const rfid = document.querySelector('.js-parRfid').value;
       const name = document.querySelector('.js-parName').value;
       const pwrd = document.querySelector('.js-parPwrd').value;
+      const email = document.querySelector('.js-parEmail').value;
       const body = JSON.stringify({
         rfid: rfid,
         naam: name,
         wachtwoord: pwrd,
+        email: email,
       });
       let urlParams = new URLSearchParams(window.location.search);
       let userID = urlParams.get('userID');
@@ -539,6 +673,7 @@ const listenToSubmit = function () {
     const rfid = document.querySelector('.js-parRfid').value;
     const name = document.querySelector('.js-parName').value;
     const pwrd = document.querySelector('.js-parPwrd').value;
+    const email = document.querySelector('.js-parEmail').value;
     if (name == '') {
       document.querySelector('.js-parName').classList.add('u-bdclr-red');
     } else if (pwrd == '') {
@@ -548,6 +683,7 @@ const listenToSubmit = function () {
         rfid: rfid,
         naam: name,
         wachtwoord: pwrd,
+        email: email,
       });
       const url = `http://${lanIP}/api/v1/users/`;
       handleData(url, backToList, null, 'POST', body);
@@ -643,6 +779,34 @@ const listenToSocketSettings = function () {
     empytwbutton.classList.remove('u-no-clicking');
   });
 };
+
+const listenToBtnStats = function () {
+  document
+    .querySelector('.js-prev-week-btn')
+    .addEventListener('click', function () {
+      weeknr = weeknr - 1;
+      // console.log(weeknr);
+      socket.emit('F2B_getLetterLogs', { weeknr: weeknr });
+    });
+  document
+    .querySelector('.js-next-week-btn')
+    .addEventListener('click', function () {
+      weeknr = weeknr + 1;
+      if (weeknr > 0) {
+        weeknr = 0;
+      }
+      socket.emit('F2B_getLetterLogs', { weeknr: weeknr });
+    });
+};
+
+const listenToSocketStats = function () {
+  socket.on('B2F_letter_logs', function (payload) {
+    letterData.length = 0;
+    LetterLabels.length = 0;
+    updateLetters(payload);
+  });
+};
+
 // #endregion
 
 // #region ***  Init / DOMContentLoaded                  ***********
@@ -657,6 +821,7 @@ const init = function () {
   htmlLogin = document.querySelector('.js-loginPage');
   htmlSettings = document.querySelector('.js-settingsPage');
   htmlProfile = document.querySelector('.js-profilePage');
+  htmlStats = document.querySelector('.js-statsPage');
 
   setCurrentUser();
 
@@ -707,6 +872,12 @@ const init = function () {
       listenToReset();
       listenToOption();
       listenToSocketSettings();
+    } else if (htmlStats) {
+      // console.log('test');
+      makeMailGraph();
+      getGraphData();
+      listenToSocketStats();
+      listenToBtnStats();
     } else if (htmlProfile) {
       let urlParams = new URLSearchParams(window.location.search);
       let userID = urlParams.get('userID');

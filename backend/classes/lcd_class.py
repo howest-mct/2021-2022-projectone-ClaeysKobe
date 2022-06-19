@@ -84,6 +84,14 @@ class LCD_Module:
                 # VOOR NIEUWE REGEL: 0x40 is de 40tigste hexadecimale waarde van de gewenste blok
                 self.send_instruction(0b10000000 | 0x40)
 
+    def write_ip_message(self, iptype, ip):
+        self.send_instruction(0b00000001)
+        for i in iptype:
+            self.send_character(i)
+        self.send_instruction(0b10000000 | 0x40)
+        for k in ip:
+            self.send_character(k)
+
     # Instructies om LCD op te zetten
 
     def init_LCD(self):

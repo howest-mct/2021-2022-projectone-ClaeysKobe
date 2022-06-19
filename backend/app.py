@@ -42,6 +42,7 @@ led_strip_ldr = False
 led_strip_lock = False
 led_waarde = False
 prev_led_waarde = False
+relay_low = False
 latest_setting = DataRepository.get_latest_setting()
 if latest_setting is not None:
     latest_setting = latest_setting['value']
@@ -105,29 +106,32 @@ def setup_gpio():
 
 def lees_shutdown_knop(pin):
     if shutdownBtnPin.pressed:
-        print("**** button pressed: shutting down PI ****")
-        time.sleep(5)
-        os.system("sudo shutdown -h now")
+        if relay_low == False:
+            print("**** button pressed: shutting down PI ****")
+            time.sleep(5)
+            os.system("sudo shutdown -h now")
 
 
 def lees_knop(pin):
     if btnPin.pressed:
-        print("**** button pressed: showing IP ****")
-        lcd_module.write_ip_message(ip_type, ip)
-        time.sleep(5)
-        show_brieven_vandaag()
+        if relay_low == False:
+            print("**** button pressed: showing IP ****")
+            lcd_module.write_ip_message(ip_type, ip)
+            time.sleep(5)
+            show_brieven_vandaag()
 
 
 def empty_box(pin):
     global laatst_geledigd
     global geledigd
     if auto_empty == False:
-        print("Box geledigd")
-        laatst_geledigd = datetime.now()
-        geledigd = True
-        answer = DataRepository.emptied_box()
-        socketio.emit('B2F_emptyd_letters', broadcast=True)
-        socketio.emit('B2F_refresh_history', broadcast=True)
+        if relay_low == False:
+            print("Box geledigd")
+            laatst_geledigd = datetime.now()
+            geledigd = True
+            answer = DataRepository.emptied_box()
+            socketio.emit('B2F_emptyd_letters', broadcast=True)
+            socketio.emit('B2F_refresh_history', broadcast=True)
     time.sleep(1)
 
 
@@ -384,6 +388,7 @@ def open_box(payload):
 def open_box(payload):
     global lock_opened
     global led_strip_lock
+    global relay_low
     print('Box closed via PC')
     userID = payload['userID']
     naam = DataRepository.check_name(userID)
@@ -393,7 +398,11 @@ def open_box(payload):
     answer = DataRepository.insert_box_site(
         0, f"{naam} Locked your mailbox", userID)
     print(answer)
+    relay_low = True
+    time.sleep(0.5)
     GPIO.output(relayPin, GPIO.LOW)
+    time.sleep(0.5)
+    relay_low = False
     # Send to the client!
     lock_opened = False
     led_strip_lock = False
@@ -473,6 +482,7 @@ def read_rfid():
     global laatst_geledigd
     global led_strip_lock
     global geledigd
+    global relay_low
     while True:
         id, text = reader.read()
         if id != "":
@@ -508,7 +518,11 @@ def read_rfid():
                             beschrijving = f"{gebruiker} Locked your mailbox"
                             print(beschrijving)
                             led_strip_lock = False
+                            relay_low = True
+                            time.sleep(0.5)
                             GPIO.output(relayPin, GPIO.LOW)
+                            time.sleep(0.5)
+                            relay_low = False
                             time.sleep(0.5)
                         answer = DataRepository.insert_rfid_value(
                             id, beschrijving)

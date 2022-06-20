@@ -57,6 +57,8 @@ brieven_vandaag = f""
 try:
     ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
     ip_type = "WLAN0"
+    while ip == None:
+        ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 except Exception:
     ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
     ip_type = f"ETH0"

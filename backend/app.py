@@ -89,10 +89,6 @@ def setup_gpio():
     global spiObj
     spiObj = SpiClass(0, 1)
     # aantal brieven vandaag setten
-    global brieven_vandaag
-    brieven_vandaag = DataRepository.read_brieven_today()
-    brieven_vandaag = brieven_vandaag[0]
-    brieven_vandaag = brieven_vandaag['Aantal']
     show_brieven_vandaag()
     # lock status
     global lock_opened
@@ -140,6 +136,9 @@ def empty_box(pin):
 
 
 def show_brieven_vandaag():
+    brieven_vandaag = DataRepository.read_brieven_today()
+    brieven_vandaag = brieven_vandaag[0]
+    brieven_vandaag = brieven_vandaag['Aantal']
     if brieven_vandaag > 0:
         lcd_module.write_message(f"Brieven vandaag:{brieven_vandaag}")
     else:
@@ -387,6 +386,8 @@ def open_box(payload):
     socketio.emit('B2F_refresh_history', broadcast=True)
     socketio.emit('B2F_new_lock_value', {'status': 'Aan'}, broadcast=True)
     time.sleep(0.5)
+    show_brieven_vandaag()
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_closeBox')
@@ -414,6 +415,8 @@ def open_box(payload):
     led_strip_lock = False
     socketio.emit('B2F_refresh_history', broadcast=True)
     socketio.emit('B2F_new_lock_value', {'status': 'Uit'}, broadcast=True)
+    time.sleep(0.5)
+    show_brieven_vandaag()
     time.sleep(0.5)
 
 

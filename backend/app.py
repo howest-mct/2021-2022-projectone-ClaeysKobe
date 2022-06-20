@@ -567,9 +567,7 @@ def read_ldr():
     global led_strip_ldr
     global brieven_vandaag
     global geledigd
-    i = 0
     while True:
-        print(i)
         ldr1 = spiObj.read_channel(0b1)
         ldr2 = spiObj.read_channel(32)
         ldr3 = spiObj.read_channel(4)
@@ -601,7 +599,6 @@ def read_ldr():
             led_strip_ldr = True
         else:
             led_strip_ldr = False
-        i += 1
         time.sleep(0.05)
 
 

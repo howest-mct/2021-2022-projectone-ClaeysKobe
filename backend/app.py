@@ -105,6 +105,7 @@ def setup_gpio():
             lock_opened = False
     else:
         lock_opened = False
+    time.sleep(1)
 
 
 def lees_shutdown_knop(pin):
@@ -144,6 +145,7 @@ def show_brieven_vandaag():
         lcd_module.write_message(f"Brieven vandaag:{brieven_vandaag}")
     else:
         lcd_module.write_message(f"Nog geen brievenontvangen")
+    time.sleep(2)
 
 
 # Code voor Flask
@@ -356,7 +358,7 @@ def latest_setting():
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
-    time.sleep(0.1)
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_openBox')
@@ -425,12 +427,14 @@ def open_box(payload):
 def login_via_rfid():
     global login_rfid
     login_rfid = True
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_waitingForRegister')
 def register_rfid_set():
     global register_rfid
     register_rfid = True
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_emptywbutton')
@@ -439,6 +443,7 @@ def change_to_button():
     auto_empty = False
     answer = DataRepository.set_latest_setting(0)
     socketio.emit('B2F_changedtoemptywbutton', broadcast=True)
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_emptyauto')
@@ -447,6 +452,7 @@ def change_to_auto():
     auto_empty = True
     answer = DataRepository.set_latest_setting(1)
     socketio.emit('B2F_changedtoauto', broadcast=True)
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_getLetterLogs')
@@ -465,6 +471,7 @@ def shut_down():
     lcd_module.write_message("Pi shut down...")
     time.sleep(5)
     os.system("sudo shutdown -h now")
+    time.sleep(0.5)
 
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
@@ -640,26 +647,31 @@ def change_led():
 def start_thread_magnet():
     thread = threading.Thread(target=read_sensor_magnet, args=(), daemon=True)
     thread.start()
+    time.sleep(0.5)
 
 
 def start_thread_rfid():
     thread2 = threading.Thread(target=read_rfid, args=(), daemon=True)
     thread2.start()
+    time.sleep(0.5)
 
 
 def start_thread_button():
     thread3 = threading.Thread(target=wait_for_button, args=(), daemon=True)
     thread3.start()
+    time.sleep(0.5)
 
 
 def start_thread_read_ldr():
     thread4 = threading.Thread(target=read_ldr, args=(), daemon=True)
     thread4.start()
+    time.sleep(0.5)
 
 
 def start_thread_led():
     thread5 = threading.Thread(target=change_led, args=(), daemon=True)
     thread5.start()
+    time.sleep(0.5)
 
 
 def start_threads():
@@ -669,6 +681,7 @@ def start_threads():
     start_thread_button()
     start_thread_read_ldr()
     start_thread_led()
+    time.sleep(0.5)
 
 
 def start_chrome_kiosk():
@@ -698,7 +711,7 @@ def start_chrome_kiosk():
     driver = webdriver.Chrome(options=options)
     driver.get("http://localhost")
     while True:
-        time.sleep(0.1)
+        time.sleep(0.5)
 
 
 def start_chrome_thread():
@@ -706,6 +719,7 @@ def start_chrome_thread():
     chromeThread = threading.Thread(
         target=start_chrome_kiosk, args=(), daemon=True)
     chromeThread.start()
+    time.sleep(0.5)
 
 
 # ANDERE FUNCTIES

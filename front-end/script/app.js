@@ -211,7 +211,7 @@ const showUsers = function (payload) {
 };
 
 const showUserInfo = function (payload) {
-  // console.log(payload);
+  console.log(payload);
   let registreerdatum = '';
   let rfid = '';
   let email = '';

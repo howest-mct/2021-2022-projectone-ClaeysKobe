@@ -89,6 +89,10 @@ def setup_gpio():
     global spiObj
     spiObj = SpiClass(0, 1)
     # aantal brieven vandaag setten
+    global brieven_vandaag
+    brieven_vandaag = DataRepository.read_brieven_today()
+    brieven_vandaag = brieven_vandaag[0]
+    brieven_vandaag = brieven_vandaag['Aantal']
     show_brieven_vandaag()
     # lock status
     global lock_opened
@@ -136,9 +140,6 @@ def empty_box(pin):
 
 
 def show_brieven_vandaag():
-    brieven_vandaag = DataRepository.read_brieven_today()
-    brieven_vandaag = brieven_vandaag[0]
-    brieven_vandaag = brieven_vandaag['Aantal']
     if brieven_vandaag > 0:
         lcd_module.write_message(f"Brieven vandaag:{brieven_vandaag}")
     else:
@@ -549,6 +550,9 @@ def read_rfid():
                         socketio.emit('B2F_changed_lock', {
                             "lock_status": lock_opened}, broadcast=True)
                         socketio.emit('B2F_refresh_history', broadcast=True)
+                        time.sleep(0.5)
+                        show_brieven_vandaag()
+                        time.sleep(0.5)
                 else:
                     print("Ongeregistreede gebruiker probeerde in te loggen")
                 time.sleep(0.5)

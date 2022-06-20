@@ -192,7 +192,7 @@ class DataRepository:
 
     @staticmethod
     def load_graph_data(weeknr):
-        sql = 'select count(*) as `Aantal`, dayname(date) as `Day` from brievenbusevent where week(date, 5) = week(now(), 5) + %s and ActieID = 3 group by dayname(date) order by date DESC'
+        sql = 'select count(*) as `Aantal`, dayname(date) as `Day` from brievenbusevent where week(date, 5) = week(now(), 5) + %s and ActieID = 3 and deleted = 0 group by dayname(date) order by date DESC'
         params = [weeknr]
         return Database.get_rows(sql, params)
 

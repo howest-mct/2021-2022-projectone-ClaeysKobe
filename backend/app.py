@@ -567,7 +567,9 @@ def read_ldr():
     global led_strip_ldr
     global brieven_vandaag
     global geledigd
+    i = 0
     while True:
+        print(i)
         ldr1 = spiObj.read_channel(0b1)
         ldr2 = spiObj.read_channel(32)
         ldr3 = spiObj.read_channel(4)
@@ -588,16 +590,18 @@ def read_ldr():
             socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
             time.sleep(0.1)
             emailContent = f"U got a new deposit at {datetime.now()}."
-            for email in emails:
-                sendTo = email['email']
-                sender.sendmail(sendTo, emailSubject, emailContent)
-                time.sleep(0.5)
+            # for email in emails:
+            # sendTo = email['email']
+            # sender.sendmail(sendTo, emailSubject, emailContent)
+            # time.sleep(0.5)
+            # print("Mailed")
         ldr6 = spiObj.read_channel(2)
         if ldr6 > 800:
             # print("WORKING")
             led_strip_ldr = True
         else:
             led_strip_ldr = False
+        i += 1
         time.sleep(0.05)
 
 
@@ -615,9 +619,9 @@ def change_led():
             if prev_led_waarde != led_waarde:
                 DataRepository.insert_led(0)
         time.sleep(0.5)
-        # print(geledigd)
         if geledigd == False:
-            GPIO.output(mailPin, True)
+            GPIO.output(mailPin, GPIO.HIGH)
+            # print("led aan")
         else:
             GPIO.output(mailPin, False)
         prev_led_waarde = led_waarde

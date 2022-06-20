@@ -299,6 +299,10 @@ const backToHome = function (jsonObj) {
   window.location.href = 'home.html';
 };
 
+const backToIndex = function (jsonObj) {
+  window.location.href = 'index.html';
+};
+
 const boxOpen = function () {
   htmlBoxOpen.classList.remove('c-btn--unselected');
   htmlBoxOpen.classList.add('c-btn--selected');
@@ -668,7 +672,11 @@ const listenToDeleteUser = function () {
       const userID = this.dataset.userid;
       // console.log(userID);
       const url = `http://${lanIP}/api/v1/user/${userID}/`;
-      handleData(url, backToList, null, 'DELETE');
+      if (currentUser == userID) {
+        handleData(url, backToIndex, null, 'DELETE');
+      } else {
+        handleData(url, backToList, null, 'DELETE');
+      }
     });
   }
 };

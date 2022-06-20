@@ -166,7 +166,7 @@ a:focus {
     margin: 20px auto;
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -910,6 +910,7 @@ a:focus {
 
 .c-btn--nfclogin__text {
     width: 192px;
+    text-align: center;
 }
 
 .c-btn--selected {
@@ -927,7 +928,8 @@ a:focus {
     padding: 2px 12px;
 }
 
-.c-registerbtn {}
+.c-registerbtn {
+}
 
 @media (min-width: 992px) {
     .c-btn--lg {

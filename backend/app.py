@@ -529,9 +529,9 @@ def read_rfid():
                             print(beschrijving)
                             led_strip_lock = False
                             relay_low = True
-                            time.sleep(0.5)
+                            time.sleep(1)
                             GPIO.output(relayPin, GPIO.LOW)
-                            time.sleep(0.5)
+                            time.sleep(1)
                             relay_low = False
                             time.sleep(0.5)
                         answer = DataRepository.insert_rfid_value(

@@ -402,9 +402,9 @@ def open_box(payload):
         0, f"{naam} Locked your mailbox", userID)
     print(answer)
     relay_low = True
-    time.sleep(1)
+    time.sleep(0.5)
     GPIO.output(relayPin, GPIO.LOW)
-    time.sleep(1)
+    time.sleep(2)
     relay_low = False
     time.sleep(0.5)
     # Send to the client!
@@ -532,9 +532,9 @@ def read_rfid():
                             print(beschrijving)
                             led_strip_lock = False
                             relay_low = True
-                            time.sleep(1)
+                            time.sleep(0.5)
                             GPIO.output(relayPin, GPIO.LOW)
-                            time.sleep(1)
+                            time.sleep(2)
                             relay_low = False
                             time.sleep(0.5)
                         answer = DataRepository.insert_rfid_value(

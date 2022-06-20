@@ -381,9 +381,10 @@ def open_box(payload):
         geledigd = True
         answer = DataRepository.emptied_box()
         socketio.emit('B2F_emptyd_letters', broadcast=True)
+        time.sleep(0.5)
     socketio.emit('B2F_refresh_history', broadcast=True)
     socketio.emit('B2F_new_lock_value', {'status': 'Aan'}, broadcast=True)
-    time.sleep(0.1)
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_closeBox')
@@ -401,16 +402,17 @@ def open_box(payload):
         0, f"{naam} Locked your mailbox", userID)
     print(answer)
     relay_low = True
-    time.sleep(0.5)
+    time.sleep(1)
     GPIO.output(relayPin, GPIO.LOW)
-    time.sleep(0.5)
+    time.sleep(1)
     relay_low = False
+    time.sleep(0.5)
     # Send to the client!
     lock_opened = False
     led_strip_lock = False
     socketio.emit('B2F_refresh_history', broadcast=True)
     socketio.emit('B2F_new_lock_value', {'status': 'Uit'}, broadcast=True)
-    time.sleep(0.1)
+    time.sleep(0.5)
 
 
 @socketio.on('F2B_waitingForLogin')

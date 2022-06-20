@@ -588,11 +588,11 @@ def read_ldr():
             socketio.emit('B2F_letter_logs', {'data': data}, broadcast=True)
             time.sleep(0.1)
             emailContent = f"U got a new deposit at {datetime.now()}."
-            # for email in emails:
-            # sendTo = email['email']
-            # sender.sendmail(sendTo, emailSubject, emailContent)
-            # time.sleep(0.5)
-            # print("Mailed")
+            for email in emails:
+                sendTo = email['email']
+                sender.sendmail(sendTo, emailSubject, emailContent)
+                time.sleep(0.5)
+                print("Mailed")
         ldr6 = spiObj.read_channel(2)
         if ldr6 > 800:
             # print("WORKING")

@@ -20,6 +20,7 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+time.sleep(10)
 
 goPin = 22
 mailPin = 27
@@ -27,7 +28,7 @@ magnetPin = 21
 transistorPin = 17
 relayPin = 6
 btnPin = Button(26)
-emptiedBtnPin = Button(19)
+emptiedBtnPin = Button(19, 400)
 shutdownBtnPin = Button(13)
 
 # Default variables

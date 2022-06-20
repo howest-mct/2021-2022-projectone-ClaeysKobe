@@ -35,6 +35,7 @@ let htmlBoxOpen,
   ],
   letterChart,
   weeknr = 0,
+  prevPage,
   token;
 
 const lanIP = `${window.location.hostname}:5000`;
@@ -292,6 +293,10 @@ const setValueAndId = function (jsKlasse, value) {
 
 const backToList = function (jsonObj) {
   window.location.href = 'users.html';
+};
+
+const backToHome = function (jsonObj) {
+  window.location.href = 'home.html';
 };
 
 const boxOpen = function () {
@@ -686,7 +691,7 @@ const listenToSubmit = function () {
         email: email,
       });
       const url = `http://${lanIP}/api/v1/users/`;
-      handleData(url, backToList, null, 'POST', body);
+      handleData(url, backToHome, null, 'POST', body);
       console.log('verzonden');
     }
   });
